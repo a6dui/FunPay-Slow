@@ -1,6 +1,6 @@
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? "http://127.0.0.1:8080" 
-    : "https://funpay-slow-backend.onrender.com"; // Замените на ваш URL на Render после деплоя
+    : "https://funpay-slow.onrender.com"; // Замените на ваш URL на Render после деплоя
 
 // --- Global App State ---
 window.App = {
