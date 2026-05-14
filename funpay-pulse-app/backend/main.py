@@ -27,7 +27,6 @@ DB_FILE = os.path.join(BASE_DIR, "funpaypulse.db")
 ADMIN_CHAT_ID = "755843448" 
 BOT_TOKEN = '8997989380:AAHxcNyf46EQ2_jsU7gZ-xST_9ey9Qcr1FE'
 FUNPAY_GOLDEN_KEY = "goomqs6ab8nho7areo9irc7cgorbc070"
-
 import requests
 def send_admin_tg(message: str):
     print(f"DEBUG: Attempting to send TG message to {ADMIN_CHAT_ID}...")
