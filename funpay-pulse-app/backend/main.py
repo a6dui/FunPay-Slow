@@ -4,8 +4,10 @@ from pydantic import BaseModel
 import sqlite3
 import os
 import hashlib
+import random
+from datetime import datetime, timedelta
 
-app = FastAPI(title="FunPayPulse API")
+app = FastAPI(title="FunPay Slow API")
 
 # Allow requests from our desktop app (or any frontend)
 app.add_middleware(
@@ -106,6 +108,7 @@ def init_db():
     # Insert default plugins if empty
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
+    c.execute("CREATE TABLE IF NOT EXISTS plugins (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, price TEXT, icon TEXT)")
     c.execute("SELECT COUNT(*) FROM plugins")
     if c.fetchone()[0] == 0:
         default_plugins = [
@@ -117,7 +120,58 @@ def init_db():
             ('ChatSpam', 'Массовая отправка сообщений в чаты FunPay.', 'Официальный', '💬')
         ]
         c.executemany("INSERT INTO plugins (title, description, price, icon) VALUES (?, ?, ?, ?)", default_plugins)
-        
+    
+    # Create Referral Stats table
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS referral_stats (
+            user_id INTEGER PRIMARY KEY,
+            referral_code TEXT UNIQUE NOT NULL,
+            referrer_id INTEGER,
+            balance REAL DEFAULT 0,
+            invited_count INTEGER DEFAULT 0,
+            level INTEGER DEFAULT 1,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+    ''')
+    
+    # Create Referrals tracking table
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS referrals_list (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            referrer_id INTEGER,
+            referred_id INTEGER,
+            created_at TEXT,
+            FOREIGN KEY(referrer_id) REFERENCES users(id),
+            FOREIGN KEY(referred_id) REFERENCES users(id)
+        )
+    ''')
+
+    # Create User Plugins table
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS user_plugins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            plugin_id INTEGER,
+            activated_at TEXT,
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            FOREIGN KEY(plugin_id) REFERENCES plugins(id)
+        )
+    ''')
+
+    # Create User Installations table
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS user_installations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            plugin_id INTEGER,
+            ip_address TEXT,
+            status TEXT,
+            installed_at TEXT,
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            FOREIGN KEY(plugin_id) REFERENCES plugins(id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -243,7 +297,11 @@ def check_tg_auth(code: str):
         conn.close()
         
         if row and row[0] == 1:
-            return {"success": True, "name": row[1], "user_id": row[2]}
+            u_name = row[1]
+            u_id = row[2]
+            # Ensure referral stats exist for this user
+            ensure_referral_stats(u_id)
+            return {"success": True, "name": u_name, "user_id": u_id}
     except Exception as e:
         print(f"Auth check error: {e}")
     return {"success": False}
@@ -418,6 +476,29 @@ def get_admin_stats():
         if 'conn' in locals(): conn.close()
         return {"error": str(e)}
 
+class DevVerificationRequest(BaseModel):
+    user_id: str
+    username: str
+    payout_method: str
+    payout_name: str
+    contact: str
+    wallet_label: str
+    comment: str
+
+@app.post("/api/developer/verify")
+def verify_developer(req: DevVerificationRequest):
+    tg_text = (
+        f"👨‍💻 <b>Заявка на верификацию разработчика</b>\n"
+        f"👤 <b>Пользователь:</b> {req.username} (ID: {req.user_id})\n"
+        f"💳 <b>Метод выплаты:</b> {req.payout_method}\n"
+        f"📝 <b>Имя/Ник:</b> {req.payout_name}\n"
+        f"📱 <b>Контакт:</b> {req.contact}\n"
+        f"💰 <b>Кошелек:</b> {req.wallet_label}\n"
+        f"💬 <b>Коммент:</b> {req.comment}\n"
+    )
+    send_admin_tg(tg_text)
+    return {"success": True, "message": "Заявка отправлена на проверку"}
+
 class PaymentRequest(BaseModel):
     user_id: str
     plan_id: str
@@ -476,6 +557,302 @@ def get_user_sub(user_id: int):
     if row:
         return {"plan": row[0], "expires_at": row[1], "status": row[2]}
     return {"plan": "Бесплатный", "expires_at": "-", "status": "inactive"}
+
+# --- Referral System ---
+import random
+import string
+from datetime import datetime
+
+def generate_referral_code(length=8):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+
+def ensure_referral_stats(user_id):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT user_id FROM referral_stats WHERE user_id = ?", (user_id,))
+    if not c.fetchone():
+        code = generate_referral_code()
+        # Ensure uniqueness
+        while True:
+            c.execute("SELECT user_id FROM referral_stats WHERE referral_code = ?", (code,))
+            if not c.fetchone(): break
+            code = generate_referral_code()
+        
+        c.execute("INSERT INTO referral_stats (user_id, referral_code) VALUES (?, ?)", (user_id, code))
+        conn.commit()
+    conn.close()
+
+class ReferralApplyRequest(BaseModel):
+    user_id: int
+    code: str
+
+@app.get("/api/user/referral/{user_id}")
+def get_referral_data(user_id: int):
+    ensure_referral_stats(user_id)
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT referral_code, referrer_id, balance, invited_count, level FROM referral_stats WHERE user_id = ?", (user_id,))
+    row = c.fetchone()
+    
+    # Get list of referrals
+    c.execute("""
+        SELECT u.username, rl.created_at 
+        FROM referrals_list rl
+        JOIN users u ON rl.referred_id = u.id
+        WHERE rl.referrer_id = ?
+        ORDER BY rl.id DESC
+    """, (user_id,))
+    referrals = [{"username": r[0], "date": r[1]} for r in c.fetchall()]
+    conn.close()
+    
+    if row:
+        return {
+            "referral_code": row[0],
+            "referrer_id": row[1],
+            "balance": row[2],
+            "invited_count": row[3],
+            "level": row[4],
+            "referrals": referrals
+        }
+    return None
+
+@app.post("/api/user/referral/apply")
+def apply_referral_code(req: ReferralApplyRequest):
+    ensure_referral_stats(req.user_id)
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    # Check if already has a referrer
+    c.execute("SELECT referrer_id FROM referral_stats WHERE user_id = ?", (req.user_id,))
+    if c.fetchone()[0]:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Вы уже ввели реферальный код")
+    
+    # Check if code is valid and not own
+    c.execute("SELECT user_id FROM referral_stats WHERE referral_code = ?", (req.code,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Неверный реферальный код")
+    
+    referrer_id = row[0]
+    if referrer_id == req.user_id:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Нельзя использовать свой собственный код")
+    
+    # Apply
+    c.execute("UPDATE referral_stats SET referrer_id = ? WHERE user_id = ?", (referrer_id, req.user_id))
+    c.execute("UPDATE referral_stats SET invited_count = invited_count + 1 WHERE user_id = ?", (referrer_id,))
+    c.execute("INSERT INTO referrals_list (referrer_id, referred_id, created_at) VALUES (?, ?, ?)", 
+              (referrer_id, req.user_id, datetime.now().strftime("%Y-%m-%d %H:%M")))
+    
+    conn.commit()
+    conn.close()
+    return {"success": True, "message": "Реферальный код применен!"}
+
+# --- User Plugins & Installations ---
+@app.get("/api/user/plugins/{user_id}")
+def get_user_plugins(user_id: int):
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        
+        # Get owned plugins
+        c.execute("""
+            SELECT p.id, p.title, p.description, p.price, p.icon, up.activated_at
+            FROM user_plugins up
+            JOIN plugins p ON up.plugin_id = p.id
+            WHERE up.user_id = ?
+        """, (user_id,))
+        owned = [{"id": r[0], "title": r[1], "description": r[2], "price": r[3], "icon": r[4], "activated_at": r[5]} for r in c.fetchall()]
+        
+        # Get installations
+        c.execute("""
+            SELECT p.title, ui.ip_address, ui.status, ui.installed_at
+            FROM user_installations ui
+            JOIN plugins p ON ui.plugin_id = p.id
+            WHERE ui.user_id = ?
+        """, (user_id,))
+        installations = [{"plugin_title": r[0], "ip": r[1], "status": r[2], "date": r[3]} for r in c.fetchall()]
+        
+        conn.close()
+        
+        return {
+            "owned_count": len(owned),
+            "installations_count": len(installations),
+            "pending_payment_count": 0, # Placeholder
+            "plugins": owned,
+            "installations": installations,
+            "subscription": self_get_sub(user_id)
+        }
+    except Exception as e:
+        print(f"Error fetching user plugins: {e}")
+        return {"owned_count": 0, "installations_count": 0, "pending_payment_count": 0, "plugins": [], "installations": []}
+
+def self_get_sub(user_id: int):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT plan, expires_at, status, trial_used FROM subscriptions WHERE user_id = ?", (user_id,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return {"plan": row[0], "expires_at": row[1], "status": row[2], "trial_used": row[3]}
+    return {"plan": "Free", "expires_at": None, "status": "inactive", "trial_used": 0}
+
+@app.post("/api/user/activate-trial")
+def activate_trial(user_id: int):
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        
+        c.execute("SELECT trial_used FROM subscriptions WHERE user_id = ?", (user_id,))
+        row = c.fetchone()
+        
+        if row and row[0] == 1:
+            return {"success": False, "message": "Пробный период уже был использован."}
+        
+        # Activate for 4 days
+        expires_at = (datetime.now() + timedelta(days=4)).strftime("%Y-%m-%d %H:%M")
+        
+        if row:
+            c.execute("UPDATE subscriptions SET plan = 'Fast', expires_at = ?, status = 'active', trial_used = 1 WHERE user_id = ?", (expires_at, user_id))
+        else:
+            c.execute("INSERT INTO subscriptions (user_id, plan, expires_at, status, trial_used) VALUES (?, 'Fast', ?, 'active', 1)", (user_id, expires_at))
+            
+        conn.commit()
+        conn.close()
+        return {"success": True, "message": "Пробный период Fast активирован на 4 дня!", "expires_at": expires_at}
+    except Exception as e:
+        return {"success": False, "detail": str(e)}
+
+# --- CryptoBot Integration ---
+CRYPTO_BOT_TOKEN = "581922:AA78JPxCzqnhyX8n6tyzrTJysjB4zbpFC9q" # User will fill this
+CRYPTO_BOT_API = "https://pay.crypt.bot/api"
+
+@app.post("/api/payment/create")
+def create_cryptobot_payment(user_id: int, plan: str, amount: float):
+    # Determine Asset based on amount (let's assume USDT for now)
+    # Convert RUB to USDT if needed, or just use USDT amounts
+    # For now, let's assume 'amount' is in RUB and we convert roughly 1 USDT = 100 RUB
+    usdt_amount = amount / 100.0
+    
+    try:
+        if CRYPTO_BOT_TOKEN == "YOUR_CRYPTO_BOT_TOKEN":
+            # Mock for testing if no token
+            invoice_id = f"mock_{random.randint(100000, 999999)}"
+            pay_url = f"https://t.me/CryptoBot?start=pay_{invoice_id}"
+        else:
+            url = f"{CRYPTO_BOT_API}/createInvoice"
+            headers = {"Crypto-Pay-API-Token": CRYPTO_BOT_TOKEN}
+            payload = {
+                "asset": "USDT",
+                "amount": "{:.2f}".format(usdt_amount),
+                "description": f"Subscription: {plan} for User {user_id}"
+            }
+            r = requests.post(url, headers=headers, json=payload, timeout=10)
+            data = r.json()
+            if not data.get("ok"):
+                return {"success": False, "detail": data.get("error", "CryptoBot API Error")}
+            
+            invoice_id = str(data["result"]["invoice_id"])
+            pay_url = data["result"]["pay_url"]
+        
+        # Store pending payment
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute("CREATE TABLE IF NOT EXISTS payments (id INTEGER PRIMARY KEY, user_id INTEGER, invoice_id TEXT, amount REAL, plan TEXT, status TEXT, created_at TEXT)")
+        c.execute("INSERT INTO payments (user_id, invoice_id, amount, plan, status, created_at) VALUES (?, ?, ?, ?, 'pending', ?)",
+                  (user_id, invoice_id, amount, plan, datetime.now().strftime("%Y-%m-%d %H:%M")))
+        conn.commit()
+        conn.close()
+        
+        return {"success": True, "pay_url": pay_url, "invoice_id": invoice_id}
+    except Exception as e:
+        return {"success": False, "detail": str(e)}
+
+@app.get("/api/payment/verify/{invoice_id}")
+def verify_payment(invoice_id: str):
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute("SELECT user_id, plan, status FROM payments WHERE invoice_id = ?", (invoice_id,))
+        row = c.fetchone()
+        
+        if not row:
+            conn.close()
+            return {"success": False, "message": "Платеж не найден."}
+        
+        user_id, plan, status = row
+        
+        if status == 'paid':
+            conn.close()
+            return {"success": True, "message": "Подписка уже активна."}
+
+        # Check status via API
+        is_paid = False
+        if invoice_id.startswith("mock_"):
+            is_paid = True # Always approve mock for testing
+        else:
+            url = f"{CRYPTO_BOT_API}/getInvoices"
+            headers = {"Crypto-Pay-API-Token": CRYPTO_BOT_TOKEN}
+            params = {"invoice_ids": invoice_id}
+            r = requests.get(url, headers=headers, params=params, timeout=10)
+            data = r.json()
+            if data.get("ok") and data["result"]["items"]:
+                if data["result"]["items"][0]["status"] == "active": # Wait, 'paid' or 'active'? Docs say status can be active, paid, cancelled
+                    # 'active' means not paid yet. 'paid' means paid.
+                    if data["result"]["items"][0]["status"] == "paid":
+                        is_paid = True
+            
+        if is_paid:
+            # Determine duration
+            days = 30
+            if "6" in plan: days = 180
+            if "12" in plan: days = 365
+            
+            expires_at = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M")
+            plan_name = "Fast" if "fast" in plan else "Slow"
+            
+            c.execute("UPDATE payments SET status = 'paid' WHERE invoice_id = ?", (invoice_id,))
+            c.execute("INSERT OR REPLACE INTO subscriptions (user_id, plan, expires_at, status) VALUES (?, ?, ?, 'active')",
+                      (user_id, plan_name, expires_at))
+            conn.commit()
+            
+            # Notify Admin
+            send_admin_tg(f"💰 <b>Новая оплата!</b>\nUser ID: {user_id}\nPlan: {plan_name}\nAmount: {row[0]}")
+            
+            conn.close()
+            return {"success": True, "message": f"Подписка {plan_name} активирована!"}
+        
+        conn.close()
+        return {"success": False, "message": "Платеж еще не оплачен. Пожалуйста, завершите оплату в CryptoBot."}
+    except Exception as e:
+        return {"success": False, "detail": str(e)}
+
+class InstallPluginRequest(BaseModel):
+    user_id: int
+    plugin_id: int
+    ip_address: str
+    password: str
+
+@app.post("/api/user/plugins/install")
+def install_plugin_on_vps(req: InstallPluginRequest):
+    # In a real app, this would trigger an Ansible script or similar.
+    # For now, we just log it and add to DB.
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute("INSERT INTO user_installations (user_id, plugin_id, ip_address, status, installed_at) VALUES (?, ?, ?, 'Installing', ?)",
+                  (req.user_id, req.plugin_id, req.ip_address, datetime.now().strftime("%Y-%m-%d %H:%M")))
+        conn.commit()
+        conn.close()
+        
+        # Notify Admin
+        send_admin_tg(f"🚀 <b>Запрос на установку плагина!</b>\nUser ID: {req.user_id}\nPlugin ID: {req.plugin_id}\nIP: {req.ip_address}")
+        
+        return {"success": True, "message": "Установка начата. Это может занять до 10 минут."}
+    except Exception as e:
+        return {"success": False, "detail": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

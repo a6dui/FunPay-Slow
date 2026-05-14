@@ -3,3 +3,7 @@ uvicorn
 pydantic
 aiogram
 requests
+gunicorn
+uvloop
+httptools
+python-multipart

@@ -1,4 +1,6 @@
-const API_BASE = "http://127.0.0.1:8080";
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? "http://127.0.0.1:8080" 
+    : "https://funpay-slow-backend.onrender.com"; // Замените на ваш URL на Render после деплоя
 
 // --- Global App State ---
 window.App = {
@@ -92,7 +94,7 @@ window.initiatePayment = async (planId, amount, method = "cryptobot") => {
     }
 };
 
-// --- Support Logic ---
+// --- Support & Developer Verification ---
 window.sendSupport = async (title, message, contact, type = "bug") => {
     const user = window.App.user;
     const payload = {
@@ -116,6 +118,49 @@ window.sendSupport = async (title, message, contact, type = "bug") => {
     } catch (e) {
         console.error("Support submission error:", e);
         return { success: false, message: "Ошибка сети" };
+    }
+};
+
+window.submitDevVerification = async () => {
+    const user = window.App.user;
+    if (!user) {
+        alert("Пожалуйста, войдите в аккаунт.");
+        return;
+    }
+    
+    const section = document.getElementById('section-dev');
+    const inputs = section.querySelectorAll('.dev-input');
+    
+    if (!inputs[3].value) {
+        alert("Пожалуйста, укажите ваш CryptoBot ID или адрес кошелька!");
+        return;
+    }
+    
+    const payload = {
+        user_id: user.user_id.toString(),
+        username: user.name || "Unknown",
+        payout_method: inputs[0].value,
+        payout_name: inputs[1].value,
+        contact: inputs[2].value,
+        wallet_label: inputs[3].value,
+        comment: inputs[4].value
+    };
+    
+    try {
+        const res = await fetch(`${API_BASE}/api/developer/verify`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("✅ Ваша заявка на выплаты через CryptoBot отправлена! Мы свяжемся с вами после проверки.");
+        } else {
+            alert("❌ Ошибка при отправке заявки: " + (data.detail || "Неизвестная ошибка"));
+        }
+    } catch (e) {
+        console.error("Dev verification error:", e);
+        alert("❌ Ошибка соединения с сервером.");
     }
 };
 
@@ -319,6 +364,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetSection = document.getElementById(`section-${targetTab}`);
             if (targetSection) targetSection.classList.add('active');
             
+            // Referral system hook
+            if (targetTab === 'referral') {
+                window.loadReferralData();
+            }
+
+            // My Plugins hook
+            if (targetTab === 'plugins') {
+                window.loadUserPlugins();
+            }
+
             // Save hash without jump
             if (history.replaceState) {
                 history.replaceState(null, null, targetTab === 'profile' ? 'profile.html' : `#${targetTab}`);
@@ -333,6 +388,129 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // --- Referral System Logic ---
+    window.loadReferralData = async () => {
+        const user = window.App.user;
+        if (!user || !user.user_id) return;
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/user/referral/${user.user_id}`);
+            if (!res.ok) return;
+            
+            const data = await res.json();
+            
+            // Update UI elements
+            const displayCode = document.getElementById('display-ref-code');
+            const linkInput = document.getElementById('ref-link-input');
+            const balanceText = document.getElementById('ref-balance');
+            const countText = document.getElementById('ref-count-text');
+            const levelBadge = document.getElementById('ref-level-badge');
+            const progressBar = document.getElementById('ref-progress-bar');
+            const applyBox = document.getElementById('referral-apply-box');
+            
+            if (displayCode) displayCode.textContent = data.referral_code;
+            if (linkInput) linkInput.value = `https://funpaypulse.com/?ref=${data.referral_code}`;
+            if (balanceText) balanceText.textContent = data.balance.toFixed(2);
+            if (countText) countText.textContent = `${data.invited_count} из ${data.invited_count + 5} приглашённых`;
+            
+            // Levels logic (example)
+            let levelName = "Ур. 1 -- Новичок";
+            let percent = 5;
+            let progress = (data.invited_count % 5) * 20;
+            
+            if (data.level === 2) { levelName = "Ур. 2 -- Партнер"; percent = 7; }
+            if (data.level === 3) { levelName = "Ур. 3 -- Амбассадор"; percent = 10; }
+            
+            if (levelBadge) levelBadge.textContent = levelName;
+            if (progressBar) progressBar.style.width = `${progress}%`;
+            const refPercent = document.getElementById('ref-percent');
+            if (refPercent) refPercent.textContent = percent;
+
+            // Show apply box only if user doesn't have a referrer yet
+            if (applyBox) {
+                applyBox.style.display = data.has_referrer ? 'none' : 'block';
+            }
+
+            // Update List
+            const listEmpty = document.getElementById('referrals-list-empty');
+            const listContainer = document.getElementById('referrals-list-container');
+            const tableBody = document.getElementById('referrals-table-body');
+            const totalCount = document.getElementById('total-ref-count');
+
+            if (data.referrals && data.referrals.length > 0) {
+                if (listEmpty) listEmpty.style.display = 'none';
+                if (listContainer) listContainer.style.display = 'block';
+                if (totalCount) totalCount.textContent = `Всего: ${data.referrals.length}`;
+                
+                if (tableBody) {
+                    tableBody.innerHTML = data.referrals.map(ref => `
+                        <div class="last-op-row">
+                            <div class="op-main">
+                                <div class="op-icon" style="background: rgba(255,255,255,0.05); color: var(--text-muted);"><i class="fas fa-user"></i></div>
+                                <div class="op-info">
+                                    <span class="op-title">ID: ${ref.referred_id}</span>
+                                    <span class="op-date">${new Date(ref.created_at).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                            <div class="op-amount plus">+0 ₽</div>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                if (listEmpty) listEmpty.style.display = 'flex';
+                if (listContainer) listContainer.style.display = 'none';
+            }
+
+        } catch (e) {
+            console.error("Referral load error:", e);
+        }
+    };
+
+    window.applyReferralCode = async () => {
+        const input = document.getElementById('input-referral-code');
+        const code = input.value.trim().toUpperCase();
+        const user = window.App.user;
+
+        if (!code) {
+            alert("Введите код!");
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE}/api/user/referral/apply`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: user.user_id.toString(),
+                    code: code
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert("✅ Код успешно применен! Вы получили бонус.");
+                window.loadReferralData();
+            } else {
+                alert("❌ " + (data.detail || "Ошибка применения кода"));
+            }
+        } catch (e) {
+            alert("Ошибка соединения");
+        }
+    };
+
+    window.copyReferralLink = () => {
+        const input = document.getElementById('ref-link-input');
+        input.select();
+        document.execCommand('copy');
+        alert("🔗 Ссылка скопирована!");
+    };
+
+    window.shareToTelegram = () => {
+        const input = document.getElementById('ref-link-input');
+        const url = encodeURIComponent(input.value);
+        const text = encodeURIComponent("Пользуйся лучшим софтом для FunPay вместе со мной! 🚀");
+        window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+    };
 
     // --- Feedback & Payments ---
     window.sendFeedback = async (data) => {
@@ -349,10 +527,239 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // --- My Plugins System ---
+    window.loadUserPlugins = async () => {
+        const user = window.App.user;
+        if (!user || !user.user_id) return;
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/user/plugins/${user.user_id}`);
+            if (!res.ok) return;
+            
+            const data = await res.json();
+            
+            // Update Stats
+            const stats = document.querySelectorAll('#section-plugins .stat-value');
+            if (stats.length >= 3) {
+                stats[0].textContent = data.owned_count;
+                stats[1].textContent = data.installations_count;
+                stats[2].textContent = data.pending_payment_count;
+            }
+            
+            // Update Available Plugins List
+            const availableContainer = document.querySelector('#section-plugins .plugins-lists .list-card:first-child .card-content');
+            if (availableContainer) {
+                if (data.plugins && data.plugins.length > 0) {
+                    availableContainer.classList.remove('empty-state');
+                    availableContainer.style.padding = '0.5rem 0';
+                    availableContainer.innerHTML = data.plugins.map(p => `
+                        <div class="last-op-row">
+                            <div class="op-main">
+                                <div class="op-icon" style="background: rgba(255,255,255,0.05);">${p.icon}</div>
+                                <div class="op-info">
+                                    <span class="op-title">${p.title}</span>
+                                    <span class="op-date">Активирован: ${p.activated_at || 'Недавно'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    availableContainer.classList.add('empty-state');
+                    availableContainer.innerHTML = `
+                        <div class="empty-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <p style="font-size: 0.9rem;">У вас пока нет доступных плагинов.</p>
+                    `;
+                }
+            }
+            
+            // Update Installations List
+            const installContainer = document.querySelector('#section-plugins .plugins-lists .list-card:nth-child(2) .card-content');
+            if (installContainer) {
+                if (data.installations && data.installations.length > 0) {
+                    installContainer.classList.remove('empty-state');
+                    installContainer.style.padding = '0.5rem 0';
+                    installContainer.innerHTML = data.installations.map(i => `
+                        <div class="last-op-row">
+                            <div class="op-main">
+                                <div class="op-icon" style="background: rgba(167, 139, 250, 0.1); color: #a78bfa;"><i class="fas fa-server"></i></div>
+                                <div class="op-info">
+                                    <span class="op-title">${i.plugin_title} @ ${i.ip}</span>
+                                    <span class="op-date">${i.date} — <span style="color: #34d399;">${i.status}</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    installContainer.classList.add('empty-state');
+                    installContainer.innerHTML = `
+                        <div class="empty-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <p style="font-size: 0.9rem;">Активных установок не найдено.</p>
+                    `;
+                }
+            }
+            
+            // Update Dropdown
+            const select = document.querySelector('#section-plugins select.dev-input');
+            if (select) {
+                if (data.plugins && data.plugins.length > 0) {
+                    select.innerHTML = data.plugins.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
+                } else {
+                    select.innerHTML = '<option value="">Нет доступных плагинов</option>';
+                }
+            }
+            
+            // Update Sub Status
+            const subBadge = document.querySelector('.info-card .status-badge');
+            const subText = document.querySelector('.info-card .info-text .value');
+            const subNote = document.querySelector('.info-card div[style*="width: 100%"]');
+            
+            if (data.subscription && subBadge) {
+                if (data.subscription.status === 'active') {
+                    subBadge.textContent = 'Активна';
+                    subBadge.style.background = 'rgba(16, 185, 129, 0.1)';
+                    subBadge.style.color = '#10b981';
+                    subText.textContent = data.subscription.plan;
+                    subNote.textContent = `Ваша подписка действует до ${data.subscription.expires_at}`;
+                    
+                    // Hide trial card
+                    const trialCard = document.querySelector('.trial-card');
+                    if (trialCard) trialCard.style.display = 'none';
+                } else if (data.subscription.trial_used) {
+                    // Hide trial card if used
+                    const trialCard = document.querySelector('.trial-card');
+                    if (trialCard) trialCard.style.display = 'none';
+                }
+            }
+            
+        } catch (e) {
+            console.error("Plugins load error:", e);
+        }
+    };
+
+    window.selectedPlan = null;
+    window.selectedPrice = 0;
+
+    window.selectPlan = (planId, price, element) => {
+        window.selectedPlan = planId;
+        window.selectedPrice = price;
+        
+        // Update UI
+        const options = element.parentElement.querySelectorAll('.plan-option');
+        options.forEach(opt => opt.classList.remove('active'));
+        element.classList.add('active');
+    };
+
+    window.buySelectedPlan = async () => {
+        if (!window.selectedPlan) {
+            alert("Выберите период подписки!");
+            return;
+        }
+        
+        const user = window.App.user;
+        if (!user) {
+            alert("Сначала авторизуйтесь!");
+            return;
+        }
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/payment/create?user_id=${user.user_id}&plan=${window.selectedPlan}&amount=${window.selectedPrice}`, {
+                method: 'POST'
+            });
+            const data = await res.json();
+            if (data.success) {
+                // Open CryptoBot link
+                window.open(data.pay_url, '_blank');
+                
+                // Start checking status
+                alert("Платеж создан! Оплатите его в CryptoBot и нажмите OK для проверки статуса.");
+                
+                const verifyRes = await fetch(`${API_BASE}/api/payment/verify/${data.invoice_id}`);
+                const verifyData = await verifyRes.json();
+                if (verifyData.success) {
+                    alert("✅ " + verifyData.message);
+                    window.location.reload();
+                } else {
+                    alert("❌ " + verifyData.message);
+                }
+            }
+        } catch (e) {
+            alert("Ошибка при создании платежа");
+        }
+    };
+
+    window.activateTrial = async () => {
+        const user = window.App.user;
+        if (!user) {
+            alert("Сначала авторизуйтесь!");
+            return;
+        }
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/user/activate-trial?user_id=${user.user_id}`, {
+                method: 'POST'
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert("✅ " + data.message);
+                window.location.reload();
+            } else {
+                alert("❌ " + (data.message || data.detail));
+            }
+        } catch (e) {
+            alert("Ошибка активации");
+        }
+    };
+
+    window.installPluginOnVps = async () => {
+        const user = window.App.user;
+        const section = document.getElementById('section-plugins');
+        const select = section.querySelector('select.dev-input');
+        const ipInput = section.querySelector('input[placeholder="1.1.1.1"]');
+        const passInput = section.querySelector('input[type="password"]');
+        
+        if (!select || !select.value) {
+            alert("Выберите плагин!");
+            return;
+        }
+        if (!ipInput.value || !passInput.value) {
+            alert("Заполните IP и пароль сервера!");
+            return;
+        }
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/user/plugins/install`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: user.user_id,
+                    plugin_id: parseInt(select.value),
+                    ip_address: ipInput.value,
+                    password: passInput.value
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert("✅ " + data.message);
+                window.loadUserPlugins();
+            } else {
+                alert("❌ Ошибка: " + (data.detail || "Неизвестная ошибка"));
+            }
+        } catch (e) {
+            alert("Ошибка соединения");
+        }
+    };
+
     // Payment logic moved to global scope
 
     const hash = window.location.hash.replace('#', '');
     if (hash && typeof window.switchTab === 'function' && document.getElementById(`section-${hash}`)) {
         window.switchTab(hash);
     }
+    
+    // Initial data load if on referral tab
+    if (hash === 'referral') window.loadReferralData();
 });
