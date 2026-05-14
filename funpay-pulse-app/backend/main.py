@@ -220,7 +220,7 @@ class ChangelogItem(BaseModel):
 # --- Endpoints ---
 @app.get("/")
 def read_root():
-    return {"status": "ok", "message": "FunPayPulse API is running"}
+    return {"status": "ok", "message": "FunPay Slow API is running"}
 
 @app.get("/api/plugins", response_model=list[PluginResponse])
 def get_plugins():
