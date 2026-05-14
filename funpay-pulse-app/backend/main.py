@@ -25,7 +25,7 @@ DB_FILE = os.path.join(BASE_DIR, "funpaypulse.db")
 # --- SETTINGS ---
 # Replace with your actual Telegram User ID (get it from @userinfobot)
 ADMIN_CHAT_ID = "755843448" 
-BOT_TOKEN = '8997989380:AAFLk64Xrwe1ebr7LZMxaLuoDnT2Kg-P9-M'
+BOT_TOKEN = '8997989380:AAHxcNyf46EQ2_jsU7gZ-xST_9ey9Qcr1FE'
 FUNPAY_GOLDEN_KEY = "goomqs6ab8nho7areo9irc7cgorbc070"
 
 import requests
