@@ -44,4 +44,8 @@ site/
 # Generated integration files (regenerate with ./scripts/convert.sh)
 integrations/
 documentation/implementation/craighewitt-mattpocock-reimplementation-plan.md
-medium/
+medium/node_modules/
+dist/
+*.db
+*.log
+.DS_Store

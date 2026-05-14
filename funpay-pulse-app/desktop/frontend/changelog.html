@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обновления — FunPay Slow</title>
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .changelog-container {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+        }
+
+        .changelog-header h1 {
+            font-size: 4.5rem;
+            line-height: 1.05;
+            margin-bottom: 2rem;
+            letter-spacing: -2px;
+        }
+
+        .changelog-header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .summary-card h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .summary-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .timeline {
+            max-width: 900px;
+            margin: 40px auto;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .version-block {
+            position: relative;
+            margin-bottom: 4rem;
+        }
+
+        .version-dot {
+            position: absolute;
+            left: -40px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background: var(--bg-dark);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .version-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .version-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .version-tag {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .version-type {
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .version-date {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .change-section {
+            margin-top: 1.5rem;
+        }
+
+        .change-title {
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .change-title.new { color: #3b82f6; }
+        .change-title.fix { color: #f43f5e; }
+
+        .change-list {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        .change-list li {
+            position: relative;
+            color: var(--text-main);
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .change-list li::before {
+            content: '•';
+            position: absolute;
+            left: -1.2rem;
+            color: var(--text-muted);
+        }
+
+        .badge-updates {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html">SDK</a></li>
+                <li><a href="changelog.html" class="active">Обновления</a></li>
+                <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="#" class="dropdown-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="changelog-container">
+            <div class="changelog-header">
+                <div class="badge-updates">
+                    <i class="fas fa-rocket"></i> Обновления FunPay Slow
+                </div>
+                <h1>Обновления <br>продукта без <br><span class="gradient-text">лишнего шума.</span></h1>
+                <p>Здесь собрана история изменений FunPay Slow: новые функции, улучшения и исправления.</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Сводка</h3>
+                <div class="summary-item">
+                    <div class="summary-label">Последняя версия</div>
+                    <div class="summary-value">v2.2.0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Записей</div>
+                    <div class="summary-value">11</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Бета</div>
+                    <div class="summary-value">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <!-- v2.2.0 (Slow Branding & Monetization) -->
+            <div class="version-block">
+                <div class="version-dot"></div>
+                <div class="version-card">
+                    <div class="version-tag">v2.2.0 <span class="version-type">Branding & Monetization</span></div>
+                    <div class="version-date"><i class="far fa-calendar"></i> 13 мая 2026 г.</div>
+                    <div class="change-section">
+                        <div class="change-title new"><i class="fas fa-plus-circle"></i> Новое</div>
+                        <ul class="change-list">
+                            <li><b>Система подписок:</b> Запущены тарифы "Slow" и "Fast" с разным уровнем доступа.</li>
+                            <li><b>CryptoBot:</b> Интегрирован удобный способ оплаты криптой (идеально для Украины).</li>
+                            <li><b>Брендинг:</b> Добавлен анимированный равлик-маскот в футер сайта.</li>
+                            <li><b>Favicon:</b> Новый логотип во вкладке браузера.</li>
+                        </ul>
+                    </div>
+                    <div class="change-section">
+                        <div class="change-title"><i class="fas fa-wrench"></i> Улучшения</div>
+                        <ul class="change-list">
+                            <li>Рефакторинг ядра JavaScript для повышения производительности.</li>
+                            <li>Исправлена навигация в личном кабинете.</li>
+                            <li>Улучшена форма обратной связи в разделе Поддержка.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v2.5.10 -->
+            <div class="version-block">
+                <div class="version-dot"></div>
+                <div class="version-card">
+                    <div class="version-tag">v2.5.10</div>
+                    <div class="version-date"><i class="far fa-calendar"></i> 26 апреля 2026 г.</div>
+                    <div class="change-section">
+                        <div class="change-title"><i class="fas fa-wrench"></i> Улучшения</div>
+                        <ul class="change-list">
+                            <li>RentSteam command lookup fix</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v2.6.14 -->
+            <div class="version-block">
+                <div class="version-dot"></div>
+                <div class="version-card">
+                    <div class="version-tag">v2.6.14 <span class="version-type">Воркер</span></div>
+                    <div class="version-date"><i class="far fa-calendar"></i> 26 апреля 2026 г.</div>
+                    <div class="change-section">
+                        <div class="change-title"><i class="fas fa-wrench"></i> Улучшения</div>
+                        <ul class="change-list">
+                            <li>RentSteam rental command lookup fix</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v2.6.13 -->
+            <div class="version-block">
+                <div class="version-dot"></div>
+                <div class="version-card">
+                    <div class="version-tag">v2.6.13 <span class="version-type">Воркер</span></div>
+                    <div class="version-date"><i class="far fa-calendar"></i> 26 апреля 2026 г.</div>
+                    <div class="change-section">
+                        <div class="change-title"><i class="fas fa-wrench"></i> Улучшения</div>
+                        <ul class="change-list">
+                            <li>воркер v2.6.13: AutoStars includes ProviderResponseError diagnostics/retry, respects auto_refund=false after TON retry exhaustion, and accepts any valid Stars amount from 50 by default.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v2.5.9 -->
+            <div class="version-block">
+                <div class="version-dot"></div>
+                <div class="version-card">
+                    <div class="version-tag">v2.5.9</div>
+                    <div class="version-date"><i class="far fa-calendar"></i> 24 апреля 2026 г.</div>
+                    <div class="change-section">
+                        <div class="change-title new"><i class="fas fa-plus-circle"></i> Новое</div>
+                        <ul class="change-list">
+                            <li>плагин: AutoAIAccounts — automatic AI account purchase and delivery via LZT Market with lot bindings, чёрный список and order history.</li>
+                            <li>плагин: TradeManager — free scheduled on/off switching for all lots per account.</li>
+                        </ul>
+                    </div>
+                    <div class="change-section">
+                        <div class="change-title fix"><i class="fas fa-bug"></i> Исправления</div>
+                        <ul class="change-list">
+                            <li>Telegram notifications, proxy recovery, AutoStars, AutoRobux GamePass, AutoResponder lot_name, AutoDump currency, Docker local and Platega payments.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo snail-crawling" style="font-size: 2.2rem;">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+                <a href="report.html">Поддержка</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="report.html">Обратная связь</a>
+                <a href="https://t.me/FunpaySlow">Telegram</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="admin.html" id="admin-link" style="display: none; color: var(--accent); font-weight: bold;">Панель управления</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Медиапартнерство — FunPay Slow</title>
+    <link rel="stylesheet" href="styles.css?v=2.1">
+    <link rel="icon" href="icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .media-container {
+            max-width: 1400px;
+            margin: 80px auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .media-header h1 {
+            font-size: 5rem;
+            line-height: 1.05;
+            margin-bottom: 2rem;
+            letter-spacing: -2px;
+        }
+
+        .media-header p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin-bottom: 3rem;
+        }
+
+        .media-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .visual-stack {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .visual-icon {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(20, 20, 20, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: float-icon 4s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .media-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 4rem;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .platform-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .platform-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateY(-5px);
+        }
+
+        .platform-card i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .platform-name {
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .formats-section {
+            padding: 80px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .format-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .format-card h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .format-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .step-card {
+            position: relative;
+        }
+
+        .step-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.05);
+            margin-bottom: -1.5rem;
+        }
+
+        .step-text {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .badge-media {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html">SDK</a></li>
+                <li><a href="changelog.html">Обновления</a></li>
+                <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html" class="active">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a><a href="#" class="btn-download-nav" id="login-trigger-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="media-container">
+            <div class="media-header">
+                <div class="badge-media">
+                    <i class="fas fa-users"></i> Заявка для медиапартнеров
+                </div>
+                <h1>Медиапартнерство <br>FunPay <span class="gradient-text">Slow</span></h1>
+                <p>Ищем Telegram, YouTube, TikTok и другие площадки для обзоров, рекламы и интеграций. Нужен живой контент про Slow, а не одинаковые рекламные тексты под копирку.</p>
+                
+                <div class="media-actions">
+                    <button class="btn-primary btn-large" onclick="window.open('https://forms.gle/your-form-id')">
+                        Заполнить заявку <i class="fas fa-external-link-alt"></i>
+                    </button>
+                    <button class="btn-outline btn-large" onclick="window.open('https://t.me/FunpaySlow_Bot')">
+                        <i class="fab fa-telegram"></i> Обсудить в Telegram
+                    </button>
+                </div>
+            </div>
+
+            <div class="media-visual">
+                <div class="visual-stack">
+                    <div class="visual-icon" style="top: 0; left: 0; color: #0088cc;"><i class="fab fa-telegram"></i></div>
+                    <div class="visual-icon" style="top: 50px; right: 0; color: #ff0000; animation-delay: -1s;"><i class="fab fa-youtube"></i></div>
+                    <div class="visual-icon" style="bottom: 0; left: 50px; color: #fff; animation-delay: -2s;"><i class="fab fa-tiktok"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="platform-grid">
+            <div class="platform-card">
+                <i class="fab fa-telegram"></i>
+                <div class="platform-name">Telegram</div>
+                <div class="platform-desc">каналы и чаты</div>
+            </div>
+            <div class="platform-card">
+                <i class="fab fa-youtube"></i>
+                <div class="platform-name">YouTube</div>
+                <div class="platform-desc">обзоры и Shorts</div>
+            </div>
+            <div class="platform-card">
+                <i class="fab fa-tiktok"></i>
+                <div class="platform-name">TikTok</div>
+                <div class="platform-desc">короткие ролики</div>
+            </div>
+        </div>
+
+        <section class="formats-section">
+            <div class="section-header">
+                <h2 class="section-title">Форматы <span class="gradient-text">сотрудничества.</span></h2>
+                <p class="section-desc">Делайте контент в своем стиле, но по реальным фактам.</p>
+            </div>
+
+            <div class="format-grid">
+                <div class="format-card">
+                    <h3>Обзор продукта</h3>
+                    <p>Покажите Slow как рабочий инструмент: аккаунты, лоты, плагины, VPS и обычный путь продавца.</p>
+                </div>
+                <div class="format-card">
+                    <h3>Интеграция в контент</h3>
+                    <p>Вставка в ролик, пост, стрим или подборку сервисов для продавцов FunPay.</p>
+                </div>
+                <div class="format-card">
+                    <h3>Пост или серия постов</h3>
+                    <p>Telegram, VK, Discord-сообщество или другой канал, где есть аудитория продавцов.</p>
+                </div>
+                <div class="format-card">
+                    <h3>Гайд по автоматизации</h3>
+                    <p>Разбор полезного сценария без фальшивых обещаний и без накрутки ожиданий.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="formats-section">
+            <div class="section-header">
+                <h2 class="section-title">Как подать <span class="gradient-text">заявку.</span></h2>
+                <p class="section-desc">Форма короткая. Главное — показать площадку и формат.</p>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Откройте форму и оставьте контакты.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Укажите площадку, охваты и формат, который вам ближе.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Добавьте ссылку на канал или примеры прошлых интеграций.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Мы посмотрим заявку и вернемся с конкретным предложением.</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 4rem;">
+                <button class="btn-primary btn-large" onclick="window.open('https://forms.gle/your-form-id')">
+                    Перейти к форме
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;"><span class="snail-logo" style="font-size: 2.2rem;">🐌</span><div class="logo-text">FunPay <span>Slow</span></div></div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+                <a href="report.html">Поддержка</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="report.html">Обратная связь</a>
+                <a href="https://t.me/FunpaySlow">Telegram</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
