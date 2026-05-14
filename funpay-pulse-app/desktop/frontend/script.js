@@ -37,9 +37,21 @@ window.App = {
             if (profileNav) profileNav.style.display = 'flex';
             if (userAvatar) userAvatar.textContent = this.user.name ? this.user.name[0].toUpperCase() : 'U';
             
-            const isAdmin = this.user.is_admin || this.user.user_id == "6360699049"; 
-            if (adminLink && isAdmin) {
-                adminLink.style.display = 'inline-block';
+            const currentUserId = String(this.user.user_id);
+            const adminIds = ["6360699049", "5304677735", "755843448"];
+            const isAdmin = this.user.is_admin || adminIds.includes(currentUserId); 
+            
+            console.log("Checking admin rights for:", currentUserId, "Is admin:", isAdmin);
+            if (isAdmin) {
+                // Also add to main nav for better visibility
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks && !document.getElementById('nav-admin-link')) {
+                    const li = document.createElement('li');
+                    li.id = 'nav-admin-link';
+                    li.innerHTML = '<a href="admin.html" style="color: #f43f5e; font-weight: bold;"><i class="fas fa-shield-alt"></i> Админка</a>';
+                    navLinks.appendChild(li);
+                }
+                if (adminLink) adminLink.style.display = 'flex';
             }
         } else {
             if (authBtn) authBtn.style.display = 'flex';
@@ -58,25 +70,25 @@ window.initiatePayment = async (planId, amount, method = "cryptobot") => {
     }
 
     try {
-        const isFast = planId.startsWith('fast');
-        const duration = planId.endsWith('12') ? '12 месяцев' : (planId.endsWith('6') ? '6 месяцев' : '1 месяц');
-        const planName = isFast ? 'Fast (Полный доступ)' : 'Slow (Эконом)';
-
-        console.log(`Creating ${method} payment for ${amount} RUB (Plan: ${planName}, Duration: ${duration})`);
-        
-        if (method === "cryptobot") {
-            alert(`Открытие CryptoBot...\n\nТариф: ${planName}\nСрок: ${duration}\nСумма: ${amount} RUB (~${(amount/95).toFixed(2)} USDT)\n\nДля пользователей из Украины это самый удобный способ (USDT/TON/BTC).`);
-            // window.location.href = `https://t.me/CryptoBot?start=pay_...`;
-        } else if (method === "platega") {
-            alert(`Перенаправление на Platega...\n\nТариф: ${planName}\nСрок: ${duration}\nСумма: ${amount} RUB\n(СБП, Карты РФ, Крипта)`);
-        } else if (method === "lolz") {
-            alert(`Оплата через Lolz Team...\n\nТариф: ${planName}\nСрок: ${duration}\nСумма: ${amount} RUB\n(Баланс lzt.market)`);
+        const res = await fetch(`${API_BASE}/api/payment/initiate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: user.user_id.toString(),
+                plan_id: planId,
+                amount: amount,
+                method: method
+            })
+        });
+        const data = await res.json();
+        if (data.payment_url) {
+            window.open(data.payment_url, '_blank');
+        } else {
+            alert("Ошибка инициализации платежа. Попробуйте позже.");
         }
-        
-        return { success: true };
     } catch (e) {
-        console.error("Payment Error:", e);
-        return { success: false, error: e.message };
+        console.error("Payment error:", e);
+        alert("Ошибка соединения с сервером");
     }
 };
 
@@ -91,21 +103,19 @@ window.sendSupport = async (title, message, contact, type = "bug") => {
     };
     
     try {
+        console.log("Sending support payload:", payload);
         const res = await fetch(`${API_BASE}/api/support`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
-        if (res.ok) {
-            alert("Ваше сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.");
-            return await res.json();
-        } else {
-            throw new Error("Ошибка сервера");
-        }
+        
+        const data = await res.json();
+        console.log("Support response:", data);
+        return data;
     } catch (e) {
-        console.error(e);
-        alert("Произошла ошибка при отправке. Пожалуйста, попробуйте позже или напишите нам в Telegram.");
-        return {success: false, error: e.message};
+        console.error("Support submission error:", e);
+        return { success: false, message: "Ошибка сети" };
     }
 };
 
@@ -300,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sections = document.querySelectorAll('.content-section');
     
     if (profileTabs.length > 0) {
-        const switchTab = (targetTab) => {
+        window.switchTab = (targetTab) => {
             profileTabs.forEach(t => t.classList.remove('active'));
             const activeTab = document.querySelector(`.sidebar-nav-item[data-tab="${targetTab}"]`);
             if (activeTab) activeTab.classList.add('active');
@@ -319,14 +329,30 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.addEventListener('click', (e) => {
                 if (tab.getAttribute('href') !== '#') return; // Let links like admin.html work
                 e.preventDefault();
-                switchTab(tab.dataset.tab);
+                window.switchTab(tab.dataset.tab);
             });
         });
+    }
 
-        // Initial tab from hash
-        const hash = window.location.hash.replace('#', '');
-        if (hash && document.getElementById(`section-${hash}`)) {
-            switchTab(hash);
+    // --- Feedback & Payments ---
+    window.sendFeedback = async (data) => {
+        try {
+            const res = await fetch(`${API_BASE}/api/feedback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return await res.json();
+        } catch (e) {
+            console.error("Feedback error:", e);
+            return { success: false };
         }
+    };
+
+    // Payment logic moved to global scope
+
+    const hash = window.location.hash.replace('#', '');
+    if (hash && typeof window.switchTab === 'function' && document.getElementById(`section-${hash}`)) {
+        window.switchTab(hash);
     }
 });

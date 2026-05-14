@@ -22,20 +22,30 @@ DB_FILE = os.path.join(BASE_DIR, "funpaypulse.db")
 
 # --- SETTINGS ---
 # Replace with your actual Telegram User ID (get it from @userinfobot)
-ADMIN_CHAT_ID = "5304677735" 
+ADMIN_CHAT_ID = "755843448" 
 BOT_TOKEN = '8997989380:AAFLk64Xrwe1ebr7LZMxaLuoDnT2Kg-P9-M'
+FUNPAY_GOLDEN_KEY = "goomqs6ab8nho7areo9irc7cgorbc070"
 
 import requests
 def send_admin_tg(message: str):
+    print(f"DEBUG: Attempting to send TG message to {ADMIN_CHAT_ID}...")
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {"chat_id": ADMIN_CHAT_ID, "text": message, "parse_mode": "HTML"}
     try:
-        requests.post(url, json=payload, timeout=5)
+        r = requests.post(url, json=payload, timeout=5)
+        print(f"DEBUG: TG Response: {r.status_code} - {r.text}")
     except Exception as e:
-        print(f"Error sending TG: {e}")
+        print(f"DEBUG: Error sending TG: {e}")
 
-def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+# --- MODELS ---
+class SupportMessage(BaseModel):
+    user_id: str
+    username: str
+    message: str
+    type: str
+
+class TrialRequest(BaseModel):
+    user_id: str
 
 def init_db():
     conn = sqlite3.connect(DB_FILE)
@@ -50,18 +60,18 @@ def init_db():
             api_key TEXT
         )
     ''')
-    # Create Plugins table
+    # Create Subscriptions table
     c.execute('''
-        CREATE TABLE IF NOT EXISTS plugins (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
-            price TEXT NOT NULL,
-            icon TEXT NOT NULL
+        CREATE TABLE IF NOT EXISTS subscriptions (
+            user_id INTEGER PRIMARY KEY,
+            plan TEXT,
+            expires_at TEXT,
+            status TEXT DEFAULT 'inactive',
+            trial_used INTEGER DEFAULT 0,
+            FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
-    
-    # Create Auth Codes table for Telegram
+    # Create Auth Codes table
     c.execute('''
         CREATE TABLE IF NOT EXISTS auth_codes (
             code TEXT PRIMARY KEY,
@@ -71,33 +81,22 @@ def init_db():
         )
     ''')
     
-    # Create Subscriptions table
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS subscriptions (
-            user_id INTEGER PRIMARY KEY,
-            plan TEXT,
-            expires_at TEXT,
-            status TEXT DEFAULT 'inactive',
-            FOREIGN KEY(user_id) REFERENCES users(id)
-        )
-    ''')
+    # Migrations: Add user_id to auth_codes if missing
+    try:
+        c.execute("ALTER TABLE auth_codes ADD COLUMN user_id TEXT")
+    except:
+        pass # Column already exists
     
-    # Create Transactions table
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            amount REAL,
-            status TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Clear old codes on startup to prevent accidental logins
+    try:
+        c.execute("ALTER TABLE auth_codes ADD COLUMN user_first_name TEXT")
+    except:
+        pass # Column already exists
+
+    # Clear old codes
     c.execute("DELETE FROM auth_codes")
     conn.commit()
     conn.close()
-    print("Database initialized and old auth codes cleared.")
+    print("Database initialized and migrated.")
     
     # SniperBot DB path
     global SNIPER_DB_FILE
@@ -229,14 +228,24 @@ def init_tg_auth(code: str):
 
 @app.get("/api/auth/check/{code}")
 def check_tg_auth(code: str):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT confirmed, user_first_name, user_id FROM auth_codes WHERE code = ?", (code,))
-    row = c.fetchone()
-    conn.close()
-    
-    if row and row[0] == 1:
-        return {"success": True, "name": row[1], "user_id": row[2]}
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        # Verify schema again just in case
+        c.execute("PRAGMA table_info(auth_codes)")
+        columns = [col[1] for col in c.fetchall()]
+        if "user_id" not in columns:
+            c.execute("ALTER TABLE auth_codes ADD COLUMN user_id TEXT")
+            conn.commit()
+
+        c.execute("SELECT confirmed, user_first_name, user_id FROM auth_codes WHERE code = ?", (code,))
+        row = c.fetchone()
+        conn.close()
+        
+        if row and row[0] == 1:
+            return {"success": True, "name": row[1], "user_id": row[2]}
+    except Exception as e:
+        print(f"Auth check error: {e}")
     return {"success": False}
 
 @app.post("/api/login")
@@ -323,9 +332,14 @@ def get_system_status():
 
 @app.post("/api/support")
 def post_support(msg: SupportMessage):
+    # Log to console
+    print(f"SUPPORT REPORT: {msg.type} from {msg.username} ({msg.user_id})")
+    
+    # Send to Telegram
     tg_text = (
-        f"📩 <b>Новое обращение в поддержку!</b>\n\n"
+        f"📩 <b>Новое обращение в поддержку!</b>\n"
         f"👤 <b>Пользователь:</b> {msg.username} (ID: {msg.user_id})\n"
+        f"📝 <b>Тип:</b> {msg.type.upper()}\n"
         f"📝 <b>Сообщение:</b>\n{msg.message}\n\n"
         f"📅 <i>Отправлено из десктопного приложения</i>"
     )
@@ -403,6 +417,53 @@ def get_admin_stats():
     except Exception as e:
         if 'conn' in locals(): conn.close()
         return {"error": str(e)}
+
+class PaymentRequest(BaseModel):
+    user_id: str
+    plan_id: str
+    amount: float
+    method: str
+
+@app.post("/api/payment/initiate")
+def initiate_payment(req: PaymentRequest):
+    # In a real production, you'd call CryptoBot API here.
+    # For now, we redirect to the bot with a payment parameter.
+    payment_url = f"https://t.me/FunpaySlov_Bot?start=pay_{req.plan_id}_{int(req.amount)}"
+    
+    # Notify Admin about intent
+    send_admin_tg(f"💰 <b>Запрос на оплату</b>\nUser ID: {req.user_id}\nТариф: {req.plan_id}\nСумма: {req.amount} RUB\nМетод: {req.method}")
+    
+    return {"success": True, "payment_url": payment_url}
+
+
+@app.post("/api/subscription/trial")
+def activate_trial(req: TrialRequest):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    # Check if trial already used
+    c.execute("SELECT trial_used FROM subscriptions WHERE user_id = ?", (req.user_id,))
+    row = c.fetchone()
+    
+    if row and row[0] == 1:
+        conn.close()
+        return {"success": False, "message": "Пробный период уже был использован."}
+    
+    # Activate trial for 4 days
+    expires_at = (datetime.now() + timedelta(days=4)).strftime("%Y-%m-%d %H:%M:%S")
+    
+    if row:
+        c.execute("UPDATE subscriptions SET plan='Fast', expires_at=?, status='active', trial_used=1 WHERE user_id=?", (expires_at, req.user_id))
+    else:
+        c.execute("INSERT INTO subscriptions (user_id, plan, expires_at, status, trial_used) VALUES (?, 'Fast', ?, 'active', 1)", (req.user_id, expires_at))
+    
+    conn.commit()
+    conn.close()
+    
+    # Notify Admin
+    send_admin_tg(f"🎁 <b>Пользователь активировал пробный период!</b>\nID: {req.user_id}\nПлан: Fast (4 дня)")
+    
+    return {"success": True, "expires_at": expires_at}
 
 @app.get("/api/user/subscription/{user_id}")
 def get_user_sub(user_id: int):

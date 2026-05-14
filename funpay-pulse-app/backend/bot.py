@@ -18,6 +18,7 @@ from aiogram.filters import Command, CommandObject
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, command: CommandObject):
+    print(f">>> Received /start from {message.from_user.username}")
     args = command.args
     if args and len(args) == 6 and args.isdigit():
         # Automatic confirmation via deep link
@@ -31,6 +32,7 @@ async def cmd_start(message: types.Message, command: CommandObject):
 
 @dp.message()
 async def handle_message(message: types.Message):
+    print(f">>> Received message: {message.text} from {message.from_user.username}")
     code = message.text.strip()
     if len(code) == 6 and code.isdigit():
         await process_code(message, code)
@@ -47,14 +49,15 @@ async def process_code(message, code):
     row = c.fetchone()
     
     if row:
-        # Mark as confirmed
-        c.execute("UPDATE auth_codes SET confirmed = 1, user_first_name = ? WHERE code = ?", 
-                  (message.from_user.first_name, code))
+        # Mark as confirmed and save Telegram user ID
+        c.execute("UPDATE auth_codes SET confirmed = 1, user_first_name = ?, user_id = ? WHERE code = ?", 
+                  (message.from_user.first_name, str(message.from_user.id), code))
         conn.commit()
         conn.close()
         
         await message.answer(
             f"👋 С возвращением, {message.from_user.first_name}!\n\n"
+            f"🆔 Ваш Telegram ID: `{message.from_user.id}`\n\n"
             "✅ **Авторизация в FunPay Slow успешна!**\n"
             "Вернитесь в приложение — панель уже открыта.",
             parse_mode="Markdown"

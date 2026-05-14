@@ -1255,3 +1255,68 @@ footer {
     .hero-main-title { font-size: 2.8rem; }
     .section-title { font-size: 2.5rem; }
 }
+/* --- LOGIN OVERLAY --- */
+#login-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(20px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.login-box {
+    position: relative;
+    background: rgba(15, 15, 15, 0.7);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 3rem;
+    border-radius: 28px;
+    text-align: center;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+}
+.close-login-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.close-login-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    transform: rotate(90deg);
+}
+.btn-telegram {
+    background: #0088cc;
+    color: white;
+    border: none;
+    padding: 1.1rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    transition: 0.3s;
+}
+.btn-telegram:hover {
+    background: #0099e6;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
+}

@@ -5,3 +5,8 @@ dist/
 .env
 bin/
 obj/
+venv/
+__pycache__/
+*.db
+.pytest_cache/
+.vscode/

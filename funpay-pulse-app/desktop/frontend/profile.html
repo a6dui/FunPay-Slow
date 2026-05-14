@@ -6,9 +6,6 @@
     <title>Профиль — FunPay Slow</title>
     <link rel="stylesheet" href="styles.css?v=2.2">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="shortcut icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -509,6 +506,9 @@
 <body>
     <div class="background-effects">
         <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo-container" onclick="window.location.href='index.html'">
@@ -527,7 +527,7 @@
 
             <div class="nav-actions">
                 <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
-                <a href="#" class="btn-download-nav" id="login-trigger-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);">
+                <a href="#" class="btn-download-nav" id="login-trigger-btn">
                     <i class="fas fa-sign-in-alt"></i> Войти
                 </a>
                 
@@ -535,7 +535,8 @@
                     <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
                     <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
                         <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
-                        <a href="#" class="dropdown-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
                     </div>
                 </div>
             </div>
@@ -645,7 +646,7 @@
                     </div>
                 </div>
 
-                <button class="btn-logout" onclick="logout()">
+                <button class="btn-logout" onclick="window.logout()">
                     <i class="fas fa-sign-out-alt"></i> Выйти из аккаунта
                 </button>
             </div>
@@ -684,40 +685,24 @@
                 <div class="trial-card">
                     <div class="trial-text">
                         <div class="badge-trial"><i class="fas fa-bolt"></i> Пробный период</div>
-                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Запустить полный доступ на 4 дня</h3>
-                        <p style="color: var(--text-muted); font-size: 0.95rem;">Можно один раз активировать пробный период и проверить все возможности подписки без оплаты.</p>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Запустить пробный Fast период на 4 дня</h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">Активирует полную подписку <b>Fast</b> на 4 дня. Можно использовать один раз для проверки всех возможностей.</p>
                     </div>
-                    <button class="btn-primary" style="background: #f59e0b; color: #000; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <button class="btn-primary" id="btn-activate-trial" onclick="activateTrial()" style="background: #f59e0b; color: #000; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-rocket"></i> Активировать trial
                     </button>
                 </div>
 
                 <h3 style="margin-bottom: 2rem;">Способ оплаты</h3>
-                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Через Platega теперь доступны не только СБП и крипта, но и международные платежи.</p>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Через Platega теперь доступны международные платежи и крипта.</p>
                 
                 <div class="payment-methods">
                     <div class="payment-card active" data-method="cryptobot">
                         <div class="info-icon" style="background: rgba(0, 136, 204, 0.1); color: #0088cc;"><i class="fab fa-telegram-plane"></i></div>
                         <div class="payment-info">
                             <div style="font-weight: 700; color: white;">CryptoBot (Telegram)</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">USDT, TON, BTC — Идеально для Украины</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">USDT, TON, BTC — Идеально для всех стран</div>
                             <div style="font-size: 0.75rem; color: #10b981; margin-top: 4px;">Комиссия: 0%</div>
-                        </div>
-                        <div class="check-icon"><i class="fas fa-check-circle"></i></div>
-                    </div>
-                    <div class="payment-card" data-method="platega">
-                        <div class="info-icon" style="background: rgba(124, 58, 237, 0.1); color: #a78bfa;"><i class="fas fa-university"></i></div>
-                        <div class="payment-info">
-                            <div style="font-weight: 700; color: white;">Platega</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">СБП, Карты РФ, Крипта</div>
-                        </div>
-                        <div class="check-icon"><i class="fas fa-check-circle"></i></div>
-                    </div>
-                    <div class="payment-card" data-method="lolz">
-                        <div class="info-icon" style="background: rgba(59, 130, 246, 0.1); color: #60a5fa;"><i class="fas fa-globe"></i></div>
-                        <div class="payment-info">
-                            <div style="font-weight: 700; color: white;">Lolz Team</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">Баланс lzt.market</div>
                         </div>
                         <div class="check-icon"><i class="fas fa-check-circle"></i></div>
                     </div>
@@ -813,17 +798,53 @@
             <!-- Placeholder for other sections -->
             <div id="section-plugins" class="content-section">
                 <h2 style="font-size: 2rem; margin-bottom: 1rem;">Мои плагины</h2>
-                <div class="empty-state">
-                    <div class="empty-icon"><i class="fas fa-puzzle-piece"></i></div>
-                    <h3>У вас нет плагинов</h3>
-                    <p>Перейдите в маркетплейс, чтобы добавить плагины в свою библиотеку.</p>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Ваша библиотека установленных расширений</p>
+                
+                <div id="user-plugins-container">
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-puzzle-piece"></i></div>
+                        <h3>У вас пока нет плагинов</h3>
+                        <p>Добавьте их в <a href="plugins.html" style="color: var(--accent);">маркетплейсе</a>.</p>
+                        <button class="btn-primary" style="margin-top: 1.5rem;" onclick="window.location.href='plugins.html'">
+                            <i class="fas fa-plus"></i> Маркетплейс
+                        </button>
+                        <button class="btn-outline" style="margin-top: 0.5rem;" onclick="prompt('Введите лицензионный ключ плагина:')">
+                            <i class="fas fa-key"></i> Активировать ключом
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="info-card" style="margin-top: 2rem;">
+                    <div class="info-icon" style="color: var(--accent);"><i class="fas fa-plus"></i></div>
+                    <div class="info-text">
+                        <h3>Хотите создать свой?</h3>
+                        <p style="color: var(--text-muted);">Ознакомьтесь с нашей документацией по SDK и начните разработку.</p>
+                    </div>
+                    <button class="btn-outline" onclick="window.location.href='sdk.html'">Документация</button>
                 </div>
             </div>
 
             <div id="section-dev" class="content-section">
                 <h2 style="font-size: 2rem; margin-bottom: 1rem;">Разработчик</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Инструменты для создания и управления плагинами</p>
+                
                 <div class="info-card">
-                    <p style="color: var(--text-muted);">Доступ к SDK и инструментам разработчика будет доступен в следующих обновлениях.</p>
+                    <div class="info-text">
+                        <h3 style="color: white; margin-bottom: 0.5rem;">API Key</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem;">Используйте этот ключ для авторизации ваших плагинов в SDK.</p>
+                        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px;">
+                            <code id="api-key-display" style="color: var(--accent); font-family: monospace;">••••••••••••••••••••••••••••</code>
+                            <button class="btn-icon" onclick="copyApiKey()" style="margin-left: auto; color: white;"><i class="fas fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card" style="margin-top: 1.5rem;">
+                    <div class="info-text">
+                        <h3 style="color: white;">Управление плагинами</h3>
+                        <p style="color: var(--text-muted);">Загружайте свои плагины в маркетплейс FunPay Slow.</p>
+                    </div>
+                    <button class="btn-primary" onclick="alert('Доступ в Developer Console будет открыт после релиза SDK v1.0')">Открыть консоль</button>
                 </div>
             </div>
 
@@ -861,7 +882,7 @@
         <div class="footer-grid">
             <div class="footer-brand">
                 <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
-                    <span class="snail-logo snail-crawling" style="font-size: 2.2rem;">🐌</span>
+                    <span class="snail-logo">🐌</span>
                     <div class="logo-text">FunPay <span>Slow</span></div>
                 </div>
                 <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
@@ -907,19 +928,38 @@
             }
 
             // Update Profile UI
-            const name = user.name || user.email.split('@')[0];
+            const name = user.name || (user.email ? user.email.split('@')[0] : 'User');
             const char = name[0].toUpperCase();
             
-            document.getElementById('sidebar-user-name').textContent = name;
-            document.getElementById('hero-user-name').textContent = name;
-            document.getElementById('sidebar-avatar-char').textContent = char;
-            document.getElementById('hero-avatar-char').textContent = char;
-            document.getElementById('hero-user-email').textContent = user.email;
+            const elSidebarName = document.getElementById('sidebar-user-name');
+            const elHeroName = document.getElementById('hero-user-name');
+            const elSidebarChar = document.getElementById('sidebar-avatar-char');
+            const elHeroChar = document.getElementById('hero-avatar-char');
+            const elHeroEmail = document.getElementById('hero-user-email');
+
+            if (elSidebarName) elSidebarName.textContent = name;
+            if (elHeroName) elHeroName.textContent = name;
+            if (elSidebarChar) elSidebarChar.textContent = char;
+            if (elHeroChar) elHeroChar.textContent = char;
+            if (elHeroEmail) elHeroEmail.textContent = user.email || `@id${user.user_id}`;
             
             if (user.subscription) {
-                document.getElementById('sidebar-user-status').textContent = user.subscription.plan;
+                const subStatus = document.getElementById('sidebar-user-status');
+                if (subStatus) subStatus.textContent = user.subscription.plan || 'Бесплатно';
+                
                 const statusBadges = document.querySelectorAll('.status-badge');
-                statusBadges.forEach(b => b.textContent = user.subscription.plan);
+                statusBadges.forEach(b => b.textContent = user.subscription.plan || 'Бесплатно');
+            }
+            
+            // Handle active tab from URL hash
+            const hash = window.location.hash.replace('#', '') || 'profile';
+            if (document.getElementById(`section-${hash}`)) {
+                // We need to wait a tiny bit for script.js listeners
+                setTimeout(() => {
+                    if (typeof window.switchTab === 'function') {
+                        window.switchTab(hash);
+                    }
+                }, 100);
             }
             
             // Payment Method Selection
@@ -977,11 +1017,65 @@
             await window.initiatePayment(selectedPlanId, selectedAmount, method);
         }
 
-        // Initialize active payment method
-        document.querySelectorAll('.payment-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
+        async function activateTrial() {
+            const user = window.App.user;
+            if (!user) {
+                alert("Пожалуйста, сначала войдите в аккаунт.");
+                return;
+            }
+            
+            const btn = document.getElementById('btn-activate-trial');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Активация...';
+            
+            try {
+                const res = await fetch(`${window.API_BASE}/api/subscription/trial`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user_id: user.user_id.toString() })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("Пробный период на 4 дня успешно активирован! План: Fast");
+                    window.location.reload();
+                } else {
+                    alert(data.message || "Ошибка при активации пробного периода.");
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-rocket"></i> Активировать trial';
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Ошибка соединения с сервером.");
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-rocket"></i> Активировать trial';
+            }
+        }
+
+        function copyApiKey() {
+            const key = "fps_" + Math.random().toString(36).substr(2, 16); // Placeholder logic
+            navigator.clipboard.writeText(key);
+            alert("API Key скопирован!");
+        }
+
+        function copyReferral() {
+            const url = document.getElementById('referral-url').value;
+            navigator.clipboard.writeText(url);
+            alert("Ссылка скопирована!");
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = window.App.user;
+            if (user) {
+                const refUrl = document.getElementById('referral-url');
+                if (refUrl) refUrl.value = `https://funpayslow.com/join?ref=${user.user_id}`;
+            }
+            
+            // Payment Method Selection
+            document.querySelectorAll('.payment-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                });
             });
         });
     </script>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Медиапартнерство — FunPay Slow</title>
     <link rel="stylesheet" href="styles.css?v=2.1">
-    <link rel="icon" href="icon.png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -205,13 +205,14 @@
             </ul>
 
             <div class="nav-actions">
-                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a><a href="#" class="btn-download-nav" id="login-trigger-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);"><i class="fas fa-sign-in-alt"></i> Войти</a>
-                    <i class="fas fa-sign-in-alt"></i> Войти
-                </a>
-                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative;">
+                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" style="display: none;" id="login-trigger-btn"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
                     <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
                     <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
                         <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
                         <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
                     </div>
                 </div>
@@ -229,10 +230,10 @@
                 <p>Ищем Telegram, YouTube, TikTok и другие площадки для обзоров, рекламы и интеграций. Нужен живой контент про Slow, а не одинаковые рекламные тексты под копирку.</p>
                 
                 <div class="media-actions">
-                    <button class="btn-primary btn-large" onclick="window.open('https://forms.gle/your-form-id')">
-                        Заполнить заявку <i class="fas fa-external-link-alt"></i>
+                    <button class="btn-primary" style="padding: 1.2rem 2.5rem; font-size: 1.2rem; border-radius: 16px;" onclick="window.open('https://forms.gle/WyAdtxceckusqWjD6')">
+                        Заполнить заявку <i class="fas fa-external-link-alt" style="margin-left: 10px;"></i>
                     </button>
-                    <button class="btn-outline btn-large" onclick="window.open('https://t.me/FunpaySlow_Bot')">
+                    <button class="btn-outline btn-large" onclick="window.open('https://t.me/FunpaySlov_Bot')">
                         <i class="fab fa-telegram"></i> Обсудить в Telegram
                     </button>
                 </div>
@@ -244,6 +245,7 @@
                     <div class="visual-icon" style="top: 50px; right: 0; color: #ff0000; animation-delay: -1s;"><i class="fab fa-youtube"></i></div>
                     <div class="visual-icon" style="bottom: 0; left: 50px; color: #fff; animation-delay: -2s;"><i class="fab fa-tiktok"></i></div>
                 </div>
+            </div>
             </div>
         </div>
 
@@ -297,6 +299,33 @@
                 <p class="section-desc">Форма короткая. Главное — показать площадку и формат.</p>
             </div>
 
+            <div class="info-card" style="margin-top: 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; padding: 4rem; background: rgba(20,20,20,0.6);">
+                <div class="form-info-text">
+                    <h3 style="font-size: 2rem; color: white; margin-bottom: 1.5rem;">Готовы к сотрудничеству?</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; line-height: 1.8;">
+                        Мы ценим качественный контент и лояльную аудиторию. <br><br>
+                        После заполнения формы наш медиа-менеджер свяжется с вами для обсуждения условий и предоставления необходимых ресурсов (лицензии, плагины, рекламные материалы).
+                    </p>
+                    <div class="info-item" style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; color: #10b981; font-weight: 600;">
+                        <i class="fas fa-check-circle"></i> Индивидуальные условия
+                    </div>
+                    <div class="info-item" style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; color: #10b981; font-weight: 600;">
+                        <i class="fas fa-check-circle"></i> Ранний доступ к обновлениям
+                    </div>
+                    <div class="info-item" style="display: flex; align-items: center; gap: 12px; color: #10b981; font-weight: 600;">
+                        <i class="fas fa-check-circle"></i> Поддержка от разработчиков
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 24px; padding: 3rem; text-align: center;">
+                    <i class="fas fa-file-alt" style="font-size: 4rem; color: var(--accent); margin-bottom: 2rem;"></i>
+                    <h4 style="color: white; margin-bottom: 1rem;">Google Forms</h4>
+                    <p style="color: var(--text-muted); margin-bottom: 2.5rem; font-size: 0.9rem;">Нажмите кнопку ниже, чтобы открыть официальную анкету для медиа-партнеров.</p>
+                    <button class="btn-primary" style="width: 100%; padding: 18px;" onclick="window.open('https://forms.gle/WyAdtxceckusqWjD6')">
+                        Открыть анкету <i class="fas fa-external-link-alt" style="margin-left: 8px;"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="steps-grid">
                 <div class="step-card">
                     <div class="step-number">1</div>
@@ -317,7 +346,7 @@
             </div>
 
             <div style="text-align: center; margin-top: 4rem;">
-                <button class="btn-primary btn-large" onclick="window.open('https://forms.gle/your-form-id')">
+                <button class="btn-primary btn-large" onclick="window.open('https://forms.gle/FunPaySlowMedia')">
                     Перейти к форме
                 </button>
             </div>
@@ -327,7 +356,10 @@
     <footer class="main-footer">
         <div class="footer-grid">
             <div class="footer-brand">
-                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;"><span class="snail-logo" style="font-size: 2.2rem;">🐌</span><div class="logo-text">FunPay <span>Slow</span></div></div>
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
                 <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
                 <div class="footer-socials">
                     <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>

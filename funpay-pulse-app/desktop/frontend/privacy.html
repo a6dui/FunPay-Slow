@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Политика конфиденциальности — FunPay Slow</title>
     <link rel="icon" href="icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="styles.css?v=2.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -35,9 +36,8 @@
             </ul>
 
             <div class="nav-actions">
-                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a><a href="#" class="btn-download-nav" id="login-trigger-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);"><i class="fas fa-sign-in-alt"></i> Войти</a>
-                    <i class="fas fa-sign-in-alt"></i> Войти
-                </a>
+                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn"><i class="fas fa-sign-in-alt"></i> Войти</a>
                 <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative;">
                     <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
                     <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
@@ -106,7 +106,10 @@
     <footer class="main-footer">
         <div class="footer-grid">
             <div class="footer-brand">
-                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;"><span class="snail-logo" style="font-size: 2.2rem;">🐌</span><div class="logo-text">FunPay <span>Slow</span></div></div>
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
                 <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
                 <div class="footer-socials">
                     <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
