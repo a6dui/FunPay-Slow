@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Обновления — FunPay Slow</title>
     <link rel="stylesheet" href="styles.css?v=2.4.1">
+    <link rel="icon" href="icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -23,6 +25,20 @@
                 <li><a href="changelog.html" class="active">Обновления</a></li>
                 <li><a href="report.html">Поддержка</a></li>
             </ul>
+            <div class="nav-actions">
+                <a href="https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow" target="_blank" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: #111; border: 1px solid #333; border-radius: 12px; flex-direction: column; padding: 10px; width: 180px; z-index: 100;">
+                        <a href="profile.html" style="color: white; text-decoration: none; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" id="admin-link" style="color: white; text-decoration: none; padding: 10px; border-radius: 8px; display: none; align-items: center; gap: 10px;"><i class="fas fa-shield-alt"></i> Админка</a>
+                        <a href="#" onclick="window.logout()" style="color: #ef4444; text-decoration: none; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
