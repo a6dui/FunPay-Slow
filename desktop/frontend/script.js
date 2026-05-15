@@ -22,41 +22,11 @@ window.App = {
     },
     
     async checkVersion() {
-        // Отключаем уведомления об обновлении для браузерной версии
-        if (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('funpaypulse.com')) {
-            return;
-        }
-        try {
-            const res = await fetch(`${API_BASE}/`);
-            if (res.ok) {
-                const data = await res.json();
-                const localVersion = "2.4.1"; // Текущая версия десктопа
-                if (data.version && data.version !== localVersion) {
-                    console.log(`Update available: ${data.version} (Local: ${localVersion})`);
-                    this.showUpdateNotification(data.version);
-                }
-            }
-        } catch (e) {
-            console.error("Version Check Error:", e);
-        }
+        // Disabled
     },
 
     showUpdateNotification(newVersion) {
-        if (document.querySelector('.update-notification')) return;
-        
-        const notify = document.createElement('div');
-        notify.className = 'update-notification';
-        notify.innerHTML = `
-            <div class="update-content">
-                <i class="fas fa-sync-alt fa-spin"></i>
-                <span>Доступна новая версия <b>v.${newVersion}</b></span>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <button onclick="window.open('https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow')">Скачать новую версию</button>
-                    <div onclick="this.parentElement.parentElement.parentElement.remove()" style="cursor: pointer; opacity: 0.6; padding: 5px;">&times;</div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(notify);
+        // Disabled
     },
     
     async syncUser() {
