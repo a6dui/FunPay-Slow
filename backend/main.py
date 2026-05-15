@@ -352,36 +352,125 @@ def get_admin_stats(admin_id: str):
         "system_status": "healthy"
     }
 
-# --- Telegram Bot Webhook Logic (Placeholder) ---
-# В реальной жизни здесь будет обработка обновлений от бота
-@app.post("/api/bot/auth-confirm")
-def bot_confirm(code: str, user_id: str, first_name: str, username: str):
+@app.post("/api/user/activate-trial")
+def activate_trial(data: dict):
+    user_id = data.get("user_id")
     conn = get_db_conn()
     c = conn.cursor()
+    c.execute("SELECT has_trial FROM users WHERE user_id = ?", (user_id,))
+    row = c.fetchone()
+    if not row: raise HTTPException(status_code=404, detail="User not found")
+    if row[0] == 1: raise HTTPException(status_code=400, detail="Trial already used")
     
-    # Update auth token
-    c.execute("UPDATE auth_tokens SET user_id = ? WHERE code = ?", (user_id, code))
+    sub_end = int(time.time()) + (4 * 24 * 3600)
+    c.execute("UPDATE users SET plan = 'FAST', sub_end = ?, has_trial = 1 WHERE user_id = ?", (sub_end, user_id))
+    conn.commit()
+    conn.close()
+    return {"status": "success", "detail": "Trial activated"}
+
+@app.post("/api/accounts/add")
+def add_account(data: dict):
+    user_id = data.get("user_id")
+    name = data.get("name")
+    cookie = data.get("cookie")
+    proxy = data.get("proxy", "")
     
-    # Create or update user
-    now = int(time.time())
-    c.execute("INSERT OR IGNORE INTO users (user_id, first_name, username, plan, created_at) VALUES (?, ?, ?, 'none', ?)", 
-              (user_id, first_name, username, now))
-    
+    conn = get_db_conn()
+    c = conn.cursor()
+    c.execute("INSERT INTO accounts (user_id, name, cookie, proxy, is_active) VALUES (?, ?, ?, ?, 1)", 
+              (user_id, name, cookie, proxy))
     conn.commit()
     conn.close()
     return {"status": "success"}
 
-class ReportData(BaseModel):
-    user_id: str
-    username: str
-    message: str
+@app.get("/api/accounts/list")
+def list_accounts(user_id: str):
+    conn = get_db_conn()
+    c = conn.cursor()
+    c.execute("SELECT name, is_active, proxy FROM accounts WHERE user_id = ?", (user_id,))
+    rows = c.fetchall()
+    conn.close()
+    return [{"name": r[0], "is_active": r[1], "proxy": r[2]} for r in rows]
 
-@app.post("/api/report/send")
-def send_report(data: ReportData):
-    # Здесь логика отправки сообщения в Telegram Bot
-    # Для теста просто логируем и возвращаем успех
-    print(f"REPORT from {data.username} ({data.user_id}): {data.message}")
-    return {"status": "success", "detail": "Report received"}
+@app.post("/api/payment/pay-with-balance")
+def pay_with_balance(data: dict):
+    user_id = data.get("user_id")
+    plan_type = data.get("plan_type") # e.g. slow_1m
+    price = data.get("price")
+    
+    conn = get_db_conn()
+    c = conn.cursor()
+    c.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
+    balance = c.fetchone()[0]
+    
+    if balance < price:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+        
+    days = 30
+    if "_3m" in plan_type: days = 90
+    elif "_6m" in plan_type: days = 180
+    elif "_12m" in plan_type: days = 365
+    
+    plan_base = "SLOW" if "slow" in plan_type else "FAST"
+    sub_end = int(time.time()) + (days * 24 * 3600)
+    
+    c.execute("UPDATE users SET balance = balance - ?, plan = ?, sub_end = ? WHERE user_id = ?", 
+              (price, plan_base, sub_end, user_id))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+@app.post("/api/payment/webhook")
+async def crypto_bot_webhook(request: Request):
+    # This is a simple webhook for Crypto Bot
+    # In production, check for HMAC or IP whitelist
+    data = await request.json()
+    if data.get("status") == "paid" or (data.get("update_type") == "invoice_paid"):
+        payload = data.get("payload") or data.get("invoice", {}).get("payload")
+        if not payload: return {"status": "ignored"}
+        
+        # Payload format: "user_id|plan_type|price"
+        parts = payload.split("|")
+        if len(parts) < 3: return {"status": "error"}
+        
+        u_id, p_type, price = parts[0], parts[1], float(parts[2])
+        
+        days = 30
+        if "_3m" in p_type: days = 90
+        elif "_6m" in p_type: days = 180
+        elif "_12m" in p_type: days = 365
+        
+        plan_base = "SLOW" if "slow" in p_type else "FAST"
+        sub_end = int(time.time()) + (days * 24 * 3600)
+        
+        conn = get_db_conn()
+        c = conn.cursor()
+        c.execute("UPDATE users SET plan = ?, sub_end = ? WHERE user_id = ?", (plan_base, sub_end, u_id))
+        
+        # Referral reward (5%)
+        c.execute("SELECT referrer_id FROM users WHERE user_id = ?", (u_id,))
+        ref_id = c.fetchone()[0]
+        if ref_id:
+            reward = price * 0.05
+            c.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (reward, ref_id))
+            
+        conn.commit()
+        conn.close()
+        
+    return {"status": "ok"}
+
+# Start Bot Thread
+import threading
+def run_bot():
+    try:
+        print("Starting Telegram Bot Polling...")
+        bot.infinity_polling()
+    except Exception as e:
+        print(f"Bot Error: {e}")
+
+bot_thread = threading.Thread(target=run_bot, daemon=True)
+bot_thread.start()
 
 if __name__ == "__main__":
     import uvicorn

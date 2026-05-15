@@ -72,6 +72,67 @@ window.App = {
         } catch (e) { return null; }
     },
 
+    showAddAccountModal() {
+        const modal = document.getElementById('add-account-modal');
+        if (modal) modal.style.display = 'flex';
+    },
+
+    async addNewAccount() {
+        const name = document.getElementById('acc-name').value;
+        const cookie = document.getElementById('acc-cookie').value;
+        const proxy = document.getElementById('acc-proxy').value;
+
+        if (!name || !cookie) return alert("Введите имя и куки!");
+
+        try {
+            const res = await fetch(`${API_BASE}/api/accounts/add`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    user_id: String(this.user.user_id),
+                    name: name,
+                    cookie: cookie,
+                    proxy: proxy
+                })
+            });
+
+            if (res.ok) {
+                alert("✅ Аккаунт добавлен!");
+                document.getElementById('add-account-modal').style.display = 'none';
+                this.loadAccountsList();
+            } else {
+                alert("Ошибка при добавлении");
+            }
+        } catch (e) { alert("Ошибка связи с сервером"); }
+    },
+
+    async loadAccountsList() {
+        if (!this.user) return;
+        const body = document.getElementById('accounts-list-body');
+        if (!body) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/accounts/list?user_id=${this.user.user_id}`);
+            const data = await res.json();
+            
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 3rem; color: #444;">Аккаунтов пока не добавлено</td></tr>';
+                return;
+            }
+
+            body.innerHTML = data.map(acc => `
+                <tr>
+                    <td>${acc.name}</td>
+                    <td><span class="status-badge" style="color: ${acc.is_active ? '#10b981' : '#f43f5e'}">${acc.is_active ? 'АКТИВЕН' : 'ОШИБКА'}</span></td>
+                    <td>${acc.proxy || '---'}</td>
+                    <td>
+                        <button class="btn-action" style="color: #f43f5e;"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (e) { console.error(e); }
+    },
+
     ensureLoginOverlay() {
         if (document.getElementById('login-overlay')) return;
         
