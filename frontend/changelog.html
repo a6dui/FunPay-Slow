@@ -10,8 +10,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .changelog-container { max-width: 800px; margin: 60px auto; }
+        .version-block { border-left: 2px solid var(--accent); padding-left: 30px; position: relative; margin-bottom: 50px; }
+        .version-block::before { content: ''; position: absolute; left: -7px; top: 0; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent-glow); }
+        .version-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 15px; }
+        .version-tag { background: var(--accent); color: black; font-weight: 800; padding: 4px 12px; border-radius: 6px; font-size: 0.9rem; }
+        .version-date { color: var(--text-muted); font-size: 0.9rem; }
+        .changelog-list { list-style: none; padding: 0; }
+        .changelog-list li { margin-bottom: 10px; color: #ccc; display: flex; gap: 10px; }
+        .changelog-list li::before { content: '—'; color: var(--accent); }
+    </style>
 </head>
 <body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo-container" onclick="window.location.href='index.html'">
@@ -42,68 +58,36 @@
         </div>
     </nav>
 
-    <main class="container" style="padding-top: 120px;">
-        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 4rem;">
-            <div>
-                <div class="hero-badge"><i class="fas fa-history"></i> Таймлайн обновлений</div>
-                <h1 style="font-size: 4rem; margin-bottom: 2rem;">Путь к <span class="gradient-text">совершенству.</span></h1>
-                
-                <div class="changelog-list" style="display: flex; flex-direction: column-reverse; gap: 3rem;">
-                    <!-- v2.2.2 (Oldest) -->
-                    <div class="changelog-item" style="opacity: 0.5; padding: 2rem; border-left: 2px solid #333;">
-                        <h3 style="color: #666;">v2.2.2 — Базовая версия</h3>
-                        <p style="color: #444;">Начало разработки интерфейса и базовых функций бота.</p>
-                    </div>
+    <main class="container">
+        <div class="changelog-container">
+            <h1 style="font-size: 3rem; margin-bottom: 50px;">История <span class="gradient-text">версий</span></h1>
 
-                    <!-- v2.3.0 -->
-                    <div class="changelog-item" style="opacity: 0.7; padding: 2rem; border-left: 2px solid var(--accent);">
-                        <h3 style="color: #888;">v2.3.0 — Структурная оптимизация</h3>
-                        <ul style="list-style: none; padding: 0; font-size: 0.9rem; color: #666;">
-                            <li>• Очистка репозитория от лишних папок</li>
-                            <li>• Перенос бэкенда на FastAPI</li>
-                            <li>• Начало работы над системой плагинов</li>
-                        </ul>
-                    </div>
-
-                    <!-- v2.4.0 -->
-                    <div class="changelog-item" style="padding: 2.5rem; border-left: 3px solid var(--accent); background: rgba(255,255,255,0.01); border-radius: 0 24px 24px 0;">
-                        <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">v2.4.0 — Пульс и Премиум</h2>
-                        <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem; color: #888;">
-                            <li><i class="fas fa-check" style="color: var(--accent);"></i> Интеграция "Пульса системы" с анимацией волны</li>
-                            <li><i class="fas fa-check" style="color: var(--accent);"></i> Новый Hero-блок с мокапом приложения</li>
-                            <li><i class="fas fa-check" style="color: var(--accent);"></i> Система таксономии плагинов</li>
-                        </ul>
-                    </div>
-
-                    <!-- v2.4.1 (Latest) -->
-                    <div class="changelog-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 30px; padding: 3rem; border-left: 5px solid var(--accent);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                            <h2 style="font-size: 2.2rem;">v2.4.1 <span style="background: var(--accent); color: black; font-size: 0.7rem; padding: 4px 10px; border-radius: 100px; vertical-align: middle; margin-left: 1rem;">LATEST</span></h2>
-                            <span style="color: #555;">Сегодня</span>
-                        </div>
-                        <ul style="list-style: none; padding: 0; display: grid; gap: 1.2rem; color: #bbb;">
-                            <li><i class="fas fa-bolt" style="color: var(--accent);"></i> <b>Авто-авторизация:</b> Вход в один клик через прямую ссылку в бота.</li>
-                            <li><i class="fas fa-eye-slash" style="color: var(--accent);"></i> <b>Smart UI:</b> Плашка обновлений скрыта для веб-версии.</li>
-                            <li><i class="fas fa-shield-alt" style="color: var(--accent);"></i> <b>Production Ready:</b> Полная готовность всех систем к релизу.</li>
-                        </ul>
-                    </div>
+            <!-- v2.4.1 -->
+            <div class="version-block">
+                <div class="version-header">
+                    <span class="version-tag">v2.4.1</span>
+                    <span class="version-date">15 мая 2026</span>
                 </div>
+                <ul class="changelog-list">
+                    <li>Финальная стабилизация системы подписок FAST/SLOW.</li>
+                    <li>Полное удаление уведомлений об обновлении.</li>
+                    <li>Новая система «авто-входа» через Telegram Bot.</li>
+                    <li>Обновление реферальных ссылок на домен funpayslow.com.</li>
+                    <li>Исправлены иконки профиля во всех разделах.</li>
+                </ul>
             </div>
 
-            <div class="sidebar">
-                <div class="mockup-card" style="position: sticky; top: 120px;">
-                    <h3 style="margin-bottom: 1.5rem;">СВОДКА</h3>
-                    <div style="display: grid; gap: 1.5rem;">
-                        <div>
-                            <div style="color: #555; font-size: 0.8rem; margin-bottom: 0.5rem;">Актуальная версия</div>
-                            <div style="font-size: 1.5rem; font-weight: 800; color: white;">v2.4.1</div>
-                        </div>
-                        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem;">
-                            <div style="color: #555; font-size: 0.8rem; margin-bottom: 0.5rem;">Статус</div>
-                            <div style="color: var(--accent); font-weight: 700;">Стабильно</div>
-                        </div>
-                    </div>
+            <!-- v2.2.2 -->
+            <div class="version-block">
+                <div class="version-header">
+                    <span class="version-tag">v2.2.2</span>
+                    <span class="version-date">10 мая 2026</span>
                 </div>
+                <ul class="changelog-list">
+                    <li>Первый релиз FunPay Slow.</li>
+                    <li>Базовая автоматизация ответов.</li>
+                    <li>Поддержка мульти-аккаунтов.</li>
+                </ul>
             </div>
         </div>
     </main>

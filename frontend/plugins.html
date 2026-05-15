@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
     <link rel="shortcut icon" href="favicon.ico">
     <title>Плагины — FunPay Slow</title>
     <link rel="stylesheet" href="styles.css?v=2.4.1">
@@ -14,31 +13,30 @@
     <style>
         .marketplace-header { padding: 60px 0 40px 0; }
         .marketplace-title-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
-        .marketplace-stats { display: flex; gap: 1.5rem; }
         .stat-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.5rem 2rem; border-radius: 20px; min-width: 140px; }
         .stat-num { font-size: 2.2rem; font-weight: 800; color: white; display: block; margin-bottom: 0.2rem; }
         .stat-label { color: var(--text-muted); font-size: 0.85rem; }
-
-        .filter-search-bar { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 20px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
-        .filter-tabs { display: flex; gap: 0.8rem; }
-        .filter-tab { padding: 0.8rem 1.5rem; border-radius: 12px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.8rem; transition: 0.3s; }
-        .filter-tab.active { background: rgba(16, 185, 129, 0.1); color: var(--accent); }
         
         .plugin-grid-market { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 6rem; }
-        .market-card { background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); border-radius: 30px; padding: 2rem; transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1); display: flex; flex-direction: column; }
-        .market-card:hover { transform: translateY(-8px); border-color: rgba(124, 58, 237, 0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .market-card { background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); border-radius: 30px; padding: 2rem; transition: 0.4s; display: flex; flex-direction: column; }
+        .market-card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
         .premium-icon-box { width: 60px; height: 60px; background: rgba(255,255,255,0.03); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
-        .badge-official { font-size: 0.7rem; font-weight: 800; background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 5px 12px; border-radius: 100px; text-transform: uppercase; }
+        .badge-official { font-size: 0.7rem; font-weight: 800; background: rgba(124, 58, 237, 0.1); color: #a78bfa; padding: 5px 12px; border-radius: 100px; text-transform: uppercase; }
         .badge-fast-only { font-size: 0.7rem; font-weight: 800; background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 5px 12px; border-radius: 100px; text-transform: uppercase; }
         
         .btn-install { width: 100%; padding: 1rem; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; margin-top: auto; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.95rem; }
         .btn-install.locked { background: rgba(255,255,255,0.05); color: #555; cursor: not-allowed; }
-        .btn-install.active { background: var(--accent); color: #000; }
+        .btn-install.active { background: var(--accent); color: black; }
         .btn-install.active:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 5px 15px var(--accent-glow); }
     </style>
 </head>
 <body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo-container" onclick="window.location.href='index.html'">
@@ -79,8 +77,6 @@
         </div>
 
         <div class="plugin-grid-market">
-            <!-- Кнопки в карточках будут меняться в зависимости от подписки -->
-            
             <!-- RentSteam (FAST ONLY) -->
             <div class="market-card" data-tier="fast">
                 <div class="card-top">
@@ -113,68 +109,27 @@
                 <p class="card-description">Автоматическая отправка Telegram Stars Gifts. Маст-хэв для крупных продавцов.</p>
                 <button class="btn-install locked" onclick="installPlugin('AutoGift', 'fast')"><i class="fas fa-lock"></i> Установить</button>
             </div>
-
-            <!-- AutoSMM (SLOW & FAST) -->
-            <div class="market-card" data-tier="slow">
-                <div class="card-top">
-                    <div class="premium-icon-box" style="color: #a855f7;"><i class="fas fa-share-nodes"></i></div>
-                    <span class="badge-official"><i class="fas fa-check"></i> SLOW / FAST</span>
-                </div>
-                <h3 class="card-title">AutoSMM</h3>
-                <p class="card-description">Продажа SMM-услуг. Подключение внешних панелей через API.</p>
-                <button class="btn-install locked" onclick="installPlugin('AutoSMM', 'slow')"><i class="fas fa-lock"></i> Установить</button>
-            </div>
-
-            <!-- AutoStars (FAST ONLY) -->
-            <div class="market-card" data-tier="fast">
-                <div class="card-top">
-                    <div class="premium-icon-box" style="color: #fbbf24;"><i class="fas fa-star"></i></div>
-                    <span class="badge-fast-only"><i class="fas fa-crown"></i> FAST ONLY</span>
-                </div>
-                <h3 class="card-title">AutoStars</h3>
-                <p class="card-description">Мгновенная выдача Telegram Stars. Лучшее решение на рынке.</p>
-                <button class="btn-install locked" onclick="installPlugin('AutoStars', 'fast')"><i class="fas fa-lock"></i> Установить</button>
-            </div>
-
-            <!-- ChatSpam (SLOW & FAST) -->
-            <div class="market-card" data-tier="slow">
-                <div class="card-top">
-                    <div class="premium-icon-box" style="color: #f472b6;"><i class="fas fa-comments"></i></div>
-                    <span class="badge-official"><i class="fas fa-check"></i> SLOW / FAST</span>
-                </div>
-                <h3 class="card-title">ChatSpam</h3>
-                <p class="card-description">Массовая рассылка сообщений покупателям. Простой и эффективный маркетинг.</p>
-                <button class="btn-install locked" onclick="installPlugin('ChatSpam', 'slow')"><i class="fas fa-lock"></i> Установить</button>
-            </div>
         </div>
     </main>
 
     <script src="script.js"></script>
     <script>
-        // Логика проверки подписки для кнопок
         document.addEventListener('DOMContentLoaded', () => {
             const userStr = localStorage.getItem('funpay_user');
             if (!userStr) return;
-            
             const user = JSON.parse(userStr);
-            const userPlan = user.plan || 'none'; // slow, fast, none
+            const userPlan = user.plan || 'none';
             
             document.querySelectorAll('.market-card').forEach(card => {
                 const tier = card.getAttribute('data-tier');
                 const btn = card.querySelector('.btn-install');
-                
                 if (userPlan === 'fast') {
-                    // FAST видит всё
-                    btn.classList.remove('locked');
-                    btn.classList.add('active');
+                    btn.classList.remove('locked'); btn.classList.add('active');
                     btn.innerHTML = '<i class="fas fa-download"></i> Установить';
                 } else if (userPlan === 'slow' && tier === 'slow') {
-                    // SLOW видит только свои
-                    btn.classList.remove('locked');
-                    btn.classList.add('active');
+                    btn.classList.remove('locked'); btn.classList.add('active');
                     btn.innerHTML = '<i class="fas fa-download"></i> Установить';
                 } else {
-                    // Закрыто
                     btn.classList.add('locked');
                     btn.innerHTML = '<i class="fas fa-lock"></i> ' + (tier === 'fast' ? 'Нужен FAST' : 'Нужна подписка');
                 }
@@ -184,7 +139,6 @@
         function installPlugin(name, tier) {
             const userStr = localStorage.getItem('funpay_user');
             if (!userStr) { alert('Сначала войдите в аккаунт!'); return; }
-            
             const user = JSON.parse(userStr);
             if (user.plan === 'fast' || (user.plan === 'slow' && tier === 'slow')) {
                 alert(`Плагин ${name} успешно добавлен в ваш профиль!`);

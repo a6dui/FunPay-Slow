@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FunPay Slow — Приложение</title>
+    <title>FunPay Slow — Ультимативная панель для FunPay</title>
     <link rel="stylesheet" href="styles.css?v=2.4.1">
-    <link rel="icon" href="icon.png"><link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" href="icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -29,7 +30,6 @@
                 <li><a href="sdk.html">SDK</a></li>
                 <li><a href="changelog.html">Обновления</a></li>
                 <li><a href="report.html">Поддержка</a></li>
-                <li><a href="media-partnership.html">Медиа</a></li>
             </ul>
 
             <div class="nav-actions">
@@ -39,80 +39,164 @@
                 <a href="#" class="btn-download-nav" id="login-trigger-btn">
                     <i class="fas fa-sign-in-alt"></i> Войти
                 </a>
-                <div class="profile-nav-item" id="user-profile-nav" style="display: none;">
-                    <div class="user-avatar-btn" id="user-avatar" onclick="var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
-                    <div class="profile-dropdown" id="profile-dropdown">
-                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
-                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
-                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: #111; border: 1px solid #333; border-radius: 12px; flex-direction: column; padding: 10px; width: 180px; z-index: 100;">
+                        <a href="profile.html" style="color: white; text-decoration: none; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" id="admin-link" style="color: white; text-decoration: none; padding: 10px; border-radius: 8px; display: none; align-items: center; gap: 10px;"><i class="fas fa-shield-alt"></i> Админка</a>
+                        <a href="#" onclick="window.logout()" style="color: #ef4444; text-decoration: none; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-sign-out-alt"></i> Выйти</a>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="landing-container">
+    <main class="container">
+        <!-- Hero Section -->
         <section class="hero-landing">
-            <div class="hero-landing-content">
-                <div class="hero-badge"><span class="pulse-dot"></span> v2.4.1 Production</div>
-                <h1 class="hero-main-title">Ультимативная панель <br><span class="gradient-text">Slow.</span></h1>
-                <p class="hero-subtext">Все инструменты для работы с FunPay в одном удобном приложении. Профессиональная автоматизация.</p>
+            <div class="hero-content">
+                <div class="hero-badge"><i class="fas fa-rocket"></i> Release v2.4.1 is live</div>
+                <h1 class="hero-main-title">Управляй FunPay <br><span class="gradient-text">на максималках.</span></h1>
+                <p class="hero-subtext">Автоматизация, плагины и мульти-аккаунты в одном защищенном приложении. Настрой воркер один раз и забудь о рутине.</p>
+                
                 <div class="hero-actions">
                     <a href="https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow" target="_blank" class="btn-primary btn-large">
                         <i class="fab fa-windows"></i> <i class="fab fa-apple"></i> Скачать v2.4.1
                     </a>
+                    <button class="btn-outline btn-large" onclick="window.location.href='plugins.html'">
+                        <i class="fas fa-puzzle-piece"></i> Плагины
+                    </button>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-val">100+</span>
+                        <span class="stat-lab">Плагинов</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">5k+</span>
+                        <span class="stat-lab">Пользователей</span>
+                    </div>
+                    <div class="stat-item">
+                        <div class="status-pulse"></div>
+                        <span class="stat-lab">Система Online</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="hero-landing-visual">
+            <div class="hero-visual">
                 <div class="mockup-card">
                     <div class="mockup-header">
-                        <div class="mockup-icon"><i class="fas fa-microchip"></i></div>
-                        <div class="mockup-title">Управление Pulse</div>
-                        <div style="margin-left: auto; color: var(--accent); font-size: 0.8rem; font-weight: 800;">v2.4.1</div>
+                        <div class="mockup-dots"><span></span><span></span><span></span></div>
+                        <div class="mockup-version">FunPay Slow v2.4.1</div>
                     </div>
-                    <div class="mockup-grid">
-                        <div class="mockup-item"><i class="fas fa-users"></i><span>Аккаунты</span></div>
-                        <div class="mockup-item"><i class="fas fa-bolt"></i><span>Авто-выдача</span></div>
+                    <div class="mockup-body">
+                        <div class="mockup-sidebar"></div>
+                        <div class="mockup-main">
+                            <div class="mockup-chart"></div>
+                            <div class="mockup-rows">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-    </div>
 
-    <footer class="main-footer" style="padding: 100px 0 60px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 100px;">
-        <div class="landing-container">
-            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 4rem; text-align: left;">
-                <div>
-                    <div class="logo-container" style="justify-content: flex-start; margin-bottom: 1.5rem; border: none; background: none; padding: 0;">
+        <!-- Features Grid -->
+        <section class="features-grid" style="margin-top: 100px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Мгновенная реакция</h3>
+                <p>Бот отвечает покупателям и выдает товары за доли секунды. Никаких задержек.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Безопасность</h3>
+                <p>Ваши данные зашифрованы. Мы не храним пароли в открытом виде.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-server"></i>
+                <h3>VPS Воркер</h3>
+                <p>Установите воркер на свой сервер и забудьте о необходимости держать ПК включенным.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer" style="margin-top: 150px; padding: 80px 0 40px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 60px;">
+                <div class="footer-brand">
+                    <div class="logo-container" style="margin-bottom: 1.5rem; border: none; background: none; padding: 0;">
                         <span class="snail-logo">🐌</span>
                         <div class="logo-text">FunPay <span>Slow</span></div>
                     </div>
-                    <p style="color: #555; font-size: 0.9rem;">Десктопное приложение для работы с FunPay.</p>
+                    <p style="color: #555; font-size: 0.9rem; line-height: 1.6;">Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                    <a href="https://t.me/FunpaySlow" target="_blank" style="color: #888; text-decoration: none; display: block; margin-top: 1.5rem;"><i class="fab fa-telegram"></i> Telegram Channel</a>
                 </div>
                 <div>
                     <h4 style="color: white; margin-bottom: 1.5rem;">Продукт</h4>
                     <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
                         <li><a href="index.html" style="color: #555; text-decoration: none;">Главная</a></li>
                         <li><a href="plugins.html" style="color: #555; text-decoration: none;">Плагины</a></li>
+                        <li><a href="sdk.html" style="color: #555; text-decoration: none;">SDK Разработка</a></li>
+                        <li><a href="changelog.html" style="color: #555; text-decoration: none;">Обновления</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 style="color: white; margin-bottom: 1.5rem;">Поддержка</h4>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Ресурсы</h4>
                     <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
                         <li><a href="docs.html" style="color: #555; text-decoration: none;">Документация</a></li>
                         <li><a href="media-partnership.html" style="color: #555; text-decoration: none;">Медиапартнерство</a></li>
+                        <li><a href="report.html" style="color: #555; text-decoration: none;">Обратная связь</a></li>
+                        <li><a href="https://t.me/FunpaySlov_Bot" target="_blank" style="color: #555; text-decoration: none;">Telegram Bot</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 style="color: white; margin-bottom: 1.5rem;">Юридическое</h4>
                     <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
                         <li><a href="terms.html" style="color: #555; text-decoration: none;">Условия использования</a></li>
+                        <li><a href="privacy.html" style="color: #555; text-decoration: none;">Политика конфиденциальности</a></li>
+                        <li><a href="payment.html" style="color: #555; text-decoration: none;">Соглашение для оплаты</a></li>
                     </ul>
                 </div>
             </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <p style="color: #333; font-size: 0.85rem;">© 2026 FunPay Slow. Все права защищены.</p>
+                <p style="color: #222; font-size: 0.8rem;">Не является официальным приложением FunPay.com</p>
+            </div>
         </div>
     </footer>
+
+    <!-- Login Overlay -->
+    <div id="login-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="login-box" id="login-box-standard" style="background: #111; border: 1px solid #333; padding: 3rem; border-radius: 30px; width: 400px; position: relative;">
+            <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'" style="position: absolute; top: 20px; right: 25px; font-size: 1.5rem; cursor: pointer; color: #555;">&times;</div>
+            <h2 style="color: white; margin-bottom: 2rem; text-align: center;">Авторизация</h2>
+            <button class="btn-telegram" id="btn-telegram-login" style="width: 100%; background: #0088cc; color: white; border: none; padding: 1.2rem; border-radius: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fab fa-telegram-plane"></i> Войти через Telegram
+            </button>
+        </div>
+        
+        <div class="login-box" id="login-box-telegram" style="display: none; text-align: center; padding: 3rem; background: #111; border: 1px solid #333; border-radius: 30px; width: 450px; position: relative;">
+            <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'" style="position: absolute; top: 20px; right: 25px; font-size: 1.5rem; cursor: pointer; color: #555;">&times;</div>
+            <div style="width: 80px; height: 80px; background: rgba(0, 136, 204, 0.1); color: #0088cc; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; font-size: 2.5rem;">
+                <i class="fab fa-telegram-plane"></i>
+            </div>
+            <h2 style="color: white; margin-bottom: 0.5rem;">Подтвердите вход</h2>
+            <p style="color: #666; margin-bottom: 2rem; font-size: 0.95rem;">Нажмите кнопку ниже, чтобы перейти в бота и завершить авторизацию автоматически.</p>
+            
+            <a href="https://t.me/FunpaySlov_Bot" id="link-to-bot" target="_blank" class="btn-telegram" style="text-decoration: none; background: #0088cc; color: white; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 1.2rem; border-radius: 16px; font-weight: 700;">
+                <i class="fas fa-external-link-alt"></i> Открыть Telegram
+            </a>
+            
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                <div id="tg-auth-code" style="font-size: 1.5rem; color: #333; font-weight: 800; letter-spacing: 3px;">------</div>
+                <p style="color: #444; font-size: 0.8rem; margin-top: 0.5rem;">Таймер: <span id="timer-val">3:00</span></p>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

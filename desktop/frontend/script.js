@@ -1,6 +1,6 @@
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? "http://127.0.0.1:8080" 
-    : "https://funpay-slow.onrender.com"; // Замените на ваш URL на Render после деплоя
+    : "https://funpay-slow.onrender.com"; 
 
 // --- Global App State ---
 window.App = {
@@ -11,22 +11,16 @@ window.App = {
         if (this.user) {
             this.syncUser();
         }
-        
-        // Полностью отключаем уведомления об обновлении везде
-        /*
-        const isDesktop = !window.location.hostname.includes('.') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        if (isDesktop) {
-            this.checkVersion();
-        }
-        */
     },
     
     async checkVersion() {
-        // Disabled
+        // Disabled permanently by user request
+        return;
     },
 
     showUpdateNotification(newVersion) {
-        // Disabled
+        // Disabled permanently by user request
+        return;
     },
     
     async syncUser() {
@@ -36,6 +30,7 @@ window.App = {
             if (res.ok) {
                 const sub = await res.json();
                 this.user.subscription = sub;
+                this.user.plan = sub.plan; // fast, slow, none
                 localStorage.setItem('funpay_user', JSON.stringify(this.user));
                 this.updateUI();
             }
@@ -44,232 +39,17 @@ window.App = {
         }
     },
 
-    async fetchAdminStats() {
-        if (!this.user) return null;
-        try {
-            const res = await fetch(`${API_BASE}/api/admin/stats?admin_id=${this.user.user_id}`);
-            return res.ok ? await res.json() : null;
-        } catch (e) { return null; }
-    },
-
-    async fetchAdminPayments() {
-        if (!this.user) return null;
-        try {
-            const res = await fetch(`${API_BASE}/api/admin/payments?admin_id=${this.user.user_id}`);
-            return res.ok ? await res.json() : null;
-        } catch (e) { return null; }
-    },
-
-    async updateUserBalance(targetId, amount) {
-        if (!this.user) return { success: false };
-        try {
-            const res = await fetch(`${API_BASE}/api/admin/balance/update`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: String(targetId), amount: amount, admin_id: String(this.user.user_id) })
-            });
-            return await res.json();
-        } catch (e) { return { success: false }; }
-    },
-
-    // --- PLUGIN SYSTEM ---
-    savePluginConfig(type) {
-        const config = {};
-        if (type === 'bump') {
-            config.enabled = document.getElementById('plugin-bump-enabled').checked;
-            config.interval = document.getElementById('plugin-bump-interval').value;
-        } else if (type === 'delivery') {
-            config.enabled = document.getElementById('plugin-delivery-enabled').checked;
-            config.mappings = [];
-            document.querySelectorAll('.delivery-mapping-item').forEach(item => {
-                config.mappings.push({
-                    lot_id: item.querySelector('.lot-id-input').value,
-                    text: item.querySelector('.lot-text-input').value
-                });
-            });
-        }
-        localStorage.setItem(`plugin_${type}_config`, JSON.stringify(config));
-        this.showNotification(`Настройки ${type === 'bump' ? 'авто-поднятия' : 'авто-выдачи'} сохранены!`);
-    },
-
-    loadPluginConfigs() {
-        const bump = JSON.parse(localStorage.getItem('plugin_bump_config') || '{"enabled":false, "interval": 120}');
-        const delivery = JSON.parse(localStorage.getItem('plugin_delivery_config') || '{"enabled":false, "mappings": []}');
-
-        if (document.getElementById('plugin-bump-enabled')) {
-            document.getElementById('plugin-bump-enabled').checked = bump.enabled;
-            document.getElementById('plugin-bump-interval').value = bump.interval;
-        }
-
-        if (document.getElementById('plugin-delivery-enabled')) {
-            document.getElementById('plugin-delivery-enabled').checked = delivery.enabled;
-            const container = document.getElementById('delivery-mapping-container');
-            if (container) {
-                container.innerHTML = '';
-                delivery.mappings.forEach(m => this.addDeliveryMapping(m.lot_id, m.text));
-            }
-        }
-    },
-
-    addDeliveryMapping(lotId = '', text = '') {
-        const container = document.getElementById('delivery-mapping-container');
-        if (!container) return;
-        const div = document.createElement('div');
-        div.className = 'delivery-mapping-item';
-        div.style.marginBottom = '10px';
-        div.style.padding = '10px';
-        div.style.background = 'rgba(255,255,255,0.02)';
-        div.style.borderRadius = '10px';
-        div.innerHTML = `
-            <input type="text" class="dev-input lot-id-input" placeholder="ID Лота (#123456)" value="${lotId}" style="margin-bottom: 5px;">
-            <textarea class="dev-input lot-text-input" placeholder="Текст выдачи (ключ, ссылка и т.д.)">${text}</textarea>
-            <button class="btn-logout" style="margin-top: 5px; font-size: 0.8rem;" onclick="this.parentElement.remove()">Удалить</button>
-        `;
-        container.appendChild(div);
-    },
-
-    showAddAccountModal: () => {
-        document.getElementById('add-account-modal').style.display = 'flex';
-    },
-
-    addNewAccount: () => {
-        const name = document.getElementById('acc-name').value || "Без имени";
-        const cookie = document.getElementById('acc-cookie').value;
-        const proxy = document.getElementById('acc-proxy').value;
-
-        if (!cookie) return alert("Введите куки!");
-
-        const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-        accounts.push({ id: Date.now(), name, cookie, proxy, status: 'active' });
-        localStorage.setItem('funpay_accounts', JSON.stringify(accounts));
-
-        document.getElementById('add-account-modal').style.display = 'none';
-        window.App.loadAccountsList();
-        
-        // Reset inputs
-        document.getElementById('acc-name').value = '';
-        document.getElementById('acc-cookie').value = '';
-        document.getElementById('acc-proxy').value = '';
-    },
-
-    deleteAccount: (id) => {
-        if (!confirm("Удалить аккаунт?")) return;
-        let accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-        accounts = accounts.filter(a => a.id !== id);
-        localStorage.setItem('funpay_accounts', JSON.stringify(accounts));
-        window.App.loadAccountsList();
-    },
-
-    loadAccountsList: () => {
-        const body = document.getElementById('accounts-list-body');
-        if (!body) return;
-        const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-        
-        if (accounts.length === 0) {
-            body.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">Аккаунты не добавлены</td></tr>';
-            return;
-        }
-
-        body.innerHTML = accounts.map(acc => `
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 15px;">
-                    <div style="font-weight: 600;">${acc.name}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Cookie: ****${acc.cookie.slice(-4)}</div>
-                </td>
-                <td style="padding: 15px; font-family: monospace; font-size: 0.8rem;">
-                    ${acc.proxy || '<span style="color: #666;">Без прокси</span>'}
-                </td>
-                <td style="padding: 15px;">
-                    <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem;">РАБОТАЕТ</span>
-                </td>
-                <td style="padding: 15px; text-align: right;">
-                    <button class="btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.App.deleteAccount(${acc.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-    },
-
-    saveFunPayCookie(cookie) {
-        localStorage.setItem('funpay_cookie', cookie);
-        this.showNotification('Cookie FunPay сохранен!');
-    },
-
-    getFunPayCookie() {
-        return localStorage.getItem('funpay_cookie') || '';
-    },
-
     updateUI() {
-        const authBtn = document.getElementById('login-trigger-btn');
+        const loginBtn = document.getElementById('login-trigger-btn');
         const profileNav = document.getElementById('user-profile-nav');
-        const userAvatar = document.getElementById('user-avatar');
+        const avatar = document.getElementById('user-avatar');
         const adminLink = document.getElementById('admin-link');
         
         if (this.user) {
-            if (authBtn) authBtn.style.display = 'none';
-            if (profileNav) profileNav.style.display = 'flex';
-            if (userAvatar) userAvatar.textContent = this.user.name ? this.user.name[0].toUpperCase() : 'U';
-            
-            const currentUserId = String(this.user.user_id || this.user.telegram_id);
-            const adminIds = ["6360699049", "5304677735", "755843448"];
-            const isAdmin = this.user.is_admin || adminIds.includes(currentUserId); 
-            
-            if (isAdmin) {
-                const navLinks = document.querySelector('.nav-links');
-                if (navLinks && !document.getElementById('nav-admin-link')) {
-                    const li = document.createElement('li');
-                    li.id = 'nav-admin-link';
-                    li.innerHTML = '<a href="admin.html" style="color: #f43f5e; font-weight: bold;"><i class="fas fa-shield-alt"></i> Админка</a>';
-                    navLinks.appendChild(li);
-                }
-                if (adminLink) adminLink.style.display = 'flex';
-                const adminSidebar = document.getElementById('admin-sidebar-item');
-                if (adminSidebar) adminSidebar.style.display = 'block';
-            }
-
-            // --- Update Profile Fields ---
-            const planName = document.getElementById('profile-plan-name');
-            const statusBadge = document.getElementById('profile-status-badge');
-            const expireDate = document.getElementById('profile-expire-date');
-            const expireDays = document.getElementById('profile-expire-days');
-            const sidebarStatus = document.getElementById('sidebar-user-status');
-            const sidebarAvatar = document.getElementById('sidebar-avatar-char');
-            const sidebarName = document.getElementById('sidebar-user-name');
-            const heroName = document.getElementById('hero-user-name');
-            const heroAvatar = document.getElementById('hero-avatar-char');
-
-            if (sidebarAvatar) sidebarAvatar.textContent = userAvatar.textContent;
-            if (heroAvatar) heroAvatar.textContent = userAvatar.textContent;
-            if (sidebarName) sidebarName.textContent = this.user.name || "Пользователь";
-            if (heroName) heroName.textContent = this.user.name || "Пользователь";
-
-            const sub = this.user.subscription;
-            const hasSub = sub && (sub.status === 'active' || sub.plan === 'Fast' || sub.plan === 'Slow');
-            const trialBanner = document.getElementById('trial-activation-banner');
-
-            if (hasSub) {
-                const isFast = sub.plan === 'Fast' || this.user.subscription_type === 'fast';
-                if (planName) {
-                    planName.textContent = isFast ? "FAST" : "SLOW";
-                    planName.className = `value ${isFast ? 'plan-fast-text' : 'plan-slow-text'}`;
-                }
-                if (statusBadge) {
-                    statusBadge.textContent = "АКТИВНА";
-                    statusBadge.style.color = "#10b981";
-                    statusBadge.style.background = "rgba(16, 185, 129, 0.1)";
-                    statusBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
-                }
-                if (expireDate) expireDate.textContent = sub.expires_at || "Бессрочно";
-                if (sidebarStatus) {
-                    sidebarStatus.textContent = isFast ? "FAST" : "SLOW";
-                    sidebarStatus.style.color = isFast ? "#fbbf24" : "#3b82f6";
-                }
-                if (trialBanner) trialBanner.style.display = 'none';
-            } else {
-                if (planName) planName.textContent = "НЕТ ПОДПИСКИ";
-                if (statusBadge) statusBadge.textContent = "Бесплатно";
-                if (trialBanner && !this.user.is_trial_used) trialBanner.style.display = 'flex';
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (profileNav) {
+                profileNav.style.display = 'flex';
+                if (avatar) avatar.textContent = (this.user.first_name || 'U').charAt(0).toUpperCase();
             }
 
             // --- Referral Link ---
@@ -277,839 +57,93 @@ window.App = {
             if (refInput) {
                 refInput.value = `https://funpayslow.com/?ref=${this.user.user_id}`;
             }
-            const refCodeDisplay = document.getElementById('display-ref-code');
-            if (refCodeDisplay) refCodeDisplay.textContent = this.user.user_id || "OFFLINE";
-        } else {
-            if (authBtn) authBtn.style.display = 'flex';
-            if (profileNav) profileNav.style.display = 'none';
-            if (adminLink) adminLink.style.display = 'none';
-        }
-    }
-};
 
-// --- Payment Acquiring Integration ---
-window.initiatePayment = async (planId, amount, method = "cryptobot") => {
-    const user = window.App.user;
-    if (!user) {
-        alert("Пожалуйста, войдите в аккаунт для оплаты.");
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API_BASE}/api/payment/initiate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: user.user_id.toString(),
-                plan_id: planId,
-                amount: amount,
-                method: method
-            })
-        });
-        const data = await res.json();
-        if (data.payment_url) {
-            window.open(data.payment_url, '_blank');
-        } else {
-            alert("Ошибка инициализации платежа. Попробуйте позже.");
-        }
-    } catch (e) {
-        console.error("Payment error:", e);
-        alert("Ошибка соединения с сервером");
-    }
-};
-
-// --- Support & Developer Verification ---
-window.sendSupport = async (title, message, contact, type = "bug") => {
-    const user = window.App.user;
-    const payload = {
-        user_id: user ? user.user_id.toString() : "guest",
-        username: user ? user.name : "Guest",
-        message: `[${type.toUpperCase()}] ${title}\n\n${message}\n\nКонтакт: ${contact}`,
-        type: type
-    };
-    
-    try {
-        console.log("Sending support payload:", payload);
-        const res = await fetch(`${API_BASE}/api/support`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        });
-        
-        const data = await res.json();
-        console.log("Support response:", data);
-        return data;
-    } catch (e) {
-        console.error("Support submission error:", e);
-        return { success: false, message: "Ошибка сети" };
-    }
-};
-
-window.submitDevVerification = async () => {
-    const user = window.App.user;
-    if (!user) {
-        alert("Пожалуйста, войдите в аккаунт.");
-        return;
-    }
-    
-    const section = document.getElementById('section-dev');
-    const inputs = section.querySelectorAll('.dev-input');
-    
-    if (!inputs[3].value) {
-        alert("Пожалуйста, укажите ваш CryptoBot ID или адрес кошелька!");
-        return;
-    }
-    
-    const payload = {
-        user_id: user.user_id.toString(),
-        username: user.name || "Unknown",
-        payout_method: inputs[0].value,
-        payout_name: inputs[1].value,
-        contact: inputs[2].value,
-        wallet_label: inputs[3].value,
-        comment: inputs[4].value
-    };
-    
-    try {
-        const res = await fetch(`${API_BASE}/api/developer/verify`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.success) {
-            alert("✅ Ваша заявка на выплаты через CryptoBot отправлена! Мы свяжемся с вами после проверки.");
-        } else {
-            alert("❌ Ошибка при отправке заявки: " + (data.detail || "Неизвестная ошибка"));
-        }
-    } catch (e) {
-        console.error("Dev verification error:", e);
-        alert("❌ Ошибка соединения с сервером.");
-    }
-};
-
-// --- Changelog Logic ---
-window.loadChangelog = async () => {
-    const container = document.querySelector('.timeline');
-    if (!container) return;
-    
-    try {
-        const res = await fetch(`${API_BASE}/api/changelog`);
-        const data = await res.json();
-        
-        container.innerHTML = data.map(item => `
-            <div class="version-block">
-                <div class="version-dot"></div>
-                <div class="version-card">
-                    <div class="version-tag">${item.version}</div>
-                    <div class="version-date"><i class="far fa-calendar"></i> ${item.date}</div>
-                    <div class="change-section">
-                        <div class="change-title new"><i class="fas fa-plus-circle"></i> Новое</div>
-                        <ul class="change-list">
-                            ${item.changes.map(c => `<li>${c}</li>`).join('')}
-                        </ul>
-                    </div>
-                    <div class="change-section">
-                        <div class="change-title"><i class="fas fa-wrench"></i> Улучшения</div>
-                        <ul class="change-list">
-                            ${item.improvements.map(i => `<li>${i}</li>`).join('')}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-        
-        // Update summary card
-        const lastVer = document.querySelector('.summary-value');
-        if (lastVer && data.length > 0) lastVer.textContent = data[0].version;
-    } catch (e) {
-        console.error("Changelog load error:", e);
-    }
-};
-
-window.loadAdminStats = async () => {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/stats`);
-        if (res.ok) return await res.json();
-        return { error: "Access denied" };
-    } catch (e) {
-        console.error("Admin stats error:", e);
-        return { error: e.message };
-    }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("--- FunPay Slow Desktop v.2.2.3 Loaded ---");
-    window.App.init();
-
-    // Load dynamic version numbers on all pages
-    const versionBadges = document.querySelectorAll('.hero-badge, .mockup-version, .logo span');
-    versionBadges.forEach(b => {
-        if (b.textContent.includes('v.')) b.innerHTML = b.innerHTML.replace(/v\.[0-9.]+/, 'v.2.2.3');
-        if (b.textContent.includes('v2.')) b.innerHTML = b.innerHTML.replace(/v2\.[0-9.]+/, 'v2.2.3');
-    });
-
-    if (window.location.pathname.includes('changelog.html')) {
-        window.loadChangelog();
-    }
-
-    const tgAuthCode = document.getElementById('tg-auth-code');
-    const timerVal = document.getElementById('timer-val');
-    const loginTrigger = document.getElementById('login-trigger-btn');
-    const profileNav = document.getElementById('user-profile-nav');
-    const userAvatar = document.getElementById('user-avatar');
-    const errorMsg = document.getElementById('login-error');
-    const overlay = document.getElementById('login-overlay');
-    const loginBoxStandard = document.getElementById('login-box-standard');
-    const loginBoxTelegram = document.getElementById('login-box-telegram');
-    const btnTelegram = document.getElementById('btn-telegram-login');
-
-    // Telegram Auth Logic
-    const handleTelegramLogin = async () => {
-        if (loginBoxTelegram.dataset.intervalId) clearInterval(parseInt(loginBoxTelegram.dataset.intervalId));
-        if (loginBoxTelegram.dataset.pollId) clearInterval(parseInt(loginBoxTelegram.dataset.pollId));
-
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        if (tgAuthCode) tgAuthCode.textContent = code;
-        
-        const linkToBot = document.getElementById('link-to-bot');
-        if (linkToBot) {
-            linkToBot.href = `https://t.me/FunPaySlov_Bot?start=${code}`;
-        }
-        
-        try {
-            await fetch(`${API_BASE}/api/auth/init/${code}`);
-        } catch (e) {
-            console.error("Failed to init TG auth", e);
-            if (errorMsg) {
-                errorMsg.textContent = 'Сервер недоступен!';
-                errorMsg.style.display = 'block';
+            // --- Admin Visibility ---
+            const admins = ["6360699049", "5304677735", "755843448"];
+            if (admins.includes(String(this.user.user_id))) {
+                if (adminLink) adminLink.style.display = 'flex';
             }
-            return;
+        } else {
+            if (loginBtn) loginBtn.style.display = 'flex';
+            if (profileNav) profileNav.style.display = 'none';
         }
+    }
+};
 
-        if (loginBoxStandard) loginBoxStandard.style.display = 'none';
-        if (loginBoxTelegram) loginBoxTelegram.style.display = 'block';
+window.logout = function() {
+    localStorage.removeItem('funpay_user');
+    window.location.href = 'index.html';
+};
+
+// --- Telegram Auth Logic ---
+let authPollInterval = null;
+
+async function handleTelegramLogin() {
+    const overlay = document.getElementById('login-overlay');
+    const boxStandard = document.getElementById('login-box-standard');
+    const boxTelegram = document.getElementById('login-box-telegram');
+    const codeDisplay = document.getElementById('tg-auth-code');
+    const timerDisplay = document.getElementById('timer-val');
+    
+    overlay.style.display = 'flex';
+    boxStandard.style.display = 'none';
+    boxTelegram.style.display = 'block';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/generate`);
+        const { code, token } = await res.json();
+        
+        codeDisplay.textContent = code;
+        document.getElementById('link-to-bot').href = `https://t.me/FunpaySlov_Bot?start=${code}`;
 
         let timeLeft = 180;
-        const timerInterval = setInterval(() => {
+        const timer = setInterval(() => {
             timeLeft--;
             const mins = Math.floor(timeLeft / 60);
             const secs = timeLeft % 60;
-            if (timerVal) timerVal.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-            if (timeLeft <= 0) clearInterval(timerInterval);
+            timerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            if (timeLeft <= 0) clearInterval(timer);
         }, 1000);
-        if (loginBoxTelegram) loginBoxTelegram.dataset.intervalId = timerInterval;
 
-        const pollInterval = setInterval(async () => {
-            try {
-                const res = await fetch(`${API_BASE}/api/auth/check/${code}`);
-                const data = await res.json();
-                
-                if (data.success) {
-                    clearInterval(timerInterval);
-                    clearInterval(pollInterval);
-                    if (overlay) overlay.style.display = 'none';
-                    
-                    if (loginTrigger) loginTrigger.style.display = 'none';
-                    if (profileNav) profileNav.style.display = 'flex';
-                    if (userAvatar && data.name) userAvatar.textContent = data.name.charAt(0);
-
-                    localStorage.setItem('funpay_user', JSON.stringify({
-                        name: data.name,
-                        user_id: data.user_id,
-                        isLoggedIn: true
-                    }));
-
-                    window.location.reload();
-                }
-            } catch (e) { console.error("Polling error", e); }
-        }, 2000);
-        if (loginBoxTelegram) loginBoxTelegram.dataset.pollId = pollInterval;
-    };
-
-    if (btnTelegram) btnTelegram.addEventListener('click', handleTelegramLogin);
-
-    if (loginTrigger) {
-        loginTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (overlay) overlay.style.display = 'flex';
-        });
-    }
-
-    const btnCancel = document.getElementById('btn-tg-cancel');
-    if (btnCancel) {
-        btnCancel.addEventListener('click', () => {
-            if (loginBoxTelegram.dataset.intervalId) clearInterval(parseInt(loginBoxTelegram.dataset.intervalId));
-            if (loginBoxTelegram.dataset.pollId) clearInterval(parseInt(loginBoxTelegram.dataset.pollId));
-            if (loginBoxTelegram) loginBoxTelegram.style.display = 'none';
-            if (loginBoxStandard) loginBoxStandard.style.display = 'block';
-        });
-    }
-
-    // --- System Status ---
-    async function fetchSystemStatus() {
-        try {
-            const response = await fetch(`${API_BASE}/api/system/status`);
-            const data = await response.json();
-            const container = document.getElementById('system-status');
-            if (container) {
-                container.classList.remove('status-green', 'status-orange', 'status-red');
-                const statusText = container.querySelector('.status-text');
-                if (data.status === 'online') container.classList.add('status-green');
-                else if (data.status === 'unstable') container.classList.add('status-orange');
-                else container.classList.add('status-red');
-                if (statusText) statusText.innerText = data.text || data.status.toUpperCase();
-            }
-        } catch (e) {
-            console.error("System Status Fetch Error:", e);
-        }
-    }
-    
-    fetchSystemStatus();
-    setInterval(fetchSystemStatus, 30000);
-
-    // --- Profile Tabs & Logout ---
-    this.loadPluginConfigs();
-    if (document.getElementById('funpay-cookie-input')) {
-        document.getElementById('funpay-cookie-input').value = this.getFunPayCookie();
-    }
-});
-
-window.logout = () => App.logout();
-window.savePluginConfig = (t) => App.savePluginConfig(t);
-window.addDeliveryMapping = (l, t) => App.addDeliveryMapping(l, t);
-window.saveFunPayCookie = (c) => App.saveFunPayCookie(c);
-window.loadUserPlugins = () => App.loadPluginConfigs();
-
-    window.saveTgSettings = () => {
-        const chatId = document.getElementById('tg-chat-id').value;
-        localStorage.setItem('tg_chat_id', chatId);
-        alert('Telegram Chat ID сохранен!');
-    };
-
-    const profileTabs = document.querySelectorAll('.sidebar-nav-item');
-    const sections = document.querySelectorAll('.content-section');
-    
-    if (profileTabs.length > 0) {
-        window.switchTab = (targetTab) => {
-            profileTabs.forEach(t => t.classList.remove('active'));
-            const activeTab = document.querySelector(`.sidebar-nav-item[data-tab="${targetTab}"]`);
-            if (activeTab) activeTab.classList.add('active');
-            
-            sections.forEach(s => s.classList.remove('active'));
-            const targetSection = document.getElementById(`section-${targetTab}`);
-            if (targetSection) targetSection.classList.add('active');
-            
-            // Referral system hook
-            if (targetTab === 'referral') {
-                window.loadReferralData();
-            }
-
-            // My Plugins hook
-            if (targetTab === 'plugins') {
-                window.loadUserPlugins();
-            }
-
-            // Save hash without jump
-            if (history.replaceState) {
-                history.replaceState(null, null, targetTab === 'profile' ? 'profile.html' : `#${targetTab}`);
-            }
-        };
-
-        profileTabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                if (tab.getAttribute('href') !== '#') return; // Let links like admin.html work
-                e.preventDefault();
-                window.switchTab(tab.dataset.tab);
-            });
-        });
-    }
-
-    // --- Referral System Logic ---
-    window.loadReferralData = async () => {
-        const user = window.App.user;
-        if (!user || !user.user_id) return;
-        
-        try {
-            const res = await fetch(`${API_BASE}/api/user/referral/${user.user_id}`);
-            if (!res.ok) return;
-            
-            const data = await res.json();
-            
-            // Update UI elements
-            const displayCode = document.getElementById('display-ref-code');
-            const linkInput = document.getElementById('ref-link-input');
-            const balanceText = document.getElementById('ref-balance');
-            const countText = document.getElementById('ref-count-text');
-            const levelBadge = document.getElementById('ref-level-badge');
-            const progressBar = document.getElementById('ref-progress-bar');
-            const applyBox = document.getElementById('referral-apply-box');
-            
-            if (displayCode) displayCode.textContent = data.referral_code;
-            if (linkInput) linkInput.value = `${window.location.origin}/?ref=${data.referral_code}`;
-            if (balanceText) balanceText.textContent = data.balance.toFixed(2);
-            if (countText) countText.textContent = `${data.invited_count} приглашённых`;
-            
-            // Levels logic (example)
-            let levelName = "Ур. 1 -- Новичок";
-            let percent = 5;
-            let progress = (data.invited_count % 5) * 20;
-            
-            if (data.level === 2) { levelName = "Ур. 2 -- Партнер"; percent = 7; }
-            if (data.level === 3) { levelName = "Ур. 3 -- Амбассадор"; percent = 10; }
-            
-            if (levelBadge) levelBadge.textContent = levelName;
-            if (progressBar) progressBar.style.width = `${progress}%`;
-            const refPercent = document.getElementById('ref-percent');
-            if (refPercent) refPercent.textContent = percent;
-
-            // Show apply box only if user doesn't have a referrer yet
-            if (applyBox) {
-                applyBox.style.display = data.has_referrer ? 'none' : 'block';
-            }
-
-            // Update List
-            const listEmpty = document.getElementById('referrals-list-empty');
-            const listContainer = document.getElementById('referrals-list-container');
-            const tableBody = document.getElementById('referrals-table-body');
-            const totalCount = document.getElementById('total-ref-count');
-
-            if (data.referrals && data.referrals.length > 0) {
-                if (listEmpty) listEmpty.style.display = 'none';
-                if (listContainer) listContainer.style.display = 'block';
-                if (totalCount) totalCount.textContent = `Всего: ${data.referrals.length}`;
-                
-                if (tableBody) {
-                    tableBody.innerHTML = data.referrals.map(ref => `
-                        <div class="referral-friend-row">
-                            <div class="friend-avatar">${ref.referred_id.toString().slice(-2)}</div>
-                            <div class="friend-info">
-                                <span class="friend-id">Пользователь #${ref.referred_id}</span>
-                                <span class="friend-date">Присоединился: ${new Date(ref.created_at).toLocaleDateString()}</span>
-                            </div>
-                            <div class="friend-reward">+5% с оплат</div>
-                        </div>
-                    `).join('');
-                }
-            } else {
-                if (listEmpty) listEmpty.style.display = 'flex';
-                if (listContainer) listContainer.style.display = 'none';
-            }
-
-        } catch (e) {
-            console.error("Referral load error:", e);
-        }
-    };
-
-    window.applyReferralCode = async () => {
-        const input = document.getElementById('input-referral-code');
-        const code = input.value.trim().toUpperCase();
-        const user = window.App.user;
-
-        if (!code) {
-            alert("Введите код!");
-            return;
-        }
-
-        try {
-            const res = await fetch(`${API_BASE}/api/user/referral/apply`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: user.user_id.toString(),
-                    code: code
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert("✅ Код успешно применен! Вы получили бонус.");
-                window.loadReferralData();
-            } else {
-                alert("❌ " + (data.detail || "Ошибка применения кода"));
-            }
-        } catch (e) {
-            alert("Ошибка соединения");
-        }
-    };
-
-    window.copyReferralLink = () => {
-        const input = document.getElementById('ref-link-input');
-        input.select();
-        document.execCommand('copy');
-        alert("🔗 Ссылка скопирована!");
-    };
-
-    window.shareToTelegram = () => {
-        const input = document.getElementById('ref-link-input');
-        const url = encodeURIComponent(input.value);
-        const text = encodeURIComponent("Пользуйся лучшим софтом для FunPay вместе со мной в FunPay Slow! 🐌🚀");
-        window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
-    };
-
-    // --- Feedback & Payments ---
-    window.sendFeedback = async (data) => {
-        try {
-            const res = await fetch(`${API_BASE}/api/feedback`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            return await res.json();
-        } catch (e) {
-            console.error("Feedback error:", e);
-            return { success: false };
-        }
-    };
-
-    // --- FunPay Automation Worker ---
-    window.FunPayWorker = {
-        isRunning: false,
-        lastLog: "",
-
-        async start() {
-            if (this.isRunning) return;
-            this.isRunning = true;
-            this.log("🚀 Движок автоматизации запущен");
-            this.loop();
-        },
-
-        log(msg) {
-            console.log(`[Worker] ${msg}`);
-            this.lastLog = msg;
-            const logEl = document.getElementById('worker-status-log');
-            if (logEl) logEl.textContent = msg;
-
-            // Send to Telegram if set
-            this.notifyTelegram(msg);
-        },
-
-        async notifyTelegram(msg) {
-            const chatId = localStorage.getItem('tg_chat_id');
-            if (!chatId) return;
-
-            // Avoid spamming the same log too often
-            const now = Date.now();
-            if (this.lastNotifyTime && now - this.lastNotifyTime < 10000) return; 
-            this.lastNotifyTime = now;
-
-            try {
-                // Simple fetch to TG API (using a public bot or user token)
-                // In production, this should go through our backend for security
-                const BOT_TOKEN = "7290943632:AAEnmK_E6lT8l-rR_T5v8m3E9wE6wE6wE6w"; // Example/Stub
-                // fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent('🐌 FunPay Slow: ' + msg)}`);
-            } catch (e) {}
-        },
-
-        async loop() {
-            while (this.isRunning) {
-                try {
-                    const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-                    if (accounts.length === 0) {
-                        this.log("⏳ Аккаунты не добавлены. Ожидание...");
-                    } else {
-                        for (const acc of accounts) {
-                            this.log(`👤 Аккаунт: ${acc.name}`);
-                            await this.processAutoBump(acc);
-                            await this.processAutoDelivery(acc);
-                            await this.processAutoResponder(acc);
-                        }
-                    }
-                } catch (e) {
-                    this.log("❌ Ошибка в цикле: " + e.message);
-                }
-                await new Promise(r => setTimeout(r, 60000));
-            }
-        },
-
-        async processAutoBump(acc) {
-            const config = JSON.parse(localStorage.getItem('plugin_bump_config') || '{"enabled":false}');
-            if (!config.enabled || !acc.cookie) return;
-
-            const lastBumpKey = `last_bump_time_${acc.id}`;
-            const lastBump = parseInt(localStorage.getItem(lastBumpKey) || '0');
-            const now = Date.now();
-            const intervalMs = config.interval * 60 * 1000;
-
-            if (now - lastBump > intervalMs) {
-                this.log(`⏰ [${acc.name}] Поднимаю лоты...`);
-                // Используем acc.proxy если есть
-                localStorage.setItem(lastBumpKey, now.toString());
-                this.log(`✅ [${acc.name}] Лоты успешно подняты!`);
-            }
-        },
-
-        async processAutoDelivery(acc) {
-            const config = JSON.parse(localStorage.getItem('plugin_delivery_config') || '{"enabled":false}');
-            if (!config.enabled || !acc.cookie) return;
-            this.log(`📦 [${acc.name}] Проверка новых заказов...`);
-        },
-
-        async processAutoResponder(acc) {
-            // Future: Auto-Responder logic
-        }
-    };
-
-    // Auto-start worker if config exists
-    const hasConfig = localStorage.getItem('plugin_bump_config') || localStorage.getItem('plugin_delivery_config');
-    if (hasConfig) {
-        window.FunPayWorker.start();
-    }
-});
-        const user = window.App.user;
-        if (!user || !user.user_id) return;
-        
-        try {
-            const res = await fetch(`${API_BASE}/api/user/plugins/${user.user_id}`);
-            if (!res.ok) return;
-            
-            const data = await res.json();
-            
-            // Update Stats
-            const stats = document.querySelectorAll('#section-plugins .stat-value');
-            if (stats.length >= 3) {
-                stats[0].textContent = data.owned_count;
-                stats[1].textContent = data.installations_count;
-                stats[2].textContent = data.pending_payment_count;
-            }
-            
-            // Update Available Plugins List
-            const availableContainer = document.querySelector('#section-plugins .plugins-lists .list-card:first-child .card-content');
-            if (availableContainer) {
-                if (data.plugins && data.plugins.length > 0) {
-                    availableContainer.classList.remove('empty-state');
-                    availableContainer.style.padding = '0.5rem 0';
-                    availableContainer.innerHTML = data.plugins.map(p => `
-                        <div class="last-op-row">
-                            <div class="op-main">
-                                <div class="op-icon" style="background: rgba(255,255,255,0.05);">${p.icon}</div>
-                                <div class="op-info">
-                                    <span class="op-title">${p.title}</span>
-                                    <span class="op-date">Активирован: ${p.activated_at || 'Недавно'}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    availableContainer.classList.add('empty-state');
-                    availableContainer.innerHTML = `
-                        <div class="empty-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">
-                            <i class="fas fa-box-open"></i>
-                        </div>
-                        <p style="font-size: 0.9rem;">У вас пока нет доступных плагинов.</p>
-                    `;
-                }
-            }
-            
-            // Update Installations List
-            const installContainer = document.querySelector('#section-plugins .plugins-lists .list-card:nth-child(2) .card-content');
-            if (installContainer) {
-                if (data.installations && data.installations.length > 0) {
-                    installContainer.classList.remove('empty-state');
-                    installContainer.style.padding = '0.5rem 0';
-                    installContainer.innerHTML = data.installations.map(i => `
-                        <div class="last-op-row">
-                            <div class="op-main">
-                                <div class="op-icon" style="background: rgba(167, 139, 250, 0.1); color: #a78bfa;"><i class="fas fa-server"></i></div>
-                                <div class="op-info">
-                                    <span class="op-title">${i.plugin_title} @ ${i.ip}</span>
-                                    <span class="op-date">${i.date} — <span style="color: #34d399;">${i.status}</span></span>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    installContainer.classList.add('empty-state');
-                    installContainer.innerHTML = `
-                        <div class="empty-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">
-                            <i class="fas fa-server"></i>
-                        </div>
-                        <p style="font-size: 0.9rem;">Активных установок не найдено.</p>
-                    `;
-                }
-            }
-            
-            // Update Dropdown
-            const select = document.querySelector('#section-plugins select.dev-input');
-            if (select) {
-                if (data.plugins && data.plugins.length > 0) {
-                    select.innerHTML = data.plugins.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
-                } else {
-                    select.innerHTML = '<option value="">Нет доступных плагинов</option>';
-                }
-            }
-            
-            // Update Sub Status
-            const subBadge = document.querySelector('.info-card .status-badge');
-            const subText = document.querySelector('.info-card .info-text .value');
-            const subNote = document.querySelector('.info-card div[style*="width: 100%"]');
-            
-            if (data.subscription && subBadge) {
-                if (data.subscription.status === 'active') {
-                    subBadge.textContent = 'Активна';
-                    subBadge.style.background = 'rgba(16, 185, 129, 0.1)';
-                    subBadge.style.color = '#10b981';
-                    subText.textContent = data.subscription.plan;
-                    subNote.textContent = `Ваша подписка действует до ${data.subscription.expires_at}`;
-                    
-                    // Hide trial card
-                    const trialCard = document.querySelector('.trial-card');
-                    if (trialCard) trialCard.style.display = 'none';
-                } else if (data.subscription.trial_used) {
-                    // Hide trial card if used
-                    const trialCard = document.querySelector('.trial-card');
-                    if (trialCard) trialCard.style.display = 'none';
-                }
-            }
-            
-        } catch (e) {
-            console.error("Plugins load error:", e);
-        }
-    };
-
-    window.selectedPlan = null;
-    window.selectedPrice = 0;
-
-    window.selectPlan = (planId, price, element, type) => {
-        window.selectedPlan = planId;
-        window.selectedPrice = price;
-        
-        // Remove active from all options in the current type
-        document.querySelectorAll(`.tier-card#tier-${type} .plan-option`).forEach(opt => opt.classList.remove('active'));
-        // Remove active from other types to be safe
-        document.querySelectorAll(`.tier-card:not(#tier-${type}) .plan-option`).forEach(opt => opt.classList.remove('active'));
-        
-        // Remove selected from all cards
-        document.querySelectorAll('.tier-card').forEach(card => card.classList.remove('selected'));
-        // Hide/Disable all buy buttons
-        document.querySelectorAll('.btn-buy-now').forEach(btn => btn.classList.remove('ready'));
-
-        // Add active to clicked option
-        element.classList.add('active');
-        
-        // Add selected to parent card
-        const card = document.getElementById(`tier-${type}`);
-        if (card) card.classList.add('selected');
-        
-        // Enable corresponding button
-        const btn = document.getElementById(`btn-buy-${type}`);
-        if (btn) {
-            btn.classList.add('ready');
-            btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Оплатить ${price} ₽`;
-        }
-        
-        console.log(`Plan selected: ${planId} (${price} RUB)`);
-    };
-
-    window.buySelectedPlan = async () => {
-        if (!window.selectedPlan) {
-            alert("Выберите период подписки!");
-            return;
-        }
-        
-        const user = window.App.user;
-        if (!user) {
-            alert("Сначала авторизуйтесь!");
-            return;
-        }
-        
-        try {
-            const res = await fetch(`${API_BASE}/api/payment/create?user_id=${user.user_id}&plan=${window.selectedPlan}&amount=${window.selectedPrice}`, {
-                method: 'POST'
-            });
-            const data = await res.json();
-            if (data.success) {
-                // Open CryptoBot link
-                window.open(data.pay_url, '_blank');
-                
-                // Start checking status
-                alert("Платеж создан! Оплатите его в CryptoBot и нажмите OK для проверки статуса.");
-                
-                const verifyRes = await fetch(`${API_BASE}/api/payment/verify/${data.invoice_id}`);
-                const verifyData = await verifyRes.json();
-                if (verifyData.success) {
-                    alert("✅ " + verifyData.message);
-                    window.location.reload();
-                } else {
-                    alert("❌ " + verifyData.message);
-                }
-            }
-        } catch (e) {
-            alert("Ошибка при создании платежа");
-        }
-    };
-
-    window.activateTrial = async () => {
-        const user = window.App.user;
-        if (!user) {
-            alert("Сначала авторизуйтесь!");
-            return;
-        }
-        
-        try {
-            const res = await fetch(`${API_BASE}/api/subscription/trial`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: user.user_id.toString() })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert("✅ Пробный период активирован на 4 дня!");
+        // Polling
+        if (authPollInterval) clearInterval(authPollInterval);
+        authPollInterval = setInterval(async () => {
+            const checkRes = await fetch(`${API_BASE}/api/auth/check/${token}`);
+            if (checkRes.ok) {
+                const userData = await checkRes.json();
+                clearInterval(authPollInterval);
+                clearInterval(timer);
+                window.App.user = userData;
+                localStorage.setItem('funpay_user', JSON.stringify(userData));
                 window.location.reload();
-            } else {
-                alert("❌ " + (data.message || data.detail));
             }
-        } catch (e) {
-            alert("Ошибка активации");
-        }
-    };
+        }, 3000);
 
-    window.installPluginOnVps = async () => {
-        const user = window.App.user;
-        const section = document.getElementById('section-plugins');
-        const select = section.querySelector('select.dev-input');
-        const ipInput = section.querySelector('input[placeholder="1.1.1.1"]');
-        const passInput = section.querySelector('input[type="password"]');
-        
-        if (!select || !select.value) {
-            alert("Выберите плагин!");
-            return;
-        }
-        if (!ipInput.value || !passInput.value) {
-            alert("Заполните IP и пароль сервера!");
-            return;
-        }
-        
-        try {
-            const res = await fetch(`${API_BASE}/api/user/plugins/install`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: user.user_id,
-                    plugin_id: parseInt(select.value),
-                    ip_address: ipInput.value,
-                    password: passInput.value
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert("✅ " + data.message);
-                window.loadUserPlugins();
-            } else {
-                alert("❌ Ошибка: " + (data.detail || "Неизвестная ошибка"));
-            }
-        } catch (e) {
-            alert("Ошибка соединения");
-        }
-    };
-
-    // Payment logic moved to global scope
-
-    const hash = window.location.hash.replace('#', '');
-    if (hash && typeof window.switchTab === 'function' && document.getElementById(`section-${hash}`)) {
-        window.switchTab(hash);
+    } catch (e) {
+        console.error("Auth error", e);
+        alert("Ошибка сервера авторизации.");
     }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.App.init();
     
-    // Initial data load if on referral tab
-    if (hash === 'referral') window.loadReferralData();
+    const trigger = document.getElementById('login-trigger-btn');
+    if (trigger) trigger.onclick = (e) => {
+        e.preventDefault();
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('login-box-standard').style.display = 'block';
+        document.getElementById('login-box-telegram').style.display = 'none';
+    };
+
+    const tgBtn = document.getElementById('btn-telegram-login');
+    if (tgBtn) tgBtn.onclick = handleTelegramLogin;
+
+    // Close dropdown on click outside
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('profile-dropdown');
+        if (dropdown && dropdown.style.display === 'flex' && !e.target.closest('.profile-nav-item')) {
+            dropdown.style.display = 'none';
+        }
+    });
 });
