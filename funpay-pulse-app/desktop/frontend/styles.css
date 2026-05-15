@@ -593,24 +593,24 @@ h1 {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.5fr repeat(3, 1fr);
-    gap: 3rem;
-    max-width: 1200px;
+    grid-template-columns: 1.2fr repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 0 2rem;
 }
 
 .footer-brand .logo-text {
-    font-size: 1.5rem;
-    margin-bottom: 0.8rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
 }
 
 .footer-brand p {
     color: var(--text-muted);
-    font-size: 0.85rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-    max-width: 320px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    max-width: 260px;
 }
 
 .footer-socials {
@@ -651,23 +651,24 @@ h1 {
 
 .footer-col h4 {
     color: white;
-    font-size: 1.2rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
 }
 
 .footer-col a {
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 0.8rem;
     transition: 0.3s;
-    width: fit-content;
+    margin-bottom: 0.5rem;
 }
 
 .footer-col a:hover {
     color: var(--accent);
-    padding-left: 8px;
 }
 
 .footer-bottom {

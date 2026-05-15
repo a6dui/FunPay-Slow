@@ -107,8 +107,10 @@ window.App = {
             if (sidebarName) sidebarName.textContent = this.user.name || "Пользователь";
             if (heroName) heroName.textContent = this.user.name || "Пользователь";
 
-            if (this.user.subscription && this.user.subscription.status === 'active') {
-                const sub = this.user.subscription;
+            const sub = this.user.subscription;
+            const hasSub = sub && (sub.status === 'active' || sub.plan === 'Fast' || sub.plan === 'Slow');
+            
+            if (hasSub) {
                 const isFast = sub.plan === 'Fast';
                 
                 if (planName) {
@@ -117,13 +119,13 @@ window.App = {
                 }
                 
                 if (statusBadge) {
-                    statusBadge.textContent = "Активна";
-                    statusBadge.style.color = "#10b981";
-                    statusBadge.style.background = "rgba(16, 185, 129, 0.1)";
-                    statusBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
+                    statusBadge.textContent = sub.status === 'active' ? "Активна" : "Обработка";
+                    statusBadge.style.color = sub.status === 'active' ? "#10b981" : "#fbbf24";
+                    statusBadge.style.background = sub.status === 'active' ? "rgba(16, 185, 129, 0.1)" : "rgba(251, 191, 36, 0.1)";
+                    statusBadge.style.borderColor = sub.status === 'active' ? "rgba(16, 185, 129, 0.3)" : "rgba(251, 191, 36, 0.3)";
                 }
                 
-                if (expireDate) expireDate.textContent = sub.expires_at || "Не указано";
+                if (expireDate) expireDate.textContent = sub.expires_at || "Бессрочно";
                 
                 if (sidebarStatus) {
                     sidebarStatus.textContent = sub.plan || "Fast";
@@ -132,11 +134,14 @@ window.App = {
                 }
                 
                 // Calculate days left
-                if (expireDays && sub.expires_at) {
+                if (expireDays && sub.expires_at && sub.expires_at !== '-') {
                     const now = new Date();
-                    const exp = new Date(sub.expires_at.replace(' ', 'T'));
+                    const expStr = sub.expires_at.includes('T') ? sub.expires_at : sub.expires_at.replace(' ', 'T');
+                    const exp = new Date(expStr);
                     const diff = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
                     expireDays.textContent = diff > 0 ? `${diff} дн.` : "Истекла";
+                } else if (expireDays) {
+                    expireDays.textContent = "∞";
                 }
             } else {
                 if (planName) {

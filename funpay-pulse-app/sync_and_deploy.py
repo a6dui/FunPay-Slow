@@ -7,6 +7,7 @@ import subprocess
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BACKEND_MAIN = os.path.join(BASE_DIR, "backend", "main.py")
 DESKTOP_SCRIPT = os.path.join(BASE_DIR, "desktop", "frontend", "script.js")
+DESKTOP_PACKAGE = os.path.join(BASE_DIR, "desktop", "package.json")
 DESKTOP_FOLDER = os.path.join(BASE_DIR, "desktop", "frontend")
 WEB_FOLDER = os.path.join(BASE_DIR, "frontend")
 
@@ -35,7 +36,18 @@ def update_version(new_version):
             f.write(new_content)
         print(f"✓ Updated {DESKTOP_SCRIPT}")
 
-    # 3. Update all HTML files in desktop/frontend
+    # 3. Update desktop/package.json
+    if os.path.exists(DESKTOP_PACKAGE):
+        with open(DESKTOP_PACKAGE, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        new_content = re.sub(r'\"version\": \"[0-9.]+\"', f'\"version\": \"{new_version}\"', content)
+        
+        with open(DESKTOP_PACKAGE, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+        print(f"✓ Updated {DESKTOP_PACKAGE}")
+
+    # 4. Update all HTML files in desktop/frontend
     if os.path.exists(DESKTOP_FOLDER):
         for file in os.listdir(DESKTOP_FOLDER):
             if file.endswith(".html"):
