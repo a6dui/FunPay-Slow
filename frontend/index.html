@@ -5,79 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FunPay Slow — Умное приложение для FunPay</title>
     <meta name="description" content="Улучшите работу с торговыми площадками. Автоматизация, аналитика и авто-выдача.">
-    <!-- Favicon: Snail -->
-    <link rel="stylesheet" href="styles.css?v=2.4.1">
+    <link rel="stylesheet" href="styles.css?v=2.5.11">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
-        }
-        .feature-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-            padding: 2.5rem;
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .feature-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; color: white; }
-        .feature-card p { color: #888; line-height: 1.6; margin-bottom: 1.5rem; }
-        
-        .login-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-box {
-            background: #111;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 3rem;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            position: relative;
-        }
-        .auth-code {
-            font-size: 2.5rem;
-            letter-spacing: 5px;
-            font-weight: 800;
-            color: #3b82f6;
-            background: rgba(59, 130, 246, 0.05);
-            padding: 1.5rem;
-            border-radius: 15px;
-            margin: 2rem 0;
-        }
-    </style>
 </head>
 <body>
     <div class="background-effects">
@@ -112,6 +44,7 @@
                     <div class="user-avatar-btn" id="user-avatar" onclick="var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
                     <div class="profile-dropdown" id="profile-dropdown">
                         <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
                         <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
                     </div>
                 </div>
@@ -119,99 +52,215 @@
         </div>
     </nav>
 
-    <main class="container">
-        <!-- Hero Section -->
-        <section class="hero-landing" style="padding: 100px 0 60px;">
-            <div class="hero-badge">v.2.4.1 — Стабильная версия</div>
-            <h1 style="font-size: 4.5rem; margin-bottom: 1.5rem; line-height: 1.1;">Умная панель <br>автоматизации <br><span class="gradient-text">для FunPay.</span></h1>
-            <p style="color: #888; font-size: 1.2rem; max-width: 600px; margin-bottom: 3rem;">Управляйте аккаунтами, лотами и авто-выдачей в одном месте. Простая установка воркера и полный контроль над процессом.</p>
-            
-            <div style="display: flex; gap: 1rem;">
-                <a href="https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow" class="btn-primary" style="padding: 18px 40px; font-size: 1.1rem;">
-                    <i class="fas fa-download"></i> Скачать для Windows
-                </a>
-                <a href="plugins.html" class="btn-outline" style="padding: 18px 40px; font-size: 1.1rem;">
-                    Каталог плагинов <i class="fas fa-arrow-right"></i>
-                </a>
+    <div class="landing-container">
+        <!-- Hero Section Split -->
+        <section class="hero-landing">
+            <div class="hero-landing-content">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span> Аккаунты FunPay, плагины и VPS 24/7
+                </div>
+                <div class="hero-branding">
+                    <i class="fas fa-bolt" style="font-size: 2.2rem; color: var(--accent); margin-right: 1rem;"></i>
+                    <div class="hero-brand-text">
+                        <strong>FunPay Slow</strong>
+                        <span>Панель управления автоматизацией продаж</span>
+                    </div>
+                </div>
+                <h1 class="hero-main-title">Удобная панель <br>автоматизации <br>для <span class="gradient-text">FunPay.</span></h1>
+                <p class="hero-subtext">Управляйте аккаунтами FunPay, лотами, плагинами и своим VPS в одном месте. Подключение воркера простое, а управление сервером всегда остается под вашим контролем.</p>
+                
+                <div class="hero-actions">
+                    <a href="https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow" class="btn-primary btn-large">
+                        <i class="fas fa-download"></i> Скачать Windows v2.5.11
+                    </a>
+                    <button class="btn-outline btn-large" onclick="window.location.href='plugins.html'">
+                        Каталог плагинов <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- System Slow Visual -->
+                <div class="system-status-container status-green">
+                    <div class="status-label">
+                        <span>ПУЛЬС СИСТЕМЫ</span>
+                        <span class="status-online">В СЕТИ</span>
+                    </div>
+                    <div class="status-wave">
+                        <svg width="100%" height="40" viewBox="0 0 400 40" preserveAspectRatio="none">
+                            <path d="M0,20 L150,20 L160,10 L170,30 L180,10 L190,30 L200,20 L400,20" stroke="var(--accent)" stroke-width="2" fill="none" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-landing-visual">
+                <div class="mockup-card">
+                    <div class="mockup-header">
+                        <div class="mockup-icon"><i class="fas fa-th"></i></div>
+                        <div class="mockup-title-group">
+                            <div class="mockup-title">Главная страница Slow</div>
+                            <div class="mockup-subtitle">Аккаунты, плагины, VPS и заказы</div>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 12px; border-radius: 100px; font-size: 0.7rem; font-weight: 800;">Windows v2.5.11</div>
+                    </div>
+                    
+                    <div class="mockup-grid">
+                        <div class="mockup-item">
+                            <i class="fas fa-user-astronaut"></i>
+                            <span>Аккаунты FunPay</span>
+                        </div>
+                        <div class="mockup-item">
+                            <i class="fas fa-boxes-stacked"></i>
+                            <span>Лоты и каталог</span>
+                        </div>
+                        <div class="mockup-item">
+                            <i class="fas fa-puzzle-piece"></i>
+                            <span>Плагины</span>
+                        </div>
+                        <div class="mockup-item">
+                            <i class="fas fa-microchip"></i>
+                            <span>VPS и воркер</span>
+                        </div>
+                    </div>
+
+                    <div class="mockup-list-section">
+                        <div class="mockup-list-title"><i class="fas fa-shopping-cart"></i> Что видно в Slow</div>
+                        <ul class="mockup-list">
+                            <li><span class="check-dot"></span> Аккаунты FunPay под рукой</li>
+                            <li><span class="check-dot"></span> Плагины готовы к работе</li>
+                            <li><span class="check-dot"></span> VPS управляется из приложения</li>
+                        </ul>
+                    </div>
+
+                    <div class="mockup-footer-note">
+                        <i class="fas fa-comment-alt"></i> Главная страница Slow на сайте, но чище и актуальнее.
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Features Grid -->
-        <section class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-users-cog"></i></div>
-                <h3>Аккаунты FunPay</h3>
-                <p>Удобная панель для управления аккаунтами FunPay. Подключайте любое количество профилей.</p>
-                <div style="display: flex; gap: 8px;">
-                    <span style="font-size: 0.75rem; background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 4px 10px; border-radius: 100px;">Multi-Account</span>
-                </div>
+        <!-- Value Section -->
+        <section class="value-section">
+            <div class="section-header">
+                <h2 class="section-title">Главная ценность — <span class="gradient-text">удобство</span> <br>и стремление к развитию.</h2>
+                <p class="section-desc">Мы стараемся сделать Slow удобным для всех. Да, баги бывают, но мы постоянно улучшаем приложение и добавляем новые плагины.</p>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fas fa-robot"></i></div>
-                <h3>Авто-выдача</h3>
-                <p>Моментальная доставка товара сразу после оплаты. Работает автоматически 24/7.</p>
-                <div style="display: flex; gap: 8px;">
-                    <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 10px; border-radius: 100px;">Instant Delivery</span>
+            <div class="feature-grid-v2">
+                <div class="feature-card-v2">
+                    <div class="card-icon"><i class="fas fa-user-shield"></i></div>
+                    <h3>Аккаунты FunPay</h3>
+                    <p>Это удобная панель для управления аккаунтами FunPay, лотами и основными действиями.</p>
+                    <div class="card-actions">
+                        <button class="btn-small">Подключение аккаунтов</button>
+                        <button class="btn-small">Контроль лотов</button>
+                    </div>
                 </div>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;"><i class="fas fa-arrow-up"></i></div>
-                <h3>Авто-поднятие</h3>
-                <p>Автоматическое поднятие лотов в топ категорий по заданному интервалу.</p>
-                <div style="display: flex; gap: 8px;">
-                    <span style="font-size: 0.75rem; background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 4px 10px; border-radius: 100px;">Auto-Bump</span>
+                <div class="feature-card-v2">
+                    <div class="card-icon" style="color: #10b981; background: rgba(16, 185, 129, 0.05);"><i class="fas fa-comment-dots"></i></div>
+                    <h3>Чаты и заказы</h3>
+                    <p>Сообщения, заказы и уведомления собраны в одном месте.</p>
+                    <div class="card-actions">
+                        <button class="btn-small">Сообщения</button>
+                        <button class="btn-small">Заказы</button>
+                        <button class="btn-small">Уведомления</button>
+                    </div>
                 </div>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;"><i class="fas fa-microchip"></i></div>
-                <h3>VPS Управление</h3>
-                <p>Управляйте своим воркером на удаленном сервере прямо из приложения.</p>
-                <div style="display: flex; gap: 8px;">
-                    <span style="font-size: 0.75rem; background: rgba(139, 92, 246, 0.1); color: #8b5cf6; padding: 4px 10px; border-radius: 100px;">Server Control</span>
+                <div class="feature-card-v2">
+                    <div class="card-icon" style="color: #a855f7; background: rgba(168, 85, 247, 0.05);"><i class="fas fa-puzzle-piece"></i></div>
+                    <h3>Плагины для автоматизации</h3>
+                    <p>Стараемся автоматизировать как можно больше задач для вашего удобства.</p>
+                    <div class="card-actions">
+                        <button class="btn-small">Каталог плагинов</button>
+                    </div>
+                </div>
+                <div class="feature-card-v2">
+                    <div class="card-icon" style="color: #f59e0b; background: rgba(245, 158, 11, 0.05);"><i class="fas fa-microchip"></i></div>
+                    <h3>Управление VPS</h3>
+                    <p>Вы всегда можете управлять воркером на VPS прямо из приложения.</p>
+                    <div class="card-actions">
+                        <button class="btn-small">Подключение VPS</button>
+                        <button class="btn-small">Статус воркера</button>
+                    </div>
                 </div>
             </div>
         </section>
-    </main>
+
+        <!-- Taxonomy Section -->
+        <section class="taxonomy-section">
+            <div>
+                <div class="hero-badge">Каталог плагинов</div>
+                <h2 class="section-title">Стараемся как можно <br>больше добавлять <br><span class="gradient-text">новых плагинов.</span></h2>
+                <p class="section-desc">Сейчас на сайте 16 плагинов для автоматизации. Каталог постепенно растет, а существующие плагины мы дорабатываем и улучшаем.</p>
+                <div class="taxonomy-note">
+                    У нас уже есть плагины для ответов, тикетов, выдачи, аренды, Stars, SMM и поддержки каталога.
+                </div>
+            </div>
+            <div class="taxonomy-grid">
+                <div class="taxonomy-group">
+                    <div class="group-header"><i class="fas fa-comments"></i> Продажа и коммуникация</div>
+                    <p class="group-desc">Плагины для ответов, тикетов и работы с сообщениями.</p>
+                    <div class="tag-cloud">
+                        <span class="tag">Авто-ответчик</span>
+                        <span class="tag">AutoTicket</span>
+                        <span class="tag">ChatSpam</span>
+                        <span class="tag">EmailCode</span>
+                    </div>
+                </div>
+                <div class="taxonomy-group">
+                    <div class="group-header"><i class="fas fa-gamepad"></i> Игры, аренда, подарки</div>
+                    <p class="group-desc">Плагины для аренды, подарков, Stars, Discord и Roblox.</p>
+                    <div class="tag-cloud">
+                        <span class="tag">RentSteam</span>
+                        <span class="tag">AutoSteamNS</span>
+                        <span class="tag">AutoGift</span>
+                        <span class="tag">AutoAllAccounts</span>
+                        <span class="tag">AutoStars</span>
+                        <span class="tag">AutoDiscordBoost</span>
+                        <span class="tag">AutoRobux</span>
+                        <span class="tag">VIP Roblox</span>
+                    </div>
+                </div>
+                <div class="taxonomy-group">
+                    <div class="group-header"><i class="fas fa-chart-line"></i> Поддержка каталога</div>
+                    <p class="group-desc">Плагины для каталога, копирования лотов, фоновой активности.</p>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <!-- Login Overlay -->
-    <div class="login-overlay" id="login-overlay">
+    <div id="login-overlay">
         <div class="login-box" id="login-box-standard">
-            <h2 style="color: white; margin-bottom: 1rem;">Авторизация</h2>
-            <p style="color: #888; margin-bottom: 2rem;">Войдите через Telegram бота для доступа к панели управления.</p>
-            <button class="btn-primary" id="btn-telegram-login" style="width: 100%; height: 55px; border-radius: 15px;">
+            <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'">&times;</div>
+            <h2 style="color: white; margin-bottom: 1rem;">Добро пожаловать</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Войдите через Telegram для доступа к панели.</p>
+            <button class="btn-telegram" id="btn-telegram-login">
                 <i class="fab fa-telegram-plane"></i> Войти через Telegram
             </button>
-            <button onclick="document.getElementById('login-overlay').style.display='none'" style="background:none; border:none; color:#555; margin-top:1.5rem; cursor:pointer;">Закрыть</button>
         </div>
 
         <div class="login-box" id="login-box-telegram" style="display: none;">
-            <h2 style="color: white; margin-bottom: 1rem;">Подтверждение</h2>
-            <p style="color: #888;">Отправьте код боту:</p>
-            <div class="auth-code" id="tg-auth-code">------</div>
-            <div style="color: #555; margin-bottom: 2rem;">Истекает через: <span id="timer-val">3:00</span></div>
-            <a href="https://t.me/FunpaySlov_Bot" target="_blank" class="btn-primary" style="display: block; text-decoration: none; line-height: 55px; height: 55px; border-radius: 15px;">
+            <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'">&times;</div>
+            <h3 style="color: white; margin-bottom: 0.5rem;">Код входа</h3>
+            <div id="tg-auth-code" style="font-size: 3rem; letter-spacing: 5px; color: var(--accent); margin: 2rem 0; font-weight: 800;">------</div>
+            <p style="color: var(--text-muted); font-size: 0.8rem;">Код истекает через <span id="timer-val">3:00</span></p>
+            <a href="https://t.me/FunpaySlov_Bot" target="_blank" class="btn-telegram" style="margin-top: 2rem; text-decoration: none;">
                 Открыть бота
             </a>
-            <button id="btn-tg-cancel" style="background:none; border:none; color:#555; margin-top:1.5rem; cursor:pointer;">Отмена</button>
+            <button id="btn-tg-cancel" style="background: none; border: none; color: #555; margin-top: 1.5rem; cursor: pointer;">Отмена</button>
         </div>
     </div>
 
-    <footer class="main-footer" style="padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 100px;">
+    <footer class="main-footer" style="padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 100px;">
         <div class="container" style="text-align: center;">
-            <p style="color: #555;">© 2026 FunPay Slow. v2.4.1 Production. Не является официальным приложением FunPay.</p>
+            <div class="logo-container" style="justify-content: center; margin-bottom: 1.5rem; border: none; background: none;">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            <p style="color: #555; max-width: 600px; margin: 0 auto;">© 2026 FunPay Slow. v2.5.11 Production. Не является официальным приложением FunPay.com</p>
         </div>
     </footer>
 
     <script src="script.js"></script>
-    <script>
-        // Fix for login buttons on web
-        document.getElementById('login-trigger-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('login-overlay').style.display = 'flex';
-        });
-    </script>
 </body>
 </html>
