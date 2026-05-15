@@ -3,6 +3,7 @@ const API_BASE = "https://funpay-slow.onrender.com";
 // --- Global App State ---
 window.App = {
     user: JSON.parse(localStorage.getItem('funpay_user')) || null,
+    selectedPlan: null,
     
     init() {
         this.updateUI();
@@ -51,9 +52,6 @@ window.App = {
             if (pName) pName.textContent = this.user.first_name || "Пользователь";
             if (pID) pID.textContent = "@id" + this.user.user_id;
             if (hAvatar) hAvatar.textContent = (this.user.first_name || 'U').charAt(0).toUpperCase();
-            
-            const refInput = document.getElementById('ref-link-input');
-            if (refInput) refInput.value = `https://funpayslow.com/?ref=${this.user.user_id}`;
         }
     },
 
@@ -66,34 +64,35 @@ window.App = {
                 expiresVal.textContent = new Date(sub.expires * 1000).toLocaleDateString();
             } else { expiresVal.textContent = "Нет активной подписки"; }
         }
+
+        // --- Trial Visibility Logic ---
+        const trialCard = document.getElementById('trial-card');
+        if (trialCard) {
+            const daysSinceReg = sub.created_at ? (Date.now() / 1000 - sub.created_at) / (24 * 3600) : 0;
+            if (sub.has_trial || sub.plan !== 'none' || daysSinceReg > 4) {
+                trialCard.style.display = 'none';
+            } else {
+                trialCard.style.display = 'flex';
+            }
+        }
     },
 
     initTabs() {
-        // Кнопки в сайдбаре могут иметь класс .sidebar-nav-item
         const tabs = document.querySelectorAll('.sidebar-nav-item');
         const sections = document.querySelectorAll('.content-section');
-        
         tabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
                 const tabId = tab.getAttribute('data-tab');
                 if (!tabId) return;
-                
                 e.preventDefault();
-
-                // 1. Убираем активный класс у всех кнопок
                 tabs.forEach(t => t.classList.remove('active'));
-                // 2. Добавляем активный класс текущей кнопке
                 tab.classList.add('active');
-                
-                // 3. Прячем все секции и показываем нужную
                 sections.forEach(s => {
                     s.classList.remove('active');
-                    s.style.display = 'none'; // Гарантированное скрытие
-                    
-                    // Сопоставляем data-tab="profile" с id="section-profile"
+                    s.style.display = 'none';
                     if (s.id === `section-${tabId}` || s.id === tabId) {
                         s.classList.add('active');
-                        s.style.display = 'block'; // Показываем
+                        s.style.display = 'block';
                     }
                 });
             });
@@ -101,10 +100,62 @@ window.App = {
     }
 };
 
+// --- Trial & Payment Functions ---
+window.activateTrial = async function() {
+    if (!window.App.user) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/subscription/trial?user_id=${window.App.user.user_id}`, { method: 'POST' });
+        if (res.ok) {
+            alert("Пробный период 4 дня активирован!");
+            window.App.syncUser();
+        } else {
+            const err = await res.json();
+            alert(err.detail || "Ошибка активации.");
+        }
+    } catch (e) { alert("Сервер недоступен."); }
+};
+
+window.selectPlan = function(planType, price) {
+    window.App.selectedPlan = { type: planType, price: price };
+    
+    // UI Feedback
+    const cards = document.querySelectorAll('.tier-card');
+    cards.forEach(c => c.classList.remove('selected'));
+    
+    const selectedCard = document.getElementById(`plan-card-${planType}`);
+    if (selectedCard) selectedCard.classList.add('selected');
+    
+    const buyBtn = document.getElementById('buy-subscription-btn');
+    if (buyBtn) {
+        buyBtn.classList.add('ready');
+        buyBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Оплатить $${price}`;
+    }
+};
+
+window.processPayment = async function() {
+    if (!window.App.user || !window.App.selectedPlan) return;
+    
+    try {
+        const res = await fetch(`${API_BASE}/api/payment/create`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                user_id: window.App.user.user_id,
+                plan_type: window.App.selectedPlan.type,
+                price: window.App.selectedPlan.price
+            })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            window.open(data.payment_url, '_blank');
+            alert("Вы переходите в Crypto Bot для оплаты чеком. После оплаты подписка активируется автоматически.");
+        }
+    } catch (e) { alert("Ошибка платежной системы."); }
+};
+
 window.sendSupport = async function(title, desc, contact, type) {
     const user = JSON.parse(localStorage.getItem('funpay_user'));
     const message = `[${type.toUpperCase()}] ${title}\n\n${desc}\n\nКонтакт: ${contact || 'не указан'}`;
-    
     try {
         const res = await fetch(`${API_BASE}/api/report/send`, {
             method: 'POST',
@@ -115,12 +166,8 @@ window.sendSupport = async function(title, desc, contact, type) {
                 message: message
             })
         });
-        const data = await res.json();
         return { success: res.ok };
-    } catch (e) { 
-        console.error("Support Send Error:", e);
-        return { success: false }; 
-    }
+    } catch (e) { return { success: false }; }
 };
 
 window.logout = function() {
@@ -128,50 +175,6 @@ window.logout = function() {
     window.location.href = 'index.html';
 };
 
-async function loadAdminStats() {
-    const user = JSON.parse(localStorage.getItem('funpay_user'));
-    if (!user) return;
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/stats?admin_id=${user.user_id}`);
-        if (res.ok) {
-            const stats = await res.json();
-            if (document.getElementById('stat-users')) document.getElementById('stat-users').textContent = stats.total_users;
-            if (document.getElementById('stat-online')) document.getElementById('stat-online').textContent = Math.floor(stats.total_users * 0.4);
-            if (document.getElementById('stat-sales')) document.getElementById('stat-sales').textContent = stats.revenue_estimated;
-            if (document.getElementById('stat-subs')) document.getElementById('stat-subs').textContent = stats.active_fast;
-        }
-    } catch (e) { console.error("Admin Stats Error", e); }
-}
-
-async function handleTelegramLogin() {
-    const overlay = document.getElementById('login-overlay');
-    const boxTelegram = document.getElementById('login-box-telegram');
-    const codeDisplay = document.getElementById('tg-auth-code');
-    overlay.style.display = 'flex';
-    document.getElementById('login-box-standard').style.display = 'none';
-    boxTelegram.style.display = 'block';
-    try {
-        const res = await fetch(`${API_BASE}/api/auth/generate`);
-        const { code, token } = await res.json();
-        codeDisplay.textContent = code;
-        document.getElementById('link-to-bot').href = `https://t.me/FunpaySlov_Bot?start=${code}`;
-        const poll = setInterval(async () => {
-            const check = await fetch(`${API_BASE}/api/auth/check/${token}`);
-            if (check.ok) {
-                const userData = await check.json();
-                clearInterval(poll);
-                localStorage.setItem('funpay_user', JSON.stringify(userData));
-                window.location.reload();
-            }
-        }, 3000);
-    } catch (e) { alert("Ошибка связи с сервером."); }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     window.App.init();
-    if (window.location.pathname.includes('admin.html')) loadAdminStats();
-    const trigger = document.getElementById('login-trigger-btn');
-    if (trigger) trigger.onclick = () => document.getElementById('login-overlay').style.display = 'flex';
-    const tgBtn = document.getElementById('btn-telegram-login');
-    if (tgBtn) tgBtn.onclick = handleTelegramLogin;
 });

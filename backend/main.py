@@ -30,7 +30,8 @@ def init_db():
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS users 
                  (user_id TEXT PRIMARY KEY, first_name TEXT, username TEXT, plan TEXT, 
-                  sub_end INTEGER, ref_code TEXT, referrer_id TEXT, balance REAL DEFAULT 0)''')
+                  sub_end INTEGER, ref_code TEXT, referrer_id TEXT, balance REAL DEFAULT 0,
+                  has_trial INTEGER DEFAULT 0, created_at INTEGER)''')
     c.execute('''CREATE TABLE IF NOT EXISTS auth_tokens 
                  (token TEXT PRIMARY KEY, code TEXT, user_id TEXT, expires INTEGER)''')
     c.execute('''CREATE TABLE IF NOT EXISTS referrals_list 
@@ -100,13 +101,54 @@ def check_auth(token: str):
 def get_subscription(user_id: str):
     conn = get_db_conn()
     c = conn.cursor()
-    c.execute("SELECT plan, sub_end FROM users WHERE user_id = ?", (user_id,))
+    c.execute("SELECT plan, sub_end, has_trial, created_at FROM users WHERE user_id = ?", (user_id,))
     row = c.fetchone()
     conn.close()
     
     if row:
-        return {"plan": row[0], "expires": row[1]}
-    return {"plan": "none", "expires": 0}
+        return {
+            "plan": row[0], 
+            "expires": row[1], 
+            "has_trial": bool(row[2]),
+            "created_at": row[3]
+        }
+    return {"plan": "none", "expires": 0, "has_trial": False, "created_at": 0}
+
+@app.post("/api/subscription/trial")
+def activate_trial(user_id: str):
+    conn = get_db_conn()
+    c = conn.cursor()
+    c.execute("SELECT has_trial, plan FROM users WHERE user_id = ?", (user_id,))
+    row = c.fetchone()
+    
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if row[0] == 1 or row[1] != "none":
+        conn.close()
+        raise HTTPException(status_code=400, detail="Trial already used or active subscription")
+    
+    # Activate 4 days trial (Slow plan by default for trial)
+    sub_end = int(time.time()) + (4 * 24 * 3600)
+    c.execute("UPDATE users SET plan = 'slow', sub_end = ?, has_trial = 1 WHERE user_id = ?", (sub_end, user_id))
+    conn.commit()
+    conn.close()
+    return {"status": "success", "expires": sub_end}
+
+class PaymentRequest(BaseModel):
+    user_id: str
+    plan_type: str # fast_1m, slow_6m
+    price: float
+
+@app.post("/api/payment/create")
+def create_payment(data: PaymentRequest):
+    # This is a placeholder for Crypto Bot API or a simple bot link
+    # For now we return a deep link to the bot
+    amount = data.price
+    payload = f"sub_{data.plan_type}_{data.user_id}"
+    bot_url = f"https://t.me/CryptoBot?start=pay_{amount}_USD" # Example
+    return {"payment_url": bot_url}
 
 @app.get("/api/admin/stats")
 def get_admin_stats(admin_id: str):
