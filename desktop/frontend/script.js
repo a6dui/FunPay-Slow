@@ -113,24 +113,121 @@ window.App = {
 
         try {
             const res = await fetch(`${API_BASE}/api/accounts/list?user_id=${this.user.user_id}`);
-            const data = await res.json();
+            const accounts = await res.json();
             
-            if (data.length === 0) {
-                body.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 3rem; color: #444;">Аккаунтов пока не добавлено</td></tr>';
+            if (accounts.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" style="padding: 40px; text-align: center; color: #444; font-size: 0.9rem;">Аккаунты не добавлены.</td></tr>';
                 return;
             }
 
-            body.innerHTML = data.map(acc => `
-                <tr>
-                    <td>${acc.name}</td>
-                    <td><span class="status-badge" style="color: ${acc.is_active ? '#10b981' : '#f43f5e'}">${acc.is_active ? 'АКТИВЕН' : 'ОШИБКА'}</span></td>
-                    <td>${acc.proxy || '---'}</td>
-                    <td>
-                        <button class="btn-action" style="color: #f43f5e;"><i class="fas fa-trash"></i></button>
+            body.innerHTML = accounts.map(acc => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.03); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 700; color: #fff;">${acc.name}</div>
+                                <div style="font-size: 0.75rem; color: #444;">ID: ${acc.id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 20px; color: #888; font-family: monospace; font-size: 0.85rem;">${acc.proxy || '<span style="color: #333;">—</span>'}</td>
+                    <td style="padding: 20px;">
+                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 100px; font-size: 0.75rem; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.1);">
+                            <div style="width: 6px; height: 6px; background: #10b981; border-radius: 50%;"></div>
+                            АКТИВЕН
+                        </span>
+                    </td>
+                    <td style="padding: 20px; text-align: right;">
+                        <button class="btn-outline" onclick="window.App.deleteAccount(${acc.id})" style="width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.1); background: rgba(244, 63, 94, 0.05);">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </td>
                 </tr>
             `).join('');
         } catch (e) { console.error(e); }
+    },
+
+    syncUserUI() {
+        if (!this.user) return;
+        
+        // Update basic info
+        const nameEls = [document.getElementById('user-name-large')];
+        const initialEls = [document.getElementById('user-initial-large')];
+        const idEls = [document.getElementById('user-id-display')];
+        
+        const firstName = this.user.first_name || 'User';
+        nameEls.forEach(el => { if (el) el.textContent = firstName; });
+        initialEls.forEach(el => { if (el) el.textContent = firstName[0].toUpperCase(); });
+        idEls.forEach(el => { if (el) el.textContent = this.user.user_id; });
+
+        // Registration Date
+        const regDateEl = document.getElementById('registration-date');
+        if (regDateEl && this.user.created_at) {
+            const d = new Date(this.user.created_at * 1000);
+            regDateEl.textContent = d.toLocaleDateString('ru-RU');
+        }
+
+        // Balance & Stats
+        const balanceEls = [document.getElementById('profile-balance'), document.getElementById('btn-current-balance')];
+        balanceEls.forEach(el => { if (el) el.textContent = Math.floor(this.user.balance || 0); });
+
+        // Subscription Logic
+        this.updateSubscriptionUI();
+    },
+
+    updateSubscriptionUI() {
+        if (!this.user) return;
+        
+        const plan = (this.user.plan || 'NONE').toUpperCase();
+        const badge = document.getElementById('user-plan-badge');
+        if (badge) {
+            badge.textContent = plan;
+            badge.style.color = plan === 'FAST' ? '#10b981' : (plan === 'SLOW' ? '#3b82f6' : '#888');
+        }
+
+        const trialCard = document.getElementById('trial-card');
+        const statusCard = document.getElementById('sub-status-card');
+        
+        if (plan === 'NONE') {
+            if (trialCard) trialCard.style.display = 'flex';
+            if (statusCard) statusCard.style.display = 'none';
+        } else {
+            if (trialCard) trialCard.style.display = 'none';
+            if (statusCard) statusCard.style.display = 'block';
+            
+            // Calculate remaining time
+            const now = Math.floor(Date.now() / 1000);
+            const expiry = this.user.sub_end || (now + 86400 * 3); // Fallback for display
+            const remaining = Math.max(0, expiry - now);
+            const days = Math.ceil(remaining / 86400);
+            
+            const expiryDateEl = document.getElementById('sub-expiry-date');
+            const daysRemainingEl = document.getElementById('sub-days-remaining');
+            const progressBar = document.getElementById('sub-progress-bar');
+            
+            if (expiryDateEl) {
+                const d = new Date(expiry * 1000);
+                expiryDateEl.textContent = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+            
+            if (daysRemainingEl) {
+                daysRemainingEl.textContent = `${days} ${this.getPlural(days, ['день', 'дня', 'дней'])}`;
+                daysRemainingEl.style.color = days < 3 ? '#f43f5e' : '#fbbf24';
+            }
+            
+            if (progressBar) {
+                const percent = Math.min(100, (days / 30) * 100);
+                progressBar.style.width = `${percent}%`;
+                progressBar.style.background = days < 3 ? 'linear-gradient(to right, #f43f5e, #991b1b)' : 'linear-gradient(to right, #fbbf24, #f43f5e)';
+            }
+        }
+    },
+
+    getPlural(n, forms) {
+        return n % 10 == 1 && n % 100 != 11 ? forms[0] : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? forms[1] : forms[2]);
     },
 
     ensureLoginOverlay() {
@@ -256,6 +353,8 @@ window.App = {
                 if (adminLink) adminLink.style.display = 'flex';
                 if (adminSidebar) adminSidebar.style.display = 'block';
             }
+
+            this.syncUserUI();
 
             // --- Update Profile UI ---
             const planName = document.getElementById('profile-plan-name');
