@@ -460,12 +460,26 @@ async def crypto_bot_webhook(request: Request):
         
     return {"status": "ok"}
 
+@app.post("/api/bot/auth-confirm")
+def bot_confirm(code: str, user_id: str, first_name: str, username: str):
+    conn = get_db_conn()
+    c = conn.cursor()
+    c.execute("UPDATE auth_tokens SET user_id = ? WHERE code = ?", (user_id, code))
+    
+    now = int(time.time())
+    c.execute("INSERT OR IGNORE INTO users (user_id, first_name, username, plan, created_at) VALUES (?, ?, ?, 'none', ?)", 
+              (user_id, first_name, username, now))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
 # Start Bot Thread
 import threading
 def run_bot():
     try:
         print("Starting Telegram Bot Polling...")
-        bot.infinity_polling()
+        bot.remove_webhook()
+        bot.infinity_polling(timeout=60, long_polling_timeout=30)
     except Exception as e:
         print(f"Bot Error: {e}")
 

@@ -622,25 +622,39 @@ window.activateTrial = async function() {
         return;
     }
     
+    const trialBtn = document.querySelector('.btn-marketplace[onclick="window.activateTrial()"]');
+    if (!trialBtn) return;
+    
+    const originalText = trialBtn.innerHTML;
+    trialBtn.disabled = true;
+    trialBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Активация...';
+    trialBtn.style.opacity = '0.7';
+
     try {
         const res = await fetch(`${API_BASE}/api/user/activate-trial`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ 
                 user_id: String(window.App.user.user_id),
-                plan: "FAST" // Force FAST trial as requested
+                plan: "FAST" 
             })
         });
         
         if (res.ok) {
             alert("🔥 FAST-подписка на 4 дня активирована! Все плагины доступны.");
             window.App.syncUser();
+            const trialCard = document.getElementById('trial-card');
+            if (trialCard) trialCard.style.display = 'none';
         } else {
             const data = await res.json();
             alert(data.detail || "Вы уже использовали пробный период.");
         }
     } catch (e) { 
         console.error(e);
-        alert("Ошибка при активации. Попробуйте позже."); 
+        alert("Ошибка связи с сервером. Проверьте, запущен ли Render!"); 
+    } finally {
+        trialBtn.disabled = false;
+        trialBtn.innerHTML = originalText;
+        trialBtn.style.opacity = '1';
     }
 };
