@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поддержка — FunPay Slow</title>
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .report-container {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .report-header h1 {
+            font-size: 4.5rem;
+            line-height: 1.05;
+            margin-bottom: 2rem;
+            letter-spacing: -2px;
+        }
+
+        .report-header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-bottom: 3rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            padding: 2.5rem;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+            align-self: flex-start; /* Fix for stretching */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.05) 0%, transparent 100%);
+            z-index: -1;
+        }
+
+        .info-card h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .info-card h3::before {
+            content: 'ℹ️';
+            font-size: 1.2rem;
+        }
+
+        .info-item {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .form-section {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            padding: 3rem;
+            margin-top: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .form-label span {
+            color: var(--accent);
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            font-weight: 600;
+        }
+
+        .type-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .type-btn.active {
+            background: rgba(244, 63, 94, 0.1);
+            border-color: rgba(244, 63, 94, 0.3);
+            color: #f43f5e;
+        }
+
+        .type-btn.active.proposal {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1.2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-report {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html">SDK</a></li>
+                <li><a href="changelog.html">Обновления</a></li>
+                <li><a href="report.html" class="active">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="report-container">
+            <div class="report-header">
+                <div class="badge-report">
+                    <i class="fas fa-paper-plane"></i> Обратная связь FunPay Slow
+                </div>
+                <h1>Сообщить о баге <br>или идее без <br><span class="gradient-text">лишних шагов.</span></h1>
+                <p>Используйте эту форму, если нашли проблему, хотите предложить улучшение или просто передать команде обратную связь.</p>
+            </div>
+
+            <div class="info-card">
+                <h3>Перед отправкой</h3>
+                <div class="info-item">
+                    Короткий заголовок помогает быстрее понять проблему.
+                </div>
+                <div class="info-item">
+                    В описании лучше указать, где именно это произошло и что вы ожидали увидеть.
+                </div>
+                <div class="info-item">
+                    Контакт можно не оставлять, но с ним легче уточнить детали.
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label class="form-label">Тип обращения</label>
+                <div class="type-selector">
+                    <button class="type-btn active" onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active')); this.classList.add('active')">
+                        <i class="fas fa-bug"></i> Баг
+                    </button>
+                    <button class="type-btn proposal" onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active')); this.classList.add('active')">
+                        <i class="fas fa-lightbulb"></i> Предложение
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="title">Заголовок <span>*</span></label>
+                <input type="text" id="title" placeholder="Краткое описание проблемы или идеи">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="desc">Описание <span>*</span></label>
+                <textarea id="desc" rows="6" placeholder="Подробно опишите проблему или ваше предложение..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="contact">Контакт (опционально)</label>
+                <input type="text" id="contact" placeholder="Telegram, email или другой способ связи">
+            </div>
+
+            <button class="btn-submit" id="submit-support">
+                <i class="fas fa-paper-plane"></i> Отправить
+            </button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('submit-support');
+            btn.addEventListener('click', async () => {
+                const title = document.getElementById('title').value;
+                const desc = document.getElementById('desc').value;
+                const contact = document.getElementById('contact').value;
+                const typeBtn = document.querySelector('.type-btn.active');
+                const type = typeBtn && typeBtn.textContent.includes('Баг') ? 'bug' : 'proposal';
+                
+                if (!title || !desc) {
+                    alert('Пожалуйста, заполните заголовок и описание.');
+                    return;
+                }
+                
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+                
+                const res = await window.sendSupport(title, desc, contact, type);
+                
+                if (res.success) {
+                    btn.style.background = '#10b981';
+                    btn.innerHTML = '<i class="fas fa-check"></i> Отправлено!';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    alert('Ошибка при отправке. Попробуйте позже.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить';
+                }
+            });
+        });
+    </script>
+
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="https://t.me/FunpaySlow">Telegram</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
+                <a href="admin.html" id="admin-link" style="display: none; color: var(--accent); font-weight: bold;">Панель управления</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

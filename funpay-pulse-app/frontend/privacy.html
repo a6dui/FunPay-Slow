@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Политика конфиденциальности — FunPay Slow</title>
+    <link rel="icon" href="icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles.css?v=2.1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .legal-container { max-width: 900px; margin: 0 auto; padding: 140px 2rem 80px; }
+        .legal-header { margin-bottom: 4rem; }
+        .legal-header h1 { font-size: 3rem; margin-bottom: 1rem; color: white; }
+        .legal-content h2 { color: var(--accent); margin-top: 3rem; margin-bottom: 1.5rem; font-size: 1.5rem; }
+        .legal-content p { color: #888; line-height: 1.8; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html">SDK</a></li>
+                <li><a href="changelog.html">Обновления</a></li>
+                <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="legal-container">
+        <header class="legal-header">
+            <h1>Политика <span class="gradient-text">конфиденциальности</span></h1>
+            <p style="color: #666;">Последнее обновление: 13 мая 2026</p>
+        </header>
+
+        <div class="legal-content">
+            <h2>1. Сбор информации</h2>
+            <p>FunPay Slow работает по принципу локальной обработки данных. Мы не собираем и не передаем ваши пароли, cookie или golden_key на наши серверы. Все данные, необходимые для работы с FunPay, хранятся исключительно на вашем локальном устройстве в зашифрованном виде.</p>
+
+            <h2>2. Данные авторизации</h2>
+            <p>При авторизации через Telegram мы получаем ваш уникальный Telegram ID для привязки лицензии и обеспечения доступа к плагинам. Эти данные используются исключительно для идентификации вашего аккаунта в системе Slow.</p>
+
+            <h2>3. Безопасность данных</h2>
+            <p>Мы используем современные методы шифрования для защиты локальных файлов конфигурации. Мы рекомендуем пользователям не передавать свои файлы конфигурации третьим лицам.</p>
+
+            <h2>4. Сторонние сервисы</h2>
+            <p>ПО может взаимодействовать с API Telegram и API FunPay. При использовании этих интеграций действуют политики конфиденциальности соответствующих сервисов.</p>
+
+            <h2>5. Использование Cookies</h2>
+            <p>Наш веб-сайт может использовать файлы cookie для улучшения пользовательского опыта и аналитики трафика. Вы можете отключить их в настройках своего браузера.</p>
+
+            <h2>6. Локальное хранение данных</h2>
+            <p>Все ваши настройки, списки аккаунтов и логи работы плагинов сохраняются локально в папке приложения. Мы не имеем доступа к этим файлам извне.</p>
+
+            <h2>7. Безопасность аккаунта</h2>
+            <p>Защита вашего аккаунта Telegram, привязанного к FunPay Slow, является вашей ответственностью. Мы рекомендуем использовать двухфакторную аутентификацию.</p>
+
+            <h2>8. Срок хранения данных</h2>
+            <p>Технические данные, такие как ID лицензии, хранятся в нашей базе данных до тех пор, пока ваш аккаунт активен. Вы можете запросить удаление данных через службу поддержки.</p>
+
+            <h2>9. Права пользователя</h2>
+            <p>Вы имеете право запросить информацию о том, какие именно ваши данные (например, ID Telegram) хранятся в нашей системе, а также требовать их исправления или удаления.</p>
+
+            <h2>10. Сбор технических данных</h2>
+            <p>ПО может собирать анонимные отчеты об ошибках (crash logs) для улучшения стабильности работы. Эти отчеты не содержат личных данных или ключей доступа.</p>
+
+            <h2>11. Политика в отношении детей</h2>
+            <p>Наше ПО не предназначено для лиц младше 18 лет. Мы намеренно не собираем информацию о несовершеннолетних.</p>
+
+            <h2>12. Передача данных за границу</h2>
+            <p>Ваши данные (ID лицензии) могут обрабатываться на серверах, расположенных в разных странах. Мы обеспечиваем надлежащий уровень защиты данных независимо от их местоположения.</p>
+
+            <h2>13. Изменения в политике конфиденциальности</h2>
+            <p>Мы оставляем за собой право обновлять настоящую Политику. Мы уведомим вас о значительных изменениях через наш Telegram-канал или интерфейс приложения.</p>
+
+            <h2>14. Ссылки на сторонние ресурсы</h2>
+            <p>На нашем сайте могут быть ссылки на другие сайты. Мы не несем ответственности за их контент и методы обработки информации.</p>
+
+            <h2>15. Контактная информация</h2>
+            <p>По всем вопросам, связанным с вашей конфиденциальностью, вы можете обращаться в нашу официальную поддержку в Telegram: @FunPaySlov_Bot.</p>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="index.html#feedback">Обратная связь</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html" class="active">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

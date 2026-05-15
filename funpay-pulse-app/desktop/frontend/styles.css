@@ -588,28 +588,29 @@ h1 {
     background: rgba(8, 8, 12, 0.98);
     border-top: 1px solid var(--border-color);
     margin-top: 4rem;
+    padding: 3rem 0;
 }
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 2fr repeat(3, 1fr);
+    grid-template-columns: 1.5fr repeat(3, 1fr);
     gap: 3rem;
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 2rem;
+    padding: 0 2rem;
 }
 
 .footer-brand .logo-text {
-    font-size: 2.2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
 }
 
 .footer-brand p {
     color: var(--text-muted);
-    font-size: 1.1rem;
-    line-height: 1.7;
-    margin-bottom: 2.5rem;
-    max-width: 400px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    max-width: 320px;
 }
 
 .footer-socials {

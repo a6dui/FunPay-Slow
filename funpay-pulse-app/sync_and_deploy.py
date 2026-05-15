@@ -35,6 +35,22 @@ def update_version(new_version):
             f.write(new_content)
         print(f"✓ Updated {DESKTOP_SCRIPT}")
 
+    # 3. Update all HTML files in desktop/frontend
+    if os.path.exists(DESKTOP_FOLDER):
+        for file in os.listdir(DESKTOP_FOLDER):
+            if file.endswith(".html"):
+                path = os.path.join(DESKTOP_FOLDER, file)
+                with open(path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                # Update [v.X.X.X], vX.X.X, etc.
+                new_content = re.sub(r'v\.?[0-9.]+', f'v.{new_version}', content)
+                new_content = re.sub(r'v[0-9.]+', f'v{new_version}', new_content)
+                
+                with open(path, 'w', encoding='utf-8') as f:
+                    f.write(new_content)
+                print(f"✓ Updated version in {file}")
+
 def sync_folders():
     if os.path.exists(DESKTOP_FOLDER) and os.path.exists(WEB_FOLDER):
         print(f">>> Syncing {DESKTOP_FOLDER} to {WEB_FOLDER}...")

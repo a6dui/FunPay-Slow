@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Соглашение для оплаты — FunPay Slow</title>
+    <link rel="icon" href="icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles.css?v=2.1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .legal-container { max-width: 900px; margin: 0 auto; padding: 140px 2rem 80px; }
+        .legal-header { margin-bottom: 4rem; }
+        .legal-header h1 { font-size: 3rem; margin-bottom: 1rem; color: white; }
+        .legal-content h2 { color: var(--accent); margin-top: 3rem; margin-bottom: 1.5rem; font-size: 1.5rem; }
+        .legal-content p { color: #888; line-height: 1.8; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html">SDK</a></li>
+                <li><a href="changelog.html">Обновления</a></li>
+                <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/FunPaySlow/App/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="legal-container">
+        <header class="legal-header">
+            <h1>Соглашение <span class="gradient-text">для оплаты</span></h1>
+            <p style="color: #666;">Последнее обновление: 13 мая 2026</p>
+        </header>
+
+        <div class="legal-content">
+            <h2>1. Предмет соглашения</h2>
+            <p>Настоящее соглашение регулирует порядок оплаты доступа к дополнительным функциям (плагинам) и лицензиям программного обеспечения FunPay Slow.</p>
+
+            <h2>2. Порядок оплаты</h2>
+            <p>Все платежи осуществляются через официальный Telegram-бот @FunPaySlov_Bot или интегрированные платежные системы. После подтверждения оплаты доступ к выбранным функциям предоставляется автоматически на привязанный Telegram ID.</p>
+
+            <h2>3. Политика возврата</h2>
+            <p>Ввиду цифровой природы продукта, возврат средств после активации лицензии или плагина не производится, за исключением случаев технической невозможности использования продукта по вине разработчика.</p>
+
+            <h2>4. Изменение стоимости</h2>
+            <p>Разработчики оставляют за собой право изменять стоимость доступа к функциям без предварительного уведомления. Уже оплаченные подписки и лицензии сохраняют свое действие до конца оплаченного периода.</p>
+
+            <h2>5. Стоимость услуг и подписки</h2>
+            <p>Актуальная стоимость подписок и отдельных плагинов указана в интерфейсе приложения и в официальном боте. Цены могут варьироваться в зависимости от выбранного региона и метода оплаты.</p>
+
+            <h2>6. Обработка транзакций</h2>
+            <p>Транзакции обрабатываются сторонними платежными агрегаторами. Мы не храним данные ваших банковских карт или кошельков на своих ресурсах.</p>
+
+            <h2>7. Отмена подписки</h2>
+            <p>Вы можете отключить автопродление подписки в любой момент через настройки в Telegram-боте. Доступ к функциям сохранится до конца текущего оплаченного периода.</p>
+
+            <h2>8. Безопасность платежей</h2>
+            <p>Все платежные операции защищены протоколами SSL и соответствуют стандартам безопасности PCI DSS, установленным международными платежными системами.</p>
+
+            <h2>9. Налоги и сборы</h2>
+            <p>Пользователь самостоятельно несет ответственность за оплату всех применимых налогов и комиссий платежных систем, которые могут возникнуть при совершении транзакции.</p>
+
+            <h2>10. Пробный период</h2>
+            <p>Администрация может предоставлять ограниченный пробный период для ознакомления с функциями ПО. По истечении этого периода доступ к функциям будет ограничен до совершения оплаты.</p>
+
+            <h2>11. Скидки и промокоды</h2>
+            <p>Промокоды и скидки применяются на этапе оформления заказа в Telegram-боте. Суммирование нескольких скидок возможно только в случаях, прямо указанных в условиях акции.</p>
+
+            <h2>12. Неуспешные платежи</h2>
+            <p>В случае сбоя при оплате, доступ к плагинам может быть приостановлен до момента успешного списания средств. Мы рекомендуем проверять наличие достаточного баланса на счету.</p>
+
+            <h2>13. Подтверждение оплаты</h2>
+            <p>Электронный чек или квитанция об оплате высылаются платежной системой на ваш email или в чат Telegram-бота сразу после успешного завершения транзакции.</p>
+
+            <h2>14. Сторонние платежные системы</h2>
+            <p>Мы поддерживаем оплату через криптовалюты, банковские карты и электронные кошельки. Каждый метод может иметь свои лимиты и специфические условия обработки.</p>
+
+            <h2>15. Заключительные положения по платежам</h2>
+            <p>Факт совершения оплаты подтверждает ваше полное и безоговорочное согласие с условиями настоящего Соглашения и Условиями использования ПО FunPay Slow.</p>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="index.html#feedback">Обратная связь</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html" class="active">Соглашение для оплаты</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
