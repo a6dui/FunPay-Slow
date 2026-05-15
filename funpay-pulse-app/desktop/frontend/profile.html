@@ -997,40 +997,51 @@
         .code-area { font-family: monospace; min-height: 120px; resize: vertical; line-height: 1.4; }
 
         .badge-status-waiting {
-            background: rgba(245, 158, 11, 0.1);
+        /* Plan Cards Effects */
+        .tier-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .tier-card.slow:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+            transform: translateY(-5px);
+        }
+        .tier-card.fast:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
+            transform: translateY(-5px);
+        }
+        .plan-option.selected {
+            border-color: var(--accent) !important;
+            background: rgba(124, 58, 237, 0.1) !important;
+        }
+
+        /* Status Colors */
+        #profile-plan-name {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .plan-fast-text {
             color: #fbbf24;
-            padding: 4px 12px;
-            border-radius: 100px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-left: auto;
-            border: 1px solid rgba(245, 158, 11, 0.2);
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
         }
-        
-        .btn-outline {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 12px;
+        .plan-slow-text {
+            color: #3b82f6;
+        }
+        #profile-expire-date {
+            color: #ec4899; /* Розовый/Яркий для даты */
             font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.3);
+        #profile-expire-days {
+            background: rgba(236, 72, 153, 0.1);
+            color: #ec4899;
+            padding: 2px 8px;
+            border-radius: 6px;
         }
-        .btn-primary.purple { background: #7c3aed; box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3); }
-        .btn-primary.purple:hover { background: #6d28d9; }
-        .btn-primary.green { background: #10b981; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
-        .btn-primary.green:hover { background: #059669; }
-        .btn-primary.blue { background: #3b82f6; box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3); }
-        .btn-primary.blue:hover { background: #2563eb; }
-        .btn-primary.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -1933,19 +1944,18 @@
                 <a href="plugins.html">Плагины</a>
                 <a href="sdk.html">Разработчикам</a>
                 <a href="changelog.html">Обновления</a>
-                <a href="report.html">Поддержка</a>
             </div>
             <div class="footer-col">
                 <h4>Документация</h4>
                 <a href="docs.html">Документация</a>
                 <a href="media-partnership.html">Медиапартнерство</a>
-                <a href="report.html">Обратная связь</a>
                 <a href="https://t.me/FunpaySlow">Telegram</a>
             </div>
             <div class="footer-col">
                 <h4>Юридическое</h4>
                 <a href="terms.html">Условия использования</a>
                 <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
                 <a href="admin.html" id="admin-link" style="display: none; color: var(--accent); font-weight: bold;">Панель управления</a>
             </div>
         </div>

@@ -17,6 +17,7 @@
             display: grid;
             grid-template-columns: 1.2fr 1fr;
             gap: 4rem;
+            align-items: start;
         }
 
         .report-header h1 {
@@ -34,20 +35,44 @@
         }
 
         .info-card {
-            background: rgba(20, 20, 20, 0.4);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
-            border-radius: 24px;
+            border-radius: 28px;
             padding: 2.5rem;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+            align-self: flex-start; /* Fix for stretching */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.05) 0%, transparent 100%);
+            z-index: -1;
         }
 
         .info-card h3 {
             color: white;
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            margin-bottom: 1.8rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
+            letter-spacing: 2px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .info-card h3::before {
+            content: 'ℹ️';
+            font-size: 1.2rem;
         }
 
         .info-item {
@@ -329,19 +354,18 @@
                 <a href="plugins.html">Плагины</a>
                 <a href="sdk.html">Разработчикам</a>
                 <a href="changelog.html">Обновления</a>
-                <a href="report.html">Поддержка</a>
             </div>
             <div class="footer-col">
                 <h4>Документация</h4>
                 <a href="docs.html">Документация</a>
                 <a href="media-partnership.html">Медиапартнерство</a>
-                <a href="report.html">Обратная связь</a>
                 <a href="https://t.me/FunpaySlow">Telegram</a>
             </div>
             <div class="footer-col">
                 <h4>Юридическое</h4>
                 <a href="terms.html">Условия использования</a>
                 <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
                 <a href="admin.html" id="admin-link" style="display: none; color: var(--accent); font-weight: bold;">Панель управления</a>
             </div>
         </div>

@@ -112,6 +112,10 @@
                 <div class="stat-value" id="stat-users">...</div>
             </div>
             <div class="stat-card">
+                <div class="stat-label">Онлайн</div>
+                <div class="stat-value" id="stat-online" style="color: #10b981;">...</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-label">Продаж всего</div>
                 <div class="stat-value" id="stat-sales">...</div>
             </div>
@@ -143,20 +147,18 @@
                 <a href="plugins.html">Плагины</a>
                 <a href="sdk.html">Разработчикам</a>
                 <a href="changelog.html">Обновления</a>
-                <a href="report.html">Поддержка</a>
             </div>
             <div class="footer-col">
                 <h4>Документация</h4>
                 <a href="docs.html">Документация</a>
                 <a href="media-partnership.html">Медиапартнерство</a>
-                <a href="report.html">Обратная связь</a>
                 <a href="https://t.me/FunpaySlow">Telegram</a>
             </div>
             <div class="footer-col">
                 <h4>Юридическое</h4>
                 <a href="terms.html">Условия использования</a>
                 <a href="privacy.html">Политика конфиденциальности</a>
-                <a href="admin.html" id="admin-link" style="display: none; color: var(--accent); font-weight: bold;">Панель управления</a>
+                <a href="payment.html">Соглашение для оплаты</a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -184,6 +186,7 @@
                 return;
             }
             document.getElementById('stat-users').textContent = stats.total_users;
+            document.getElementById('stat-online').textContent = stats.online_users;
             document.getElementById('stat-sales').textContent = stats.total_sales;
             document.getElementById('stat-subs').textContent = stats.active_subs;
             document.getElementById('stat-plugins').textContent = stats.total_plugins;

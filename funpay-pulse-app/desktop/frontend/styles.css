@@ -593,10 +593,10 @@ h1 {
 .footer-grid {
     display: grid;
     grid-template-columns: 2fr repeat(3, 1fr);
-    gap: 4rem;
+    gap: 3rem;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 5rem 2rem;
+    padding: 3rem 2rem;
 }
 
 .footer-brand .logo-text {
@@ -671,7 +671,7 @@ h1 {
 
 .footer-bottom {
     border-top: 1px solid var(--border-color);
-    padding: 3rem 2rem;
+    padding: 1.5rem 2rem;
     text-align: center;
 }
 

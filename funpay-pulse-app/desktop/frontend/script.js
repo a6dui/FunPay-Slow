@@ -74,16 +74,26 @@ window.App = {
 
             if (this.user.subscription && this.user.subscription.status === 'active') {
                 const sub = this.user.subscription;
-                if (planName) planName.textContent = sub.plan || "Fast";
+                const isFast = sub.plan === 'Fast';
+                
+                if (planName) {
+                    planName.textContent = sub.plan || "Fast";
+                    planName.className = `value ${isFast ? 'plan-fast-text' : 'plan-slow-text'}`;
+                }
+                
                 if (statusBadge) {
                     statusBadge.textContent = "Активна";
                     statusBadge.style.color = "#10b981";
                     statusBadge.style.background = "rgba(16, 185, 129, 0.1)";
+                    statusBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
                 }
+                
                 if (expireDate) expireDate.textContent = sub.expires_at || "Не указано";
+                
                 if (sidebarStatus) {
                     sidebarStatus.textContent = sub.plan || "Fast";
-                    sidebarStatus.style.color = "#fbbf24";
+                    sidebarStatus.style.color = isFast ? "#fbbf24" : "#3b82f6";
+                    sidebarStatus.style.textShadow = isFast ? "0 0 10px rgba(251, 191, 36, 0.3)" : "none";
                 }
                 
                 // Calculate days left
@@ -94,13 +104,21 @@ window.App = {
                     expireDays.textContent = diff > 0 ? `${diff} дн.` : "Истекла";
                 }
             } else {
-                if (planName) planName.textContent = "Бесплатно";
+                if (planName) {
+                    planName.textContent = "Бесплатно";
+                    planName.className = "value";
+                }
                 if (statusBadge) {
                     statusBadge.textContent = "Не активна";
                     statusBadge.style.color = "var(--text-muted)";
+                    statusBadge.style.background = "rgba(255,255,255,0.05)";
                 }
                 if (expireDate) expireDate.textContent = "Нет активной подписки";
-                if (sidebarStatus) sidebarStatus.textContent = "Бесплатно";
+                if (sidebarStatus) {
+                    sidebarStatus.textContent = "Бесплатно";
+                    sidebarStatus.style.color = "var(--text-muted)";
+                    sidebarStatus.style.textShadow = "none";
+                }
             }
 
         } else {
@@ -556,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.shareToTelegram = () => {
         const input = document.getElementById('ref-link-input');
         const url = encodeURIComponent(input.value);
-        const text = encodeURIComponent("Пользуйся лучшим софтом для FunPay вместе со мной! 🚀");
+        const text = encodeURIComponent("Пользуйся лучшим софтом для FunPay вместе со мной в FunPay Slow! 🐌🚀");
         window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
     };
 
