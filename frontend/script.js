@@ -1,6 +1,4 @@
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? "http://127.0.0.1:8080" 
-    : "https://funpay-slow.onrender.com"; 
+const API_BASE = "https://funpay-slow.onrender.com"; 
 
 // --- Global App State ---
 window.App = {
@@ -13,16 +11,6 @@ window.App = {
         }
     },
     
-    async checkVersion() {
-        // Disabled permanently by user request
-        return;
-    },
-
-    showUpdateNotification(newVersion) {
-        // Disabled permanently by user request
-        return;
-    },
-    
     async syncUser() {
         if (!this.user || !this.user.user_id) return;
         try {
@@ -33,6 +21,7 @@ window.App = {
                 this.user.plan = sub.plan; // fast, slow, none
                 localStorage.setItem('funpay_user', JSON.stringify(this.user));
                 this.updateUI();
+                this.updateProfilePage(sub);
             }
         } catch (e) {
             console.error("Sync Error:", e);
@@ -52,20 +41,38 @@ window.App = {
                 if (avatar) avatar.textContent = (this.user.first_name || 'U').charAt(0).toUpperCase();
             }
 
-            // --- Referral Link ---
-            const refInput = document.getElementById('ref-link-input');
-            if (refInput) {
-                refInput.value = `https://funpayslow.com/?ref=${this.user.user_id}`;
-            }
-
             // --- Admin Visibility ---
             const admins = ["6360699049", "5304677735", "755843448"];
             if (admins.includes(String(this.user.user_id))) {
-                if (adminLink) adminLink.style.display = 'flex';
+                if (adminLink) {
+                    adminLink.style.display = 'flex';
+                    // Show in navbar dropdown too if exists
+                    const adminDrop = document.querySelectorAll('#admin-link');
+                    adminDrop.forEach(el => el.style.display = 'flex');
+                }
             }
-        } else {
-            if (loginBtn) loginBtn.style.display = 'flex';
-            if (profileNav) profileNav.style.display = 'none';
+
+            // Update Profile Info on Page
+            const profileName = document.getElementById('profile-name');
+            const profileID = document.getElementById('profile-tg-id');
+            const heroAvatar = document.getElementById('hero-avatar-letter');
+            if (profileName) profileName.textContent = this.user.first_name || "Пользователь";
+            if (profileID) profileID.textContent = "@id" + this.user.user_id;
+            if (heroAvatar) heroAvatar.textContent = (this.user.first_name || 'U').charAt(0).toUpperCase();
+        }
+    },
+
+    updateProfilePage(sub) {
+        const planVal = document.getElementById('sub-plan-val');
+        const expiresVal = document.getElementById('sub-expires-val');
+        if (planVal) planVal.textContent = (sub.plan || 'none').toUpperCase();
+        if (expiresVal) {
+            if (sub.expires && sub.expires > 0) {
+                const date = new Date(sub.expires * 1000);
+                expiresVal.textContent = date.toLocaleDateString();
+            } else {
+                expiresVal.textContent = "Нет активной подписки";
+            }
         }
     }
 };
@@ -75,75 +82,57 @@ window.logout = function() {
     window.location.href = 'index.html';
 };
 
-// --- Telegram Auth Logic ---
-let authPollInterval = null;
+// --- Admin Stats ---
+async function loadAdminStats() {
+    const user = JSON.parse(localStorage.getItem('funpay_user'));
+    if (!user) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/stats?admin_id=${user.user_id}`);
+        if (res.ok) {
+            const stats = await res.json();
+            document.getElementById('stat-users').textContent = stats.total_users;
+            document.getElementById('stat-online').textContent = Math.floor(stats.total_users * 0.4); // Mock online
+            document.getElementById('stat-sales').textContent = stats.revenue_estimated;
+            document.getElementById('stat-subs').textContent = stats.active_fast;
+        }
+    } catch (e) { console.error("Admin Stats Error", e); }
+}
 
+// --- Telegram Auth ---
 async function handleTelegramLogin() {
     const overlay = document.getElementById('login-overlay');
-    const boxStandard = document.getElementById('login-box-standard');
     const boxTelegram = document.getElementById('login-box-telegram');
     const codeDisplay = document.getElementById('tg-auth-code');
-    const timerDisplay = document.getElementById('timer-val');
     
     overlay.style.display = 'flex';
-    boxStandard.style.display = 'none';
+    document.getElementById('login-box-standard').style.display = 'none';
     boxTelegram.style.display = 'block';
 
     try {
         const res = await fetch(`${API_BASE}/api/auth/generate`);
         const { code, token } = await res.json();
-        
         codeDisplay.textContent = code;
         document.getElementById('link-to-bot').href = `https://t.me/FunpaySlov_Bot?start=${code}`;
 
-        let timeLeft = 180;
-        const timer = setInterval(() => {
-            timeLeft--;
-            const mins = Math.floor(timeLeft / 60);
-            const secs = timeLeft % 60;
-            timerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-            if (timeLeft <= 0) clearInterval(timer);
-        }, 1000);
-
-        // Polling
-        if (authPollInterval) clearInterval(authPollInterval);
-        authPollInterval = setInterval(async () => {
-            const checkRes = await fetch(`${API_BASE}/api/auth/check/${token}`);
-            if (checkRes.ok) {
-                const userData = await checkRes.json();
-                clearInterval(authPollInterval);
-                clearInterval(timer);
-                window.App.user = userData;
+        const poll = setInterval(async () => {
+            const check = await fetch(`${API_BASE}/api/auth/check/${token}`);
+            if (check.ok) {
+                const userData = await check.json();
+                clearInterval(poll);
                 localStorage.setItem('funpay_user', JSON.stringify(userData));
                 window.location.reload();
             }
         }, 3000);
-
-    } catch (e) {
-        console.error("Auth error", e);
-        alert("Ошибка сервера авторизации.");
-    }
+    } catch (e) { alert("Ошибка связи с сервером."); }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     window.App.init();
+    if (window.location.pathname.includes('admin.html')) loadAdminStats();
     
     const trigger = document.getElementById('login-trigger-btn');
-    if (trigger) trigger.onclick = (e) => {
-        e.preventDefault();
-        document.getElementById('login-overlay').style.display = 'flex';
-        document.getElementById('login-box-standard').style.display = 'block';
-        document.getElementById('login-box-telegram').style.display = 'none';
-    };
-
+    if (trigger) trigger.onclick = () => document.getElementById('login-overlay').style.display = 'flex';
+    
     const tgBtn = document.getElementById('btn-telegram-login');
     if (tgBtn) tgBtn.onclick = handleTelegramLogin;
-
-    // Close dropdown on click outside
-    document.addEventListener('click', (e) => {
-        const dropdown = document.getElementById('profile-dropdown');
-        if (dropdown && dropdown.style.display === 'flex' && !e.target.closest('.profile-nav-item')) {
-            dropdown.style.display = 'none';
-        }
-    });
 });
