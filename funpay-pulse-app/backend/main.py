@@ -1,13 +1,27 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import sqlite3
-import os
-import hashlib
-import random
-from datetime import datetime, timedelta
+import asyncio
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command, CommandObject
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="FunPay Slow API")
+# --- Bot Initialization ---
+# BOT_TOKEN will be taken from the config below
+bot_obj = None
+dp = Dispatcher()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Start Telegram Bot in background
+    global bot_obj
+    bot_obj = Bot(token=BOT_TOKEN)
+    loop = asyncio.get_event_loop()
+    loop.create_task(dp.start_polling(bot_obj))
+    print(">>> Telegram Bot started in background")
+    yield
+    # Shutdown: Close bot session
+    if bot_obj:
+        await bot_obj.session.close()
+
+app = FastAPI(title="FunPay Slow API", lifespan=lifespan)
 
 # Allow requests from our desktop app (or any frontend)
 app.add_middleware(
@@ -215,6 +229,46 @@ class ChangelogItem(BaseModel):
     improvements: list[str]
 
 
+
+# --- Bot Handlers ---
+@dp.message(Command("start"))
+async def cmd_start(message: types.Message, command: CommandObject):
+    args = command.args
+    if args and len(args) == 6 and args.isdigit():
+        await process_auth_code(message, args)
+    else:
+        await message.answer(
+            "👋 **Добро пожаловать в FunPay Slow!**\n\n"
+            "Чтобы войти в панель управления, отправьте мне 6-значный код, который вы видите в приложении.",
+            parse_mode="Markdown"
+        )
+
+@dp.message()
+async def handle_bot_message(message: types.Message):
+    code = message.text.strip()
+    if len(code) == 6 and code.isdigit():
+        await process_auth_code(message, code)
+
+async def process_auth_code(message, code):
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT code FROM auth_codes WHERE code = ?", (code,))
+    row = c.fetchone()
+    
+    if row:
+        c.execute("UPDATE auth_codes SET confirmed = 1, user_first_name = ?, user_id = ? WHERE code = ?", 
+                  (message.from_user.first_name, str(message.from_user.id), code))
+        conn.commit()
+        conn.close()
+        await message.answer(
+            f"👋 С возвращением, {message.from_user.first_name}!\n\n"
+            "✅ **Авторизация успешна!**\n"
+            "Вернитесь на сайт — панель уже открыта.",
+            parse_mode="Markdown"
+        )
+    else:
+        conn.close()
+        await message.answer("❌ Код не найден или уже использован.")
 
 # --- Endpoints ---
 @app.get("/")
