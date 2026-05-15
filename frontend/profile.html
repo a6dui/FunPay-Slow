@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль — FunPay Slow</title>
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .profile-wrapper {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 2rem;
+            min-height: 70vh;
+        }
+
+        /* Sidebar Styles */
+        .profile-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-avatar {
+            width: 64px;
+            height: 64px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 8px 16px var(--accent-glow);
+        }
+
+        .sidebar-user-meta .name {
+            display: block;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-user-meta .status-badge {
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 6px;
+            color: var(--text-muted);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.85rem 1.2rem;
+            border-radius: 14px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .sidebar-nav-item i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        .sidebar-nav-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+        }
+
+        .sidebar-nav-item.active {
+            background: rgba(124, 58, 237, 0.1);
+            color: #a78bfa;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .sidebar-nav-item .chevron {
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        /* My Plugins Specific Styles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+        .header-main { flex: 1; }
+        .btn-marketplace {
+            background: var(--accent);
+            color: #000;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+        .btn-marketplace:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--accent-glow);
+            filter: brightness(1.1);
+        }
+        
+        .session-expired-banner {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #f59e0b;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        .banner-icon { font-size: 1.2rem; }
+
+        .plugins-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .list-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .list-card.highlight {
+            border-color: rgba(124, 58, 237, 0.3);
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(20, 20, 20, 0.4) 100%);
+        }
+        .card-header { margin-bottom: 1.5rem; }
+        .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: white; }
+        .card-subtitle { font-size: 0.85rem; color: var(--text-muted); }
+
+        .btn-install-vps {
+            width: 100%;
+            background: #a78bfa;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 1.5rem 0 1rem;
+            transition: 0.3s;
+        }
+        .btn-install-vps:hover {
+            background: #8b5cf6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+        .install-note { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+        .install-note i { margin-right: 5px; color: #a78bfa; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+
+        /* Content Area Styles */
+        .profile-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Profile Section */
+        .user-hero {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .hero-avatar {
+            width: 120px;
+            height: 120px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            position: relative;
+        }
+
+        .online-dot {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border: 3px solid #000;
+            border-radius: 50%;
+        }
+
+        .hero-info h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-info .telegram {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .info-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .info-text .label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .info-text .value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            margin-top: 2rem;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .btn-logout:hover {
+            opacity: 0.8;
+            transform: translateX(5px);
+        }
+
+        /* Devices Section */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 2rem;
+            text-align: center;
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        /* Subscription Section */
+        .trial-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(20, 20, 20, 0.4) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .badge-trial {
+            background: #f59e0b;
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .payment-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .payment-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-card.active {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .check-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--accent);
+            display: none;
+        }
+
+        .payment-card.active .check-icon {
+            display: block;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .price-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .price-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .price-card.popular {
+            border-color: var(--accent);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            right: 30px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .price-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 1rem 0;
+        }
+
+        .price-value span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        /* Pricing Tiers */
+        .pricing-section-container {
+            margin-top: 2rem;
+        }
+        .tiers-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        .tier-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .tier-card.fast {
+            border-color: var(--accent);
+            background: rgba(244, 63, 94, 0.05);
+        }
+        .tier-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+        }
+        .tier-card.fast .tier-badge {
+            background: var(--accent);
+            color: white;
+        }
+        .tier-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tier-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            min-height: 40px;
+        }
+        .plan-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .plan-option {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .plan-option:hover {
+            border-color: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+        }
+        .plan-option.selected {
+            border-color: var(--accent);
+            background: rgba(244, 63, 94, 0.1);
+        }
+        .plan-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .plan-duration {
+            font-weight: 700;
+            color: white;
+        }
+        .plan-savings {
+            font-size: 0.75rem;
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+/* --- Subscription Selection & Animations --- */
+.tier-card {
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(255, 255, 255, 0.03);
+    position: relative;
+    overflow: hidden;
+    background: rgba(20, 20, 20, 0.4);
+    backdrop-filter: blur(20px);
+}
+
+.tier-card:hover {
+    transform: translateY(-12px) scale(1.01);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(124, 58, 237, 0.1);
+    border-color: rgba(124, 58, 237, 0.3);
+}
+
+.tier-card.selected {
+    border-color: #10b981 !important;
+    background: rgba(16, 185, 129, 0.05);
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);
+}
+
+.tier-card.fast.selected {
+    border-color: #fbbf24 !important;
+    background: rgba(251, 191, 36, 0.05);
+    box-shadow: 0 0 40px rgba(251, 191, 36, 0.15);
+}
+
+.plan-option {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.01);
+    padding: 1.4rem;
+    position: relative;
+}
+
+.plan-option:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+}
+
+.plan-option.active {
+    background: rgba(16, 185, 129, 0.1) !important;
+    border-color: #10b981 !important;
+    box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+.tier-card.fast .plan-option.active {
+    background: rgba(251, 191, 36, 0.1) !important;
+    border-color: #fbbf24 !important;
+    box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.1);
+}
+
+.plan-option.active::after {
+    content: '\f058';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: currentColor;
+    font-size: 1.2rem;
+    animation: fadeInScale 0.3s ease;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: translateY(-50%) scale(0.5); }
+    to { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+
+.btn-buy-now {
+    opacity: 0.4;
+    pointer-events: none;
+    transition: all 0.4s ease;
+    filter: grayscale(1);
+}
+
+.btn-buy-now.ready {
+    opacity: 1;
+    pointer-events: auto;
+    filter: grayscale(0);
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* --- Referral List Styling --- */
+.referral-friend-row {
+    display: flex;
+    align-items: center;
+    padding: 1.2rem;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    animation: slideInLeft 0.5s ease backwards;
+}
+
+.referral-friend-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--accent);
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.friend-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #000;
+    font-size: 1.1rem;
+    margin-right: 1.2rem;
+}
+
+.friend-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.friend-id {
+    font-weight: 700;
+    color: white;
+    font-size: 1rem;
+}
+
+.friend-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.friend-reward {
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 0.95rem;
+    padding: 6px 12px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 8px;
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+    
+    .friend-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+    
+    .friend-info {
+        flex: 1;
+    }
+    
+    .friend-id {
+        font-weight: 600;
+        display: block;
+    }
+    
+    .friend-date {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    
+    .friend-reward {
+        font-weight: 700;
+        color: #10b981;
+    }
+        .plan-price {
+            text-align: right;
+        }
+        .price-val {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: white;
+        }
+        .price-mo {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer Animation */
+        @keyframes crawl {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(20px); }
+        }
+        .snail-crawling {
+            display: inline-block;
+            animation: crawl 3s infinite alternate ease-in-out;
+        }
+
+        /* Developer Section Styles */
+        .dev-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .dev-stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: 0.3s;
+        }
+        .dev-stat-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .stat-icon.purple { color: #a78bfa; background: rgba(167, 139, 250, 0.1); }
+        .stat-icon.blue { color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
+        .stat-icon.green { color: #34d399; background: rgba(52, 211, 153, 0.1); }
+        .stat-icon.pink { color: #f472b6; background: rgba(244, 114, 182, 0.1); }
+        
+        .stat-info .stat-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+        .stat-info .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .dev-banner {
+            padding: 1.2rem;
+            border-radius: 16px;
+            display: flex;
+            gap: 1.2rem;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .dev-banner.info {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+        .dev-banner.warning {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        .dev-banner i {
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        .dev-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .dev-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .dev-card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .dev-card-icon.purple { color: #a78bfa; background: rgba(167, 139, 250, 0.1); }
+        .dev-card-icon.blue { color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
+        .dev-card-icon.green { color: #34d399; background: rgba(52, 211, 153, 0.1); }
+        
+        .dev-card-title h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+        .dev-card-title p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .dev-token-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .dev-input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            color: white;
+            font-size: 0.95rem;
+            flex: 1;
+            transition: 0.3s;
+        }
+        .dev-input:focus {
+            border-color: var(--accent);
+            outline: none;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .dev-card-footer {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin-top: 1rem;
+            line-height: 1.5;
+        }
+        .empty-list-placeholder, .empty-ops-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+            text-align: center;
+            border: 1px dashed var(--border-color);
+            border-radius: 16px;
+            margin-top: 1.5rem;
+            gap: 1rem;
+        }
+        .empty-list-placeholder i, .empty-ops-placeholder i {
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        .dev-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .dev-card-footer-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            gap: 2rem;
+        }
+        .dev-card-footer-flex p {
+            flex: 1;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .dev-earnings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .earning-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.2rem;
+        }
+        .earning-item .label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .earning-item .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+        }
+        .earning-item .value.yellow { color: #fbbf24; }
+        .earning-item .value.red { color: #f87171; }
+        .earning-item .value.green { color: #34d399; }
+
+        .banner-inline-info {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-left: auto;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+
+        .last-ops-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .last-ops-header .muted { color: var(--text-muted); font-weight: 400; text-transform: none; }
+
+        .dev-two-cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+        
+        .content-section {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .dev-card {
+            width: 100%;
+            box-sizing: border-box;
+            min-width: 0; /* Prevents grid blowout */
+        }
+
+        .dev-status-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #34d399;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .dev-status-title.blue { color: #60a5fa; }
+        
+        .dev-status-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+        .dev-status-block i {
+            font-size: 2.5rem;
+            opacity: 0.2;
+        }
+        .dev-status-block p {
+            font-size: 0.85rem;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+
+        .invite-duration {
+            display: flex;
+            gap: 10px;
+        }
+        .invite-duration .dev-input {
+            flex: 2;
+        }
+        .invite-duration .duration-val {
+            flex: 1;
+        }
+
+        .manifest-editor {
+            background: #050505;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .manifest-editor pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+        .manifest-actions {
+            display: flex;
+            flex-direction: column; /* Цифры под кнопки */
+            align-items: flex-start;
+            gap: 12px;
+            padding: 1.2rem 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid var(--border-color);
+            border-radius: 0 0 16px 16px;
+        }
+        .manifest-btns {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+        .char-count {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0.5;
+            padding-left: 4px;
+        }
+        .manifest-actions button {
+            margin: 0 !important;
+            padding: 0 1.2rem !important;
+            font-size: 0.85rem !important;
+            border-radius: 10px !important;
+            height: 38px !important;
+            width: auto !important;
+            white-space: nowrap;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.01);
+        }
+        .upload-zone:hover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.05);
+            transform: scale(1.02);
+        }
+        .upload-zone i { font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .upload-zone h4 { color: white; margin-bottom: 4px; font-weight: 700; }
+        .upload-zone p { font-size: 0.75rem; color: var(--text-muted); }
+        
+        .upload-note, .commission-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 1rem 0 1.5rem;
+            line-height: 1.4;
+        }
+
+        .marketplace-settings {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .market-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .dev-card-header.mini { margin-bottom: 1.2rem; }
+        .dev-card-icon.mini { width: 34px; height: 34px; font-size: 0.9rem; }
+        .code-area { font-family: monospace; min-height: 120px; resize: vertical; line-height: 1.4; }
+
+        .badge-status-waiting {
+        /* Plan Cards Effects */
+        .tier-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .tier-card.slow:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+            transform: translateY(-5px);
+        }
+        .tier-card.fast:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
+            transform: translateY(-5px);
+        }
+        .plan-option.selected {
+            border-color: var(--accent) !important;
+            background: rgba(124, 58, 237, 0.1) !important;
+        }
+
+        /* Status Colors */
+        #profile-plan-name {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .plan-fast-text {
+            color: #fbbf24;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+        }
+        .plan-slow-text {
+            color: #3b82f6;
+        }
+        #profile-expire-date {
+            color: #ec4899; /* Розовый/Яркий для даты */
+            font-weight: 600;
+        }
+        #profile-expire-days {
+            background: rgba(236, 72, 153, 0.1);
+            color: #ec4899;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html">SDK</a></li>
+                <li><a href="changelog.html">Обновления</a></li>
+                <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/a6dui/FunPay-Slow/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="profile-wrapper">
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-user-info">
+                    <div class="sidebar-avatar" id="sidebar-avatar-char">U</div>
+                    <div class="sidebar-user-meta">
+                        <span class="name" id="sidebar-user-name">Загрузка...</span>
+                        <span class="status-badge" id="sidebar-user-status">Бесплатно</span>
+                    </div>
+                </div>
+
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="#" class="sidebar-nav-item active" data-tab="profile">
+                            <span><i class="fas fa-user"></i> Профиль</span>
+                            <i class="fas fa-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-nav-item" data-tab="subscription">
+                            <span><i class="fas fa-credit-card"></i> Подписка</span>
+                            <i class="fas fa-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-nav-item" data-tab="devices">
+                            <span><i class="fas fa-desktop"></i> Устройства</span>
+                            <i class="fas fa-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-nav-item" data-tab="plugins">
+                            <span><i class="fas fa-puzzle-piece"></i> Мои плагины</span>
+                            <i class="fas fa-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-nav-item" data-tab="dev">
+                            <span><i class="fas fa-code"></i> Разработчик</span>
+                            <i class="fas fa-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-nav-item" data-tab="payments">
+                            <span><i class="fas fa-wallet"></i> Платежи</span>
+                            <i class="fas fa-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-nav-item" data-tab="referral">
+                            <span><i class="fas fa-users"></i> Рефералка</span>
+                            <i class="fas fa-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                    <li id="admin-sidebar-item" style="display: none;">
+                        <a href="admin.html" class="sidebar-nav-item" style="color: var(--accent);">
+                            <span><i class="fas fa-shield-alt"></i> Админ-панель</span>
+                            <i class="fas fa-chevron-right chevron"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <section class="profile-content">
+            
+            <!-- Section: Profile -->
+            <div id="section-profile" class="content-section active">
+                <div class="user-hero">
+                    <div class="hero-avatar">
+                        <span id="hero-avatar-char">U</span>
+                        <div class="online-dot"></div>
+                    </div>
+                    <div class="hero-info">
+                        <h1 id="hero-user-name">Пользователь</h1>
+                        <div class="telegram" id="hero-user-email">email@example.com</div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-credit-card"></i></div>
+                    <div class="info-text">
+                        <span class="label">Подписка</span>
+                        <span class="value" id="profile-plan-name">Загрузка...</span>
+                    </div>
+                    <div style="margin-left: auto;">
+                        <span class="status-badge" id="profile-status-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); font-weight: 600;">Бесплатно</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-calendar"></i></div>
+                    <div class="info-text">
+                        <span class="label">Истекает</span>
+                        <span class="value" id="profile-expire-date">Нет активной подписки</span>
+                    </div>
+                    <div style="margin-left: auto; color: var(--text-muted); font-weight: 600;" id="profile-expire-days">
+                        --
+                    </div>
+                </div>
+
+                <button class="btn-logout" onclick="window.logout()">
+                    <i class="fas fa-sign-out-alt"></i> Выйти из аккаунта
+                </button>
+            </div>
+
+            <!-- Section: Devices -->
+            <div id="section-devices" class="content-section">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem;">Устройства</h2>
+                <p style="color: var(--text-muted); margin-bottom: 3rem;">VPS-серверы и десктоп-сессии вашего аккаунта</p>
+                
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-desktop"></i></div>
+                    <h3>Нет устройств</h3>
+                    <p>Устройства появятся здесь после первого подключения через приложение или VPS.</p>
+                </div>
+            </div>
+
+            <!-- Section: Subscription -->
+            <div id="section-subscription" class="content-section">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem;">Подписка</h2>
+                <p style="color: var(--text-muted); margin-bottom: 3rem;">Управление планом и оплата</p>
+
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-credit-card"></i></div>
+                    <div class="info-text">
+                        <span class="label">Текущий план</span>
+                        <span class="value">Статус подписки</span>
+                    </div>
+                    <div style="margin-left: auto;">
+                        <span class="status-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); font-weight: 600;">Бесплатно</span>
+                    </div>
+                    <div style="width: 100%; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                        У вас нет активной подписки. Выберите план ниже.
+                    </div>
+                </div>
+
+                <div class="trial-card">
+                    <div class="trial-text">
+                        <div class="badge-trial"><i class="fas fa-bolt"></i> Пробный период</div>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Запустить пробный Fast период на 4 дня</h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">Активирует полную подписку <b>Fast</b> на 4 дня. Можно использовать один раз для проверки всех возможностей.</p>
+                    </div>
+                    <button class="btn-primary" id="btn-activate-trial" onclick="activateTrial()" style="background: #f59e0b; color: #000; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-rocket"></i> Активировать trial
+                    </button>
+                </div>
+
+                <h3 style="margin-bottom: 2rem;">Способ оплаты</h3>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Через Platega теперь доступны международные платежи и крипта.</p>
+                
+                <div class="payment-methods">
+                    <div class="payment-card active" data-method="cryptobot">
+                        <div class="info-icon" style="background: rgba(0, 136, 204, 0.1); color: #0088cc;"><i class="fab fa-telegram-plane"></i></div>
+                        <div class="payment-info">
+                            <div style="font-weight: 700; color: white;">CryptoBot (Telegram)</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">USDT, TON, BTC — Идеально для всех стран</div>
+                            <div style="font-size: 0.75rem; color: #10b981; margin-top: 4px;">Комиссия: 0%</div>
+                        </div>
+                        <div class="check-icon"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                </div>
+
+                <div class="pricing-section-container">
+                    <div class="tiers-wrapper">
+                        <!-- Slow Plan -->
+                        <div class="tier-card" id="tier-slow">
+                            <div class="tier-badge">ECONOMY</div>
+                            <div class="tier-title"><i class="fas fa-leaf" style="color: #10b981;"></i> Slow</div>
+                            <div class="tier-desc">Для экономных. Работает с 50% товаров и базовыми плагинами.</div>
+                            
+                            <div class="plan-options">
+                                <div class="plan-option" onclick="selectPlan('slow_1', 199, this, 'slow')">
+                                    <div class="plan-info">
+                                        <span class="plan-duration">1 месяц</span>
+                                        <span class="plan-savings">Базовый тариф</span>
+                                    </div>
+                                    <div class="plan-price">
+                                        <div class="price-val">199 ₽</div>
+                                        <div class="price-mo">199 ₽/мес</div>
+                                    </div>
+                                </div>
+                                <div class="plan-option" onclick="selectPlan('slow_6', 1100, this, 'slow')">
+                                    <div class="plan-info">
+                                        <span class="plan-duration">6 месяцев</span>
+                                        <span class="plan-savings">Экономия 94 ₽</span>
+                                    </div>
+                                    <div class="plan-price">
+                                        <div class="price-val">1100 ₽</div>
+                                        <div class="price-mo">183 ₽/мес</div>
+                                    </div>
+                                </div>
+                                <div class="plan-option" onclick="selectPlan('slow_12', 2300, this, 'slow')">
+                                    <div class="plan-info">
+                                        <span class="plan-duration">12 месяцев</span>
+                                        <span class="plan-savings">Экономия 88 ₽</span>
+                                    </div>
+                                    <div class="plan-price">
+                                        <div class="price-val">2300 ₽</div>
+                                        <div class="price-mo">191 ₽/мес</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn-primary btn-buy-now" id="btn-buy-slow" style="width: 100%; margin-top: 1.5rem; justify-content: center; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white;" onclick="buySelectedPlan()"><i class="fas fa-shopping-cart"></i> Выбрать Slow</button>
+                        </div>
+
+                        <!-- Fast Plan -->
+                        <div class="tier-card fast" id="tier-fast">
+                            <div class="tier-badge">PREMIUM</div>
+                            <div class="tier-title"><i class="fas fa-bolt" style="color: #fbbf24;"></i> Fast</div>
+                            <div class="tier-desc">Полный доступ. Все плагины, 100% товаров и эксклюзивные функции.</div>
+                            
+                            <div class="plan-options">
+                                <div class="plan-option" onclick="selectPlan('fast_1', 400, this, 'fast')">
+                                    <div class="plan-info">
+                                        <span class="plan-duration">1 месяц</span>
+                                        <span class="plan-savings">Полный доступ</span>
+                                    </div>
+                                    <div class="plan-price">
+                                        <div class="price-val">400 ₽</div>
+                                        <div class="price-mo">400 ₽/мес</div>
+                                    </div>
+                                </div>
+                                <div class="plan-option" onclick="selectPlan('fast_6', 2200, this, 'fast')">
+                                    <div class="plan-info">
+                                        <span class="plan-duration">6 месяцев</span>
+                                        <span class="plan-savings">Экономия 200 ₽</span>
+                                    </div>
+                                    <div class="plan-price">
+                                        <div class="price-val">2200 ₽</div>
+                                        <div class="price-mo">366 ₽/мес</div>
+                                    </div>
+                                </div>
+                                <div class="plan-option" onclick="selectPlan('fast_12', 4600, this, 'fast')">
+                                    <div class="plan-info">
+                                        <span class="plan-duration">12 месяцев</span>
+                                        <span class="plan-savings">Экономия 200 ₽</span>
+                                    </div>
+                                    <div class="plan-price">
+                                        <div class="price-val">4600 ₽</div>
+                                        <div class="price-mo">383 ₽/мес</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn-primary btn-buy-now" id="btn-buy-fast" style="width: 100%; margin-top: 1.5rem; justify-content: center; height: 50px;" onclick="buySelectedPlan()"><i class="fas fa-crown"></i> Выбрать Fast</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder for other sections -->
+            <div id="section-plugins" class="content-section">
+                <div class="section-header">
+                    <div class="header-main">
+                        <h2 class="section-title">Мои плагины</h2>
+                        <p class="section-subtitle">Купленные marketplace-плагины FunPay Slow, установка на VPS и настройки.</p>
+                    </div>
+                    <div class="header-actions">
+                        <a href="index.html#marketplace" class="btn-marketplace">
+                            <i class="fas fa-shopping-bag"></i> Открыть маркетплейс
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="dev-stats-grid">
+                    <div class="dev-stat-card">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value">0</span>
+                            <span class="stat-label">Доступно</span>
+                        </div>
+                    </div>
+                    <div class="dev-stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-server"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value">0</span>
+                            <span class="stat-label">Установки</span>
+                        </div>
+                    </div>
+                    <div class="dev-stat-card">
+                        <div class="stat-icon pink"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value">0</span>
+                            <span class="stat-label">Ожидают оплату</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Banner -->
+                <div class="session-expired-banner">
+                    <div class="banner-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="banner-content">
+                        Сессия истекла или не установлена. Функционал FunPay Slow ограничен до авторизации.
+                    </div>
+                </div>
+
+                <div class="plugins-layout">
+                    <!-- Left Column: Lists -->
+                    <div class="plugins-lists">
+                        <div class="list-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Доступные плагины</h3>
+                                <p class="card-subtitle">Плагины, доступные для установки на ваши устройства.</p>
+                            </div>
+                            <div class="card-content empty-state" style="padding: 3rem 1rem; background: none; border: none;">
+                                <div class="empty-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <p style="font-size: 0.9rem;">У вас пока нет доступных плагинов.</p>
+                            </div>
+                        </div>
+
+                        <div class="list-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Установки</h3>
+                                <p class="card-subtitle">Активные сессии плагинов на внешних серверах.</p>
+                            </div>
+                            <div class="card-content empty-state" style="padding: 3rem 1rem; background: none; border: none;">
+                                <div class="empty-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <p style="font-size: 0.9rem;">Активных установок не найдено.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Install Form -->
+                    <div class="install-form-sidebar">
+                        <div class="list-card highlight">
+                            <div class="card-header">
+                                <h3 class="card-title">Установить на VPS</h3>
+                                <p class="card-subtitle">Автоматическое развертывание плагина по ключу.</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Выберите плагин</label>
+                                    <select class="dev-input">
+                                        <option value="">Нет доступных плагинов</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>IP Адрес сервера</label>
+                                    <input type="text" class="dev-input" placeholder="1.1.1.1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Root Пароль</label>
+                                    <input type="password" class="dev-input" placeholder="••••••••">
+                                </div>
+                                <button class="btn-install-vps" onclick="installPluginOnVps()">
+                                    <i class="fas fa-rocket"></i> Начать установку
+                                </button>
+                                <p class="install-note">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Для установки требуется чистая ОС Ubuntu 20.04/22.04.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-dev" class="content-section">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Разработчик</h2>
+                        <p style="color: var(--text-muted);">Брокер-плагины, заявки в маркетплейс, установки на VPS и токены</p>
+                    </div>
+                    <button class="btn-outline" onclick="window.location.reload()"><i class="fas fa-sync-alt"></i> Обновить</button>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="dev-stats-grid">
+                    <div class="dev-stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-puzzle-piece"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Плагины</span>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="dev-stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-server"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Серверы</span>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="dev-stat-card">
+                        <div class="stat-icon green"><i class="fas fa-shield-alt"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Установки</span>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="dev-stat-card">
+                        <div class="stat-icon pink"><i class="fas fa-user-plus"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Доступы</span>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Banners -->
+                <div class="dev-banner info">
+                    <i class="fas fa-server"></i>
+                    <p>Pulse не запускает код стороннего плагина. В SDK v2.2.2 разработчик или покупатель запускает отдельное приложение плагина сам: systemd, Docker или свой SaaS. Брокер-токен нужно хранить только в защищенном хранилище этого внешнего процесса.</p>
+                </div>
+
+                <div class="dev-banner warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Сессия истекла или не установлена. Откройте локальный вход и повторите действие.</p>
+                </div>
+
+                <!-- Tokens Section -->
+                <div class="dev-card">
+                    <div class="dev-card-header">
+                        <div class="dev-card-icon"><i class="fas fa-key"></i></div>
+                        <div class="dev-card-title">
+                            <h3>Токены SDK публикации</h3>
+                            <p>Для 'pulse-plugin publish --upload'. Не дает установку, инвайты, выплаты или брокер-действия.</p>
+                        </div>
+                    </div>
+                    <div class="dev-token-row">
+                        <input type="text" placeholder="SDK CLI" class="dev-input">
+                        <button class="btn-primary purple" onclick="alert('Генерация токена доступна после подтверждения профиля разработчика')"><i class="fas fa-plus"></i> Создать токен</button>
+                    </div>
+                    <div class="dev-card-footer">
+                        Токен хранится на сервере только как SHA-256 хэш и показывается исходным один раз. 'publish --upload' загрузит пакет на ревью, но не установит плагин и не выдаст брокер-токен.
+                    </div>
+                    <div class="empty-list-placeholder">
+                        <i class="fas fa-key"></i>
+                        <p>Активные и отозванные SDK токены появятся здесь.</p>
+                    </div>
+                </div>
+
+                <!-- Payment Profile -->
+                <div class="dev-card">
+                    <div class="dev-card-header">
+                        <div class="dev-card-icon green"><i class="fas fa-university"></i></div>
+                        <div class="dev-card-title">
+                            <h3>Профиль выплат</h3>
+                            <p>Данные для ручной проверки перед выплатой дохода из маркетплейса</p>
+                        </div>
+                        <div class="badge-status-waiting">Не отправлен</div>
+                    </div>
+                    <form class="dev-form-grid" onsubmit="event.preventDefault(); alert('Данные отправлены на проверку')">
+                        <div class="form-group">
+                            <label>Способ выплаты</label>
+                            <select class="dev-input">
+                                <option>CryptoBot (USDT/TON)</option>
+                                <option>Ручное согласование</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Получатель</label>
+                            <input type="text" placeholder="Имя автора или никнейм" class="dev-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Контакт</label>
+                            <input type="text" placeholder="@username или email" class="dev-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Метка кошелька</label>
+                            <input type="text" placeholder="Ваш ID в @CryptoBot или адрес кошелька" class="dev-input">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Комментарий</label>
+                            <input type="text" placeholder="Дополнительная информация по выплате" class="dev-input">
+                        </div>
+                    </form>
+                    <div class="dev-card-footer-flex">
+                        <p>Выплаты производятся через @CryptoBot (USDT/TON). Мы не используем СБП и банковские карты для расчетов с разработчиками в целях безопасности и анонимности.</p>
+                        <button class="btn-primary green" onclick="window.submitDevVerification()"><i class="fas fa-paper-plane"></i> Отправить на проверку</button>
+                    </div>
+                </div>
+
+                <!-- Marketplace Earnings -->
+                <div class="dev-card">
+                    <div class="dev-card-header">
+                        <div class="dev-card-icon purple"><i class="fas fa-wallet"></i></div>
+                        <div class="dev-card-title">
+                            <h3>Доходы маркетплейса</h3>
+                            <p>Продажи, комиссия Pulse, удержание и возвраты по вашим публичным плагинам</p>
+                        </div>
+                        <div class="banner-inline-info">
+                            Выплаты пока не автоматические. Баланс к выплате информационный до проверки реквизитов и ручного процесса выплат.
+                        </div>
+                    </div>
+                    <div class="dev-earnings-grid">
+                        <div class="earning-item">
+                            <span class="label">Валовая выручка</span>
+                            <span class="value">0 ₽</span>
+                        </div>
+                        <div class="earning-item">
+                            <span class="label">Комиссия Pulse</span>
+                            <span class="value">0 ₽</span>
+                        </div>
+                        <div class="earning-item">
+                            <span class="label">Ожидает выплаты</span>
+                            <span class="value">0 ₽</span>
+                        </div>
+                        <div class="earning-item">
+                            <span class="label">К выплате</span>
+                            <span class="value">0 ₽</span>
+                        </div>
+                        <div class="earning-item">
+                            <span class="label">Удержано</span>
+                            <span class="value yellow">0 ₽</span>
+                        </div>
+                        <div class="earning-item">
+                            <span class="label">Доступно без удержания</span>
+                            <span class="value">0 ₽</span>
+                        </div>
+                        <div class="earning-item">
+                            <span class="label">Возвраты и чарджбэки</span>
+                            <span class="value red">0 ₽</span>
+                        </div>
+                        <div class="earning-item">
+                            <span class="label">Итоговый баланс</span>
+                            <span class="value">0 ₽</span>
+                        </div>
+                        <div class="earning-item">
+                            <span class="label">Выплачено вручную</span>
+                            <span class="value green">0 ₽</span>
+                        </div>
+                    </div>
+                    <div class="last-ops-header">
+                        <span>Последние операции (0)</span>
+                        <span class="muted">Показывается до 50 записей</span>
+                    </div>
+                    <div class="empty-ops-placeholder">
+                        <i class="fas fa-history"></i>
+                        <p>Операции появятся после первой оплаченной покупки плагина из маркетплейса.</p>
+                    </div>
+                </div>
+
+                <!-- Manifest & Package -->
+                <div class="dev-two-cols">
+                    <div class="dev-card">
+                        <div class="dev-card-header">
+                            <div class="dev-card-icon purple"><i class="fas fa-code"></i></div>
+                            <div class="dev-card-title">
+                                <h3>Манифест</h3>
+                                <p>JSON или YAML</p>
+                            </div>
+                        </div>
+                        <div class="manifest-editor" style="margin-bottom: 0; border-radius: 16px 16px 0 0; border-bottom: none; background: #000;">
+                            <pre style="padding: 1.5rem; margin: 0; overflow: auto; max-height: 350px; border: none;"><code id="manifest-code" style="background: transparent; border: none; padding: 0;">{
+  "manifest_version": "1.0",
+  "plugin_id": "seller_auto_reply",
+  "name": "Автоответ продавца",
+  "description": "Приватный плагин для опроса брокера",
+  "version": "1.0.0",
+  "runtime": {
+    "type": "broker-poller",
+    "url": "https://example.com/funpay-pulse/broker-poller"
+  },
+  "events": [
+    "events:new_message"
+  ],
+  "scopes": [],
+  "config_schema": {
+    "type": "object",
+    "properties": {
+      "greeting": { "type": "string" }
+    }
+  }
+}</code></pre>
+                        </div>
+                        <div class="manifest-actions">
+                            <div class="manifest-btns">
+                                <button class="btn-outline" onclick="alert('Проверка пройдена!')"><i class="fas fa-check"></i> Проверить</button>
+                                <button class="btn-primary purple" onclick="alert('Плагин зарегистрирован!')"><i class="fas fa-plus-circle"></i> Зарегистрировать</button>
+                            </div>
+                            <span class="char-count">817 / 262 144 байт</span>
+                        </div>
+                    </div>
+                    
+                    <div class="dev-card">
+                        <div class="dev-card-header">
+                            <div class="dev-card-icon blue"><i class="fas fa-upload"></i></div>
+                            <div class="dev-card-title">
+                                <h3>Пакет .fppkg</h3>
+                                <p>Артефакт для проверки версии</p>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label>Ваш плагин</label>
+                            <select class="dev-input">
+                                <option>Нет ваших плагинов</option>
+                            </select>
+                        </div>
+                        <div class="upload-zone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>Выбрать .fppkg</h4>
+                            <p>Лимит: 5.0 МиБ. Сервер проверит пакет повторно.</p>
+                        </div>
+                        <p class="upload-note">Загрузка пакета не устанавливает плагин, не публикует его и не выдает брокер-токен.</p>
+                        <button class="btn-primary blue disabled" disabled><i class="fas fa-upload"></i> Загрузить пакет</button>
+                        
+                        <div class="marketplace-settings">
+                            <div class="dev-card-header mini">
+                                <div class="dev-card-icon mini green"><i class="fas fa-store"></i></div>
+                                <div class="dev-card-title">
+                                    <h3 style="font-size: 1rem;">Маркетплейс</h3>
+                                </div>
+                            </div>
+                            <div class="market-inputs">
+                                <div class="form-group">
+                                    <label>Тип продажи</label>
+                                    <select class="dev-input">
+                                        <option>Бесплатно</option>
+                                        <option>Платно</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Цена, ₽</label>
+                                    <input type="number" value="0" class="dev-input">
+                                </div>
+                            </div>
+                            <button class="btn-primary green" style="width: 100%;"><i class="fas fa-paper-plane"></i> Отправить</button>
+                            <p class="commission-note">Комиссия Pulse: 10%. Публикация включается только после проверки пакета.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Installation & Access -->
+                <div class="dev-two-cols">
+                    <div class="dev-card">
+                        <div class="dev-card-header">
+                            <div class="dev-card-icon green"><i class="fas fa-terminal"></i></div>
+                            <div class="dev-card-title">
+                                <h3>Установка</h3>
+                                <p>Плагин, VPS и настройки</p>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label>Плагин</label>
+                            <select class="dev-input">
+                                <option>Нет плагинов или доступов</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label>VPS</label>
+                            <select class="dev-input">
+                                <option>Нет VPS</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label>Настройки JSON</label>
+                            <textarea class="dev-input code-area" placeholder="{}"></textarea>
+                        </div>
+                        <button class="btn-primary green" style="width: 100%; justify-content: center;"><i class="fas fa-plug"></i> Установить</button>
+                    </div>
+                    
+                    <div class="dev-card">
+                        <div class="dev-card-header">
+                            <div class="dev-card-icon blue"><i class="fas fa-user-shield"></i></div>
+                            <div class="dev-card-title">
+                                <h3>Выдать доступ</h3>
+                                <p>Инвайт для конкретного Telegram ID</p>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label>Ваш плагин</label>
+                            <select class="dev-input">
+                                <option>Нет ваших плагинов</option>
+                            </select>
+                        </div>
+                        <div class="dev-two-cols" style="gap: 1rem; margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <label>Telegram ID получателя</label>
+                                <input type="text" placeholder="123456789" class="dev-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Срок, часы</label>
+                                <input type="number" value="72" class="dev-input">
+                            </div>
+                        </div>
+                        <div class="dev-card-footer" style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.2);">
+                            Сейчас инвайт привязан к Telegram ID, одноразовый, максимум 1 установка.
+                        </div>
+                        <button class="btn-primary blue" style="width: 100%; justify-content: center;"><i class="fas fa-user-plus"></i> Создать инвайт</button>
+                    </div>
+
+                    <div class="dev-card">
+                        <div class="dev-card-header">
+                            <div class="dev-card-icon blue"><i class="fas fa-key"></i></div>
+                            <div class="dev-card-title">
+                                <h3>Принять инвайт</h3>
+                                <p>Создает доступ без брокер-токена</p>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label>Токен инвайта</label>
+                            <input type="text" placeholder="fppi_..." class="dev-input">
+                        </div>
+                        <button class="btn-primary blue" style="width: 100%; justify-content: center; background: #2563eb;"><i class="fas fa-key"></i> Принять инвайт</button>
+                    </div>
+                </div>
+
+                <!-- New Accesses and Installations Sections -->
+                <div class="dev-status-title">
+                    <i class="fas fa-user-plus"></i> ДОСТУПЫ (0)
+                </div>
+                <div class="dev-status-block">
+                    <i class="fas fa-user-plus"></i>
+                    <p>Выданные или принятые доступы появятся здесь.</p>
+                </div>
+
+                <div class="dev-status-title blue">
+                    <i class="fas fa-shield-alt"></i> УСТАНОВКИ (0)
+                </div>
+                <div class="dev-status-block">
+                    <i class="fas fa-shield-alt"></i>
+                    <p>Активные установки появятся здесь.</p>
+                </div>
+
+                <!-- Your Plugins Section at the Bottom -->
+                <div class="dev-card" style="margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <span style="font-size: 1rem; font-weight: 700; color: white;">Ваши плагины</span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Всего: 0</span>
+                    </div>
+                    <div style="border: 1px dashed var(--border-color); border-radius: 16px; padding: 4rem 1.5rem; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-puzzle-piece" style="font-size: 3rem; opacity: 0.2; margin-bottom: 1.5rem; display: block;"></i>
+                        <p style="font-size: 0.9rem; max-width: 300px; margin: 0 auto;">Плагины появятся после регистрации манифеста.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-payments" class="content-section">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem;">История платежей</h2>
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-wallet"></i></div>
+                    <h3>Платежей пока нет</h3>
+                    <p>Здесь будет отображаться история ваших покупок и продлений подписки.</p>
+                </div>
+            </div>
+
+            <div id="section-referral" class="content-section">
+                <div style="margin-bottom: 2rem;">
+                    <h2 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1px;">Реферальная программа</h2>
+                    <p style="color: var(--text-muted); font-size: 1rem;">Приглашайте друзей и получайте 5% с каждой их оплаты</p>
+                </div>
+
+                <!-- Step 1: Apply Code (if not applied) -->
+                <div id="referral-apply-box" class="dev-card" style="margin-bottom: 1.5rem; display: none;">
+                    <div class="dev-card-header mini" style="margin-bottom: 1rem;">
+                        <div class="dev-card-icon mini green" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fas fa-ticket-alt"></i></div>
+                        <div class="dev-card-title">
+                            <h3 style="font-size: 1.1rem;">Есть реферальный код?</h3>
+                            <p style="font-size: 0.85rem;">Введите код друга и получите бонус</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="text" id="input-referral-code" placeholder="ABCD1234" class="dev-input" style="text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">
+                        <button class="btn-primary" onclick="applyReferralCode()" style="padding: 0 25px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: none;">Применить</button>
+                    </div>
+                </div>
+
+                <!-- Your Code Section -->
+                <div class="dev-card" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(20, 20, 20, 0.4) 100%); border-color: rgba(124, 58, 237, 0.2);">
+                    <div class="dev-card-header" style="margin-bottom: 1.5rem;">
+                        <div class="dev-card-icon purple"><i class="fas fa-gift"></i></div>
+                        <div class="dev-card-title">
+                            <h3>Ваш реферальный код</h3>
+                            <p>Делитесь с друзьями</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+                        <span id="display-ref-code" style="font-size: 2.2rem; font-weight: 900; letter-spacing: 8px; color: white; font-family: 'JetBrains Mono', monospace;">LOADING...</span>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <input type="text" id="ref-link-input" readonly value="https://funpaypulse.com/?ref=..." class="dev-input" style="width: 100%; background: rgba(0,0,0,0.2); text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem;">
+                        <button class="btn-primary purple" onclick="copyReferralLink()" style="justify-content: center; height: 52px; font-weight: 700;">
+                            <i class="fas fa-copy"></i> Копировать ссылку
+                        </button>
+                        <button class="btn-outline" onclick="shareToTelegram()" style="justify-content: center; height: 52px; border-color: rgba(0, 136, 204, 0.3); color: #0088cc;">
+                            <i class="fab fa-telegram-plane"></i> Поделиться в Telegram
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="dev-stats-grid" style="margin-top: 2rem;">
+                    <div class="dev-stat-card" style="flex-direction: column; align-items: flex-start; padding: 2rem;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 1.5rem;">
+                            <div class="stat-icon purple" style="margin: 0;"><i class="fas fa-crown"></i></div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 100px; font-size: 0.75rem; color: var(--text-muted); font-weight: 700;" id="ref-level-badge">Ур. 1 -- Новичок</div>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Уровень</span>
+                            <h3 style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0;"><span id="ref-percent">5</span>% <span style="font-size: 0.9rem; font-weight: 400; color: var(--text-muted);">с каждого реферала</span></h3>
+                            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 1.5rem 0 0.8rem; overflow: hidden;">
+                                <div id="ref-progress-bar" style="width: 0%; height: 100%; background: var(--primary); border-radius: 10px; transition: 0.5s;"></div>
+                            </div>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);" id="ref-count-text">0 из 5 приглашённых</span>
+                        </div>
+                    </div>
+
+                    <div class="dev-stat-card" style="flex-direction: column; align-items: flex-start; padding: 2rem;">
+                        <div class="stat-icon green" style="margin-bottom: 1.5rem;"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Баланс</span>
+                            <h3 style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0;"><span id="ref-balance">0</span> ₽</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.4;">
+                                500₽ = 30 дней подписки. Приглашайте друзей
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referrals List -->
+                <div class="dev-card" style="margin-top: 2rem; min-height: 300px;">
+                    <div id="referrals-list-empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 1rem; text-align: center; color: var(--text-muted);">
+                        <div style="font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.2;"><i class="fas fa-users"></i></div>
+                        <h3 style="color: white; margin-bottom: 0.5rem;">Пока никого</h3>
+                        <p style="font-size: 0.9rem; max-width: 300px;">Пригласите друзей и получайте бонусы с каждой их оплаты.</p>
+                    </div>
+                    <div id="referrals-list-container" style="display: none;">
+                        <div class="last-ops-header">
+                            <span>Ваши рефералы</span>
+                            <span class="muted" id="total-ref-count">Всего: 0</span>
+                        </div>
+                        <div id="referrals-table-body">
+                            <!-- Rows will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="index.html#feedback">Обратная связь</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
+                <a href="admin.html" id="admin-link" style="display: none; color: var(--accent); font-weight: bold;">Панель управления</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
+        </div>
+    </footer>
+
+    <script src="script.js?v=2.2.2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = window.App.user;
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Update Profile UI
+            const name = user.name || (user.email ? user.email.split('@')[0] : 'User');
+            const char = name[0].toUpperCase();
+            
+            const elSidebarName = document.getElementById('sidebar-user-name');
+            const elHeroName = document.getElementById('hero-user-name');
+            const elSidebarChar = document.getElementById('sidebar-avatar-char');
+            const elHeroChar = document.getElementById('hero-avatar-char');
+            const elHeroEmail = document.getElementById('hero-user-email');
+
+            if (elSidebarName) elSidebarName.textContent = name;
+            if (elHeroName) elHeroName.textContent = name;
+            if (elSidebarChar) elSidebarChar.textContent = char;
+            if (elHeroChar) elHeroChar.textContent = char;
+            if (elHeroEmail) elHeroEmail.textContent = user.email || `@id${user.user_id}`;
+            
+            if (user.subscription) {
+                const subStatus = document.getElementById('sidebar-user-status');
+                if (subStatus) subStatus.textContent = user.subscription.plan || 'Бесплатно';
+                
+                const statusBadges = document.querySelectorAll('.status-badge');
+                statusBadges.forEach(b => b.textContent = user.subscription.plan || 'Бесплатно');
+            }
+            
+            // Handle active tab from URL hash
+            const hash = window.location.hash.replace('#', '') || 'profile';
+            if (document.getElementById(`section-${hash}`)) {
+                setTimeout(() => {
+                    if (typeof window.switchTab === 'function') {
+                        window.switchTab(hash);
+                    }
+                }, 100);
+            }
+            
+            // Payment Method Selection
+            document.querySelectorAll('.payment-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                });
+            });
+
+            // Admin Sidebar Visibility
+            const isAdmin = user.is_admin || user.user_id == "6360699049";
+            if (isAdmin) {
+                const adminItem = document.getElementById('admin-sidebar-item');
+                if (adminItem) adminItem.style.display = 'block';
+                
+                const heroInfo = document.querySelector('.hero-info');
+                if (heroInfo && !document.getElementById('admin-hero-btn')) {
+                    const adminBtn = document.createElement('button');
+                    adminBtn.id = 'admin-hero-btn';
+                    adminBtn.className = 'btn-download-nav';
+                    adminBtn.style.marginTop = '1rem';
+                    adminBtn.style.background = 'rgba(244, 63, 94, 0.1)';
+                    adminBtn.style.color = '#f43f5e';
+                    adminBtn.style.border = '1px solid #f43f5e';
+                    adminBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Войти в Админку';
+                    adminBtn.onclick = () => window.location.href = 'admin.html';
+                    heroInfo.appendChild(adminBtn);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

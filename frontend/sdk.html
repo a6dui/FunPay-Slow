@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDK & API — FunPay Slow</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
+    <link rel="stylesheet" href="styles.css?v=2.1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --code-bg: #0d1117; }
+        .sdk-container { max-width: 1200px; margin: 0 auto; padding: 120px 2rem 4rem; }
+        .sdk-header { margin-bottom: 4rem; text-align: center; }
+        .sdk-header h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        .sdk-header p { color: #888; font-size: 1.2rem; }
+        
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e6edf3;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        .code-block::before {
+            content: "Bash";
+            position: absolute;
+            top: 0; right: 0;
+            padding: 4px 12px;
+            background: #30363d;
+            border-bottom-left-radius: 8px;
+            font-size: 0.7rem;
+            color: #888;
+        }
+        
+        .method-tag {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            margin-right: 10px;
+        }
+        .tag-get { background: rgba(35, 134, 54, 0.2); color: #3fb950; }
+        .tag-post { background: rgba(31, 111, 235, 0.2); color: #58a6ff; }
+        
+        .api-route {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .api-route h3 { margin-top: 0; display: flex; align-items: center; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html" class="active">SDK</a></li>
+                <li><a href="changelog.html">Обновления</a></li>
+                <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/a6dui/FunPay-Slow/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sdk-container">
+        <header class="sdk-header">
+            <h1>Разработчикам <span style="color: #10b981;">Slow SDK</span></h1>
+            <p>Документация API и инструменты для создания собственных плагинов и интеграций.</p>
+        </header>
+
+        <section class="api-section">
+            <div class="api-route">
+                <h3><span class="method-tag tag-post">POST</span> /api/v2.2.2/plugins/register</h3>
+                <p>Регистрация нового плагина в системе Slow. Требуется API-ключ партнера.</p>
+                <div class="code-block">
+curl -X POST https://api.funpayslow.com/v2.2.2/plugins/register \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -d '{
+       "name": "MyAwesomePlugin",
+       "version": "1.0.0",
+       "description": "Auto-delivery for Roblox"
+     }'
+                </div>
+            </div>
+
+            <div class="api-route">
+                <h3><span class="method-tag tag-get">GET</span> /api/v2.2.2/accounts/status</h3>
+                <p>Получение текущего статуса всех подключенных аккаунтов воркера.</p>
+                <div class="code-block">
+{
+  "status": "success",
+  "data": [
+    { "id": "acc_123", "name": "Seller_1", "online": true },
+    { "id": "acc_456", "name": "Seller_2", "online": false }
+  ]
+}
+                </div>
+            </div>
+        </section>
+
+        <section class="sdk-download" style="text-align: center; background: rgba(16, 185, 129, 0.05); border: 1px dashed #10b981; padding: 4rem; border-radius: 32px; margin-top: 4rem;">
+            <h2 style="margin-top: 0;">Готовы начать разработку?</h2>
+            <p style="color: #888; margin-bottom: 2.5rem;">Скачайте наш Python SDK для быстрого старта и ознакомьтесь с примерами в репозитории.</p>
+            <button class="btn-primary" style="background: #10b981; color: black; padding: 1.2rem 3rem; font-size: 1.1rem; border-radius: 16px; border: none; font-weight: 800; cursor: pointer;">
+                Скачать Python SDK
+            </button>
+        </section>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html" class="active">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="https://t.me/FunpaySlow">Telegram</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

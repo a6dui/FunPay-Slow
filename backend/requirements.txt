@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-multipart
+pydantic
+aiogram
+requests
+python-dotenv
+gunicorn
+psycopg2-binary
+uvloop
+httptools

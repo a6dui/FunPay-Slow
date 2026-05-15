@@ -1,0 +1,29 @@
+{
+  "name": "funpay-slow-desktop",
+  "version": "2.2.2",
+  "description": "FunPay Slow Desktop Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.funpayslow.desktop",
+    "productName": "FunPay Slow",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": ["portable", "nsis"],
+      "icon": "icon.png"
+    },
+    "mac": {
+      "target": ["dmg"]
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  }
+}

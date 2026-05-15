@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Документация — FunPay Slow</title>
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <link rel="icon" href="icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Documentation Page Specific Styles */
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+        }
+
+        .docs-page-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 2rem 40px;
+        }
+
+        /* Sidebar override for standalone page */
+        .docs-sidebar-nav {
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .docs-sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .docs-sidebar-item:hover, .docs-sidebar-item.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        /* Content Styling */
+        .docs-main-content {
+            max-width: 900px;
+        }
+
+        section {
+            margin-bottom: 8rem;
+            scroll-margin-top: 140px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            color: white;
+            letter-spacing: -0.02em;
+        }
+
+        .icon-box-premium {
+            width: 64px;
+            height: 64px;
+            background: rgba(109, 40, 217, 0.1);
+            border: 1px solid rgba(109, 40, 217, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .sub-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin: 3rem 0 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .text-block {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+
+        .step-list li {
+            position: relative;
+            padding-left: 4rem;
+            margin-bottom: 2rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .step-list li::before {
+            content: attr(data-index);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .note-box {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+        }
+
+        .note-box h4 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .code-snippet {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .catalog-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .catalog-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .plugin-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .plugin-tag {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .req-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .req-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .req-card .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.8rem;
+        }
+
+        .req-card .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .faq-accordion {
+            margin-top: 3rem;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            margin-bottom: 1.2rem;
+            overflow: hidden;
+        }
+
+        .faq-header {
+            padding: 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .faq-header:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .faq-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .faq-content {
+            padding: 0 1.8rem 1.8rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            display: none;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 1024px) {
+            .docs-page-layout {
+                grid-template-columns: 1fr;
+            }
+            .docs-sidebar-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html">SDK</a></li>
+                <li><a href="changelog.html">Обновления</a></li>
+                <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/a6dui/FunPay-Slow/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav">
+                    <i class="fas fa-download"></i> Скачать
+                </a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+    </nav>
+
+    <!-- Экран авторизации -->
+    <div id="login-overlay">
+        <!-- Основной экран входа -->
+        <div class="login-box" id="login-box-standard">
+            <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'">&times;</div>
+            <div class="logo" style="font-size: 2rem; margin-bottom: 1.5rem;">FunPay Slow <span style="color: var(--accent); font-size: 0.8rem;">[v2.2.2]</span></div>
+            <h2 style="color: white; margin-bottom: 1rem;">Добро пожаловать</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Войдите через наш Telegram-бот для доступа к панели управления.</p>
+            
+            <button class="btn-telegram" id="btn-telegram-login" style="height: 55px; border-radius: 12px; font-size: 1.1rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                </svg>
+                Войти через Telegram
+            </button>
+            <p id="login-error" style="color: var(--accent); margin-top: 1.5rem; display: none;">Ошибка соединения!</p>
+        </div>
+
+        <!-- Окно с кодом подтверждения -->
+        <div class="login-box" id="login-box-telegram" style="display: none;">
+            <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'">&times;</div>
+            <div class="logo" style="font-size: 2rem; margin-bottom: 1.5rem;">FunPay Slow <span style="color: var(--accent); font-size: 0.8rem;">[v2.2.2]</span></div>
+            <h3 style="color: white; margin-bottom: 0.5rem;">Подтвердите вход</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Отправьте этот код нашему официальному боту:</p>
+            
+            <div id="tg-code-display" style="margin-bottom: 2rem;">
+                <div id="tg-auth-code" style="font-size: 2.5rem; letter-spacing: 8px; font-weight: 800; color: white; background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.8rem;">000000</div>
+                <p id="tg-timer" style="font-size: 0.8rem; color: var(--text-muted);">Код истекает через <span id="timer-val">3:00</span></p>
+            </div>
+
+            <a href="https://t.me/FunpaySlov_Bot" id="link-to-bot" target="_blank" class="btn-telegram" style="text-decoration: none; height: 50px; border-radius: 12px; margin-bottom: 1.5rem;">
+                Открыть @FunPaySlov_Bot
+            </a>
+        </div>
+    </div>
+
+    <div class="docs-page-layout">
+        <aside class="docs-sidebar-nav">
+            <a href="#setup" class="docs-sidebar-item active">
+                <i class="fas fa-rocket"></i> Начало работы
+            </a>
+            <a href="#vps" class="docs-sidebar-item">
+                <i class="fas fa-server"></i> VPS и Воркер
+            </a>
+            <a href="#plugins" class="docs-sidebar-item">
+                <i class="fas fa-plug"></i> Плагины
+            </a>
+            <a href="#auto-lift" class="docs-sidebar-item">
+                <i class="fas fa-arrow-up"></i> Автоподнятие
+            </a>
+            <a href="#auto-delivery" class="docs-sidebar-item">
+                <i class="fas fa-box-open"></i> Автовыдача
+            </a>
+            <a href="#telegram" class="docs-sidebar-item">
+                <i class="fab fa-telegram-plane"></i> Telegram бот
+            </a>
+            <a href="#faq" class="docs-sidebar-item">
+                <i class="fas fa-question-circle"></i> FAQ
+            </a>
+        </aside>
+
+        <main class="docs-main-content">
+            <!-- Hero -->
+            <div class="hero-section" style="margin-bottom: 6rem; display: grid; grid-template-columns: 1fr; gap: 2rem;">
+                <div class="hero-text">
+                    <div style="color: var(--accent); font-size: 0.9rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">
+                        <span style="width: 32px; height: 2px; background: var(--accent);"></span>
+                        Документация FunPay Slow
+                    </div>
+                    <h1 style="font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.03em;">Профессиональная автоматизация без лишних сложностей.</h1>
+                    <p class="text-block" style="font-size: 1.25rem; max-width: 800px;">Добро пожаловать в центр управления FunPay Slow. Здесь вы найдете всё необходимое для настройки вашего торгового бизнеса: от первого запуска до масштабирования через VPS и плагины.</p>
+                </div>
+                <div class="quick-start" style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.1); border-radius: 28px; padding: 2.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+                    <div class="quick-step" style="background: none; border: none; padding: 0;">
+                        <div style="font-weight: 800; color: var(--accent); font-size: 1.5rem; margin-bottom: 0.5rem;">01</div>
+                        <div style="color: white; font-weight: 600; margin-bottom: 0.5rem;">Установка</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">Скачайте клиент и пройдите авторизацию.</div>
+                    </div>
+                    <div class="quick-step" style="background: none; border: none; padding: 0;">
+                        <div style="font-weight: 800; color: var(--accent); font-size: 1.5rem; margin-bottom: 0.5rem;">02</div>
+                        <div style="color: white; font-weight: 600; margin-bottom: 0.5rem;">Подключение</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">Привяжите аккаунт FunPay по golden_key.</div>
+                    </div>
+                    <div class="quick-step" style="background: none; border: none; padding: 0;">
+                        <div style="font-weight: 800; color: var(--accent); font-size: 1.5rem; margin-bottom: 0.5rem;">03</div>
+                        <div style="color: white; font-weight: 600; margin-bottom: 0.5rem;">Масштаб</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">Настройте VPS для работы в режиме 24/7.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Setup -->
+            <section id="setup">
+                <div class="section-header">
+                    <div class="icon-box"><i class="fas fa-rocket"></i></div>
+                    <h2>Начало работы</h2>
+                </div>
+
+                <h3 class="sub-header">Скачивание и установка</h3>
+                <p class="text-block">
+                    1. Скачайте установочный файл для Windows с <a href="index.html" style="color: var(--accent);">главной страницы</a>.<br>
+                    2. Запустите установщик и следуйте инструкциям.<br>
+                    3. После установки откройте FunPay Slow.<br>
+                    4. Авторизуйтесь через Telegram для активации лицензии.
+                </p>
+
+                <h3 class="sub-header"><i class="fas fa-link" style="color: var(--accent); font-size: 1rem; margin-right: 0.5rem;"></i> Подключение FunPay аккаунта</h3>
+                <p class="text-block">Для работы с FunPay необходим <code style="color: var(--accent); background: rgba(0,255,136,0.05); padding: 2px 6px; border-radius: 4px;">golden_key</code> — токен авторизации вашего аккаунта.</p>
+
+                <div class="note-box">
+                    <h4>Как получить golden_key:</h4>
+                    <ol class="step-list">
+                        <li data-index="1.">Откройте <a href="https://funpay.com" target="_blank" style="color: var(--accent);">funpay.com</a> и войдите в аккаунт</li>
+                        <li data-index="2.">Нажмите <span style="color: white; font-weight: 600;">F12</span> для открытия DevTools</li>
+                        <li data-index="3.">Перейдите в раздел <span style="color: white; font-weight: 600;">Application → Cookies → funpay.com</span></li>
+                        <li data-index="4.">Найдите cookie с именем <span style="color: var(--accent);">golden_key</span></li>
+                        <li data-index="5.">Скопируйте его значение</li>
+                    </ol>
+                </div>
+                <p class="text-block" style="font-size: 0.9rem;">Вставьте скопированный ключ в FunPay Slow при добавлении аккаунта. Ключ хранится в зашифрованном виде и никуда не передается.</p>
+            </section>
+
+            <!-- VPS -->
+            <section id="vps">
+                <div class="section-header">
+                    <div class="icon-box"><i class="fas fa-server"></i></div>
+                    <h2>VPS (удалённый режим)</h2>
+                </div>
+                <p class="text-block">
+                    VPS-режим позволяет FunPay Slow работать 24/7 даже при выключенном компьютере. Воркер запускается на вашем сервере в Docker-контейнере и выполняет все операции автономно.
+                </p>
+
+                <h3 class="sub-header" style="font-size: 1.1rem;"><i class="fas fa-shield-alt" style="color: var(--accent); margin-right: 0.5rem;"></i> Системные требования</h3>
+                <div class="req-grid">
+                    <div class="req-card">
+                        <div class="label">ОС</div>
+                        <div class="value">Ubuntu 22.04+</div>
+                    </div>
+                    <div class="req-card">
+                        <div class="label">RAM</div>
+                        <div class="value">1 GB минимум</div>
+                    </div>
+                    <div class="req-card">
+                        <div class="label">Docker</div>
+                        <div class="value">Установлен</div>
+                    </div>
+                </div>
+
+                <h3 class="sub-header">Установка воркера на VPS</h3>
+                <p class="text-block">Подключитесь к серверу по SSH и выполните команду:</p>
+                <div class="code-snippet">
+                    <span>bash &lt;(curl -s https://funpaypulse.com/install.sh)</span>
+                    <button class="copy-btn"><i class="far fa-copy"></i></button>
+                </div>
+                <p class="text-block" style="font-size: 0.9rem;">Установщик автоматически установит Docker (если не установлен), скачает последнюю версию воркера и запустит контейнер. По завершении вы получите токен подключения.</p>
+
+                <h3 class="sub-header">Подключение приложения к VPS</h3>
+                <ol class="step-list">
+                    <li data-index="1.">Откройте FunPay Slow на компьютере</li>
+                    <li data-index="2.">На экране подключения выберите <span style="color: white; font-weight: 600;">Удалённый режим</span></li>
+                    <li data-index="3.">Введите IP-адрес вашего VPS и токен подключения</li>
+                    <li data-index="4.">Нажмите <span style="color: white; font-weight: 600;">Подключиться</span></li>
+                </ol>
+            </section>
+
+            <!-- Plugins -->
+            <section id="plugins">
+                <div class="section-header">
+                    <div class="icon-box"><i class="fas fa-plug"></i></div>
+                    <h2>Плагины</h2>
+                </div>
+                <p class="text-block">
+                    Плагины расширяют возможности FunPay Slow. Каждый плагин решает конкретную задачу — от автоматической выдачи товаров до аренды Steam-аккаунтов.
+                </p>
+
+                <h3 class="sub-header">Как активировать плагин</h3>
+                <ol class="step-list">
+                    <li data-index="1.">Перейдите в раздел <span style="color: white; font-weight: 600;">Плагины</span> в приложении</li>
+                    <li data-index="2.">Найдите нужный плагин в списке</li>
+                    <li data-index="3.">Нажмите <span style="color: white; font-weight: 600;">Активировать</span></li>
+                    <li data-index="4.">Перейдите в настройки плагина и заполните конфигурацию</li>
+                    <li data-index="5.">Включите плагин переключателем</li>
+                </ol>
+
+                <h3 class="sub-header">Каталог плагинов</h3>
+                <div class="catalog-grid">
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #3b82f6;"><i class="fas fa-cloud"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">RentSteam</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Плагин для автоматизации аренды Steam-аккаунтов.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #10b981;"><i class="fas fa-comment-alt"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">Авто-ответчик</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Автоматические ответы на сообщения покупателей.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #8b5cf6;"><i class="fas fa-chart-line"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoSMM</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Продажа SMM-услуг через подключенные SMM-панели.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #ec4899;"><i class="fas fa-gift"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoGift</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Автоматическая отправка Telegram Stars Gifts по заказам FunPay.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #6366f1;"><i class="fas fa-key"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoAIAccounts</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Автоматическая покупка и выдача AI-аккаунтов через LZT Market.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #06b6d4;"><i class="fas fa-steam"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoSteamNS</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Автоматическое пополнение Steam через NSGifts по заказам на FunPay.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #f59e0b;"><i class="fas fa-ticket-alt"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoTicket</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Автоматическое создание тикетов в поддержку FunPay по просроченным заказам.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #f97316;"><i class="fas fa-gamepad"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">VIP Roblox</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Плагин для работы с VIP-серверами Roblox.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #ef4444;"><i class="fas fa-coins"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoRobux</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Выдача Robux через Roblox Game Pass.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #818cf8;"><i class="fab fa-discord"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoDiscordBoost</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Автоматический Discord boost по заказам.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #fbbf24;"><i class="fas fa-star"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoStars</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Автоматическая выдача Telegram Stars по заказам.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #9ca3af;"><i class="fas fa-moon"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">Offline Activite</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Выдача Steam Guard кодов по команде !guard для настроенных аккаунтов.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #10b981;"><i class="fas fa-copy"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">CopyLots</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Копирование лотов между аккаунтами FunPay.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #f43f5e;"><i class="fas fa-comments"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">ChatSpam</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Массовая отправка сообщений в чаты FunPay.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #3b82f6;"><i class="fas fa-envelope"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">EmailCode</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Получение кодов подтверждения из email через IMAP.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #84cc16;"><i class="fas fa-database"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">AutoDump</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Автоматическая корректировка цен по публичному рынку FunPay.</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card">
+                        <div class="plugin-icon" style="color: #10b981;"><i class="fas fa-arrow-up"></i></div>
+                        <div>
+                            <div style="font-weight: 700; color: white;">Авто-поднятие <span class="plugin-tag">Бесплатно</span></div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Встроенная функция автоматического поднятия лотов с настраиваемым интервалом. Бесплатно для всех.</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-block" style="margin-top: 2rem; font-size: 0.9rem;">Полный каталог плагинов доступен на странице <a href="plugins.html">Плагины</a>.</p>
+            </section>
+
+            <!-- Auto Lift -->
+            <section id="auto-lift">
+                <div class="section-header">
+                    <div class="icon-box"><i class="fas fa-arrow-up"></i></div>
+                    <h2>Автоподнятие лотов</h2>
+                </div>
+                <p class="text-block">
+                    Авто-поднятие — встроенная бесплатная функция, которая автоматически поднимает ваши лоты на FunPay, чтобы они были выше в выдаче.
+                </p>
+
+                <h3 class="sub-header">Как включить</h3>
+                <ol class="step-list">
+                    <li data-index="1.">Перейдите в <span style="color: white; font-weight: 600;">Настройки</span></li>
+                    <li data-index="2.">Найдите раздел <span style="color: white; font-weight: 600;">Авто-поднятие</span></li>
+                    <li data-index="3.">Включите переключатель</li>
+                    <li data-index="4.">При необходимости настройте интервал (по умолчанию — каждые 2 часа)</li>
+                </ol>
+
+                <h3 class="sub-header">Как это работает</h3>
+                <p class="text-block">FunPay позволяет поднимать лоты с определённым интервалом. FunPay Slow автоматически отслеживает этот кулдаун и поднимает лоты, как только это становится возможным.</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Интервал по умолчанию</div>
+                        <div class="stat-value">2 часа</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Настраиваемый интервал</div>
+                        <div class="stat-value">от 30 мин</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Поднимаются</div>
+                        <div class="stat-value">Все активные лоты</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Расход</div>
+                        <div class="stat-value">Бесплатно (FunPay)</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Auto Delivery -->
+            <section id="auto-delivery">
+                <div class="section-header">
+                    <div class="icon-box"><i class="fas fa-box-open"></i></div>
+                    <h2>Автовыдача</h2>
+                </div>
+                <p class="text-block">
+                    Автовыдача позволяет автоматически отправлять товар покупателю сразу после оплаты заказа — без вашего участия.
+                </p>
+                
+                <h3 class="sub-header">Режим: Текст</h3>
+                <p class="text-block">Задайте фиксированный текст, который будет отправлен покупателю при каждой покупке данного лота. Подходит для продажи ключей, инструкций, ссылок.</p>
+                <p class="text-block" style="font-size: 0.9rem;">Поддерживаются переменные шаблонов: имя покупателя, номер заказа, название лота.</p>
+
+                <h3 class="sub-header">Режим: FIFO (Файлы)</h3>
+                <p class="text-block">Загрузите файл с товарами (по одному на строку). При каждой продаже система возьмёт первую строку из файла, отправит покупателю и удалит её из списка. Так каждый покупатель получает уникальный товар.</p>
+                <p class="text-block" style="font-size: 0.9rem;">Когда товары заканчиваются, вы получите уведомление. Можно настроить автоматическое отключение лота при исчерпании запаса.</p>
+
+                <h3 class="sub-header">Настройка</h3>
+                <ol class="step-list">
+                    <li data-index="1.">Перейдите в раздел <span style="color: white; font-weight: 600;">Автовыдача</span></li>
+                    <li data-index="2.">Выберите лот, для которого нужна автовыдача</li>
+                    <li data-index="3.">Выберите режим: <span style="color: white; font-weight: 600;">Текст</span> или <span style="color: white; font-weight: 600;">FIFO</span></li>
+                    <li data-index="4.">Заполните содержимое и сохраните</li>
+                </ol>
+            </section>
+
+            <!-- Telegram -->
+            <section id="telegram">
+                <div class="section-header">
+                    <div class="icon-box"><i class="fab fa-telegram-plane"></i></div>
+                    <h2>Telegram бот</h2>
+                </div>
+                <p class="text-block">
+                    Встроенный Telegram бот позволяет получать уведомления о новых заказах, сообщениях и отзывах, а также управлять FunPay Slow удалённо через команды.
+                </p>
+
+                <h3 class="sub-header">Подключение</h3>
+                <ol class="step-list">
+                    <li data-index="1.">Создайте бота через <a href="https://t.me/BotFather" target="_blank" style="color: var(--accent);">@BotFather</a> в Telegram</li>
+                    <li data-index="2.">Скопируйте токен бота</li>
+                    <li data-index="3.">В FunPay Slow перейдите в <span style="color: white; font-weight: 600;">Настройки → Telegram</span></li>
+                    <li data-index="4.">Вставьте токен и укажите ваш Telegram ID (chat_id)</li>
+                    <li data-index="5.">Нажмите <span style="color: white; font-weight: 600;">Сохранить</span></li>
+                </ol>
+
+                <h3 class="sub-header">Доступные команды</h3>
+                <div class="commands-simple-list">
+                    <div class="cmd-item">
+                        <span class="cmd-tag">/start</span>
+                        <span class="cmd-desc">Запуск бота и приветствие</span>
+                    </div>
+                    <div class="cmd-item">
+                        <span class="cmd-tag">/help</span>
+                        <span class="cmd-desc">Список доступных команд</span>
+                    </div>
+                    <div class="cmd-item">
+                        <span class="cmd-tag">/status</span>
+                        <span class="cmd-desc">Статус воркера и аккаунтов</span>
+                    </div>
+                    <div class="cmd-item">
+                        <span class="cmd-tag">/balance</span>
+                        <span class="cmd-desc">Баланс всех аккаунтов</span>
+                    </div>
+                </div>
+
+                <style>
+                    .commands-simple-list {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1rem;
+                        margin-top: 1.5rem;
+                    }
+                    .cmd-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 2rem;
+                    }
+                    .cmd-desc {
+                        color: var(--text-muted);
+                        font-size: 0.95rem;
+                    }
+                </style>
+
+                <div class="notice-box">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <i class="fas fa-shield-alt" style="color: #3b82f6; font-size: 1.2rem;"></i>
+                        <span style="font-weight: 700; color: white;">Whitelist <span class="notice-tag">Максимальная защита</span></span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Бот отвечает только пользователям из списка разрешённых Telegram ID.</p>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section id="faq">
+                <div class="section-header">
+                    <div class="icon-box"><i class="fas fa-question-circle"></i></div>
+                    <h2>Частые вопросы</h2>
+                </div>
+                <div class="faq-accordion">
+                    <div class="faq-item">
+                        <div class="faq-header">
+                            <span class="faq-title">Не могу подключить аккаунт</span>
+                            <i class="fas fa-chevron-right faq-icon"></i>
+                        </div>
+                        <div class="faq-content">
+                            Убедитесь, что вы правильно скопировали golden_key и ваш аккаунт не заблокирован на FunPay. Также проверьте интернет-соединение или настройки прокси/VPN.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-header">
+                            <span class="faq-title">Лоты не поднимаются</span>
+                            <i class="fas fa-chevron-right faq-icon"></i>
+                        </div>
+                        <div class="faq-content">
+                            Проверьте, включена ли функция авто-поднятия в настройках и не истек ли кулдаун на стороне FunPay.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-header">
+                            <span class="faq-title">Воркер не запускается на VPS</span>
+                            <i class="fas fa-chevron-right faq-icon"></i>
+                        </div>
+                        <div class="faq-content">
+                            Убедитесь, что на сервере установлен Docker и у вас достаточно прав (sudo) для запуска контейнера.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-header">
+                            <span class="faq-title">Как обновить воркер?</span>
+                            <i class="fas fa-chevron-right faq-icon"></i>
+                        </div>
+                        <div class="faq-content">
+                            Запустите ту же команду установки SSH еще раз, и установщик автоматически обновит воркер до последней версии.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-header">
+                            <span class="faq-title">Плагин не работает после активации</span>
+                            <i class="fas fa-chevron-right faq-icon"></i>
+                        </div>
+                        <div class="faq-content">
+                            Некоторые плагины требуют дополнительной настройки. Проверьте вкладку настроек плагина и убедитесь, что все поля заполнены верно.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-header">
+                            <span class="faq-title">Как перенести данные на другой компьютер?</span>
+                            <i class="fas fa-chevron-right faq-icon"></i>
+                        </div>
+                        <div class="faq-content">
+                            Скопируйте файл базы данных funpaypulse.db из папки приложения и перенесите его в ту же папку на новом устройстве.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html" class="active">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="index.html#feedback">Обратная связь</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
+        </div>
+    </footer>
+
+    <script>
+        // Sidebar active state on scroll
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.docs-sidebar-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 180) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                window.scrollTo({
+                    top: targetElement.offsetTop - 140,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.faq-icon');
+                
+                const isOpen = content.style.display === 'block';
+                
+                // Close all others
+                document.querySelectorAll('.faq-content').forEach(c => c.style.display = 'none');
+                document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+                
+                if (!isOpen) {
+                    content.style.display = 'block';
+                    icon.style.transform = 'rotate(90deg)';
+                }
+            });
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

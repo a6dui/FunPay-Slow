@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель — FunPay Slow</title>
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 2rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .stat-card {
+            background: rgba(20, 20, 20, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+        .badge-admin {
+            background: rgba(244, 63, 94, 0.1);
+            color: #f43f5e;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-container" onclick="window.location.href='index.html'">
+                <span class="snail-logo">🐌</span>
+                <div class="logo-text">FunPay <span>Slow</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="plugins.html">Плагины</a></li>
+                <li><a href="sdk.html">SDK</a></li>
+                <li><a href="changelog.html">Обновления</a></li>
+                <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="https://github.com/a6dui/FunPay-Slow/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="admin-container">
+        <div class="admin-header">
+            <div>
+                <div class="badge-admin"><i class="fas fa-shield-alt"></i> ПАНЕЛЬ УПРАВЛЕНИЯ</div>
+                <h1 style="font-size: 3rem; margin-top: 1rem;">Статистика системы</h1>
+            </div>
+            <button class="btn-download-nav" onclick="location.reload()"><i class="fas fa-sync"></i> Обновить</button>
+        </div>
+
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Пользователей</div>
+                <div class="stat-value" id="stat-users">...</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Онлайн</div>
+                <div class="stat-value" id="stat-online" style="color: #10b981;">...</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Продаж всего</div>
+                <div class="stat-value" id="stat-sales">...</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Активных подписок</div>
+                <div class="stat-value" id="stat-subs">...</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Плагинов</div>
+                <div class="stat-value" id="stat-plugins">...</div>
+            </div>
+        </div>
+    </main>
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo snail-crawling" style="font-size: 2.2rem;">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Панель администратора FunPay Slow. Будьте осторожны с данными пользователей.</p>
+                <div class="footer-socials">
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="index.html">Главная</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
+            </div>
+            <div class="footer-col">
+                <h4>Документация</h4>
+                <a href="docs.html">Документация</a>
+                <a href="media-partnership.html">Медиапартнерство</a>
+                <a href="https://t.me/FunpaySlow">Telegram</a>
+            </div>
+            <div class="footer-col">
+                <h4>Юридическое</h4>
+                <a href="terms.html">Условия использования</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
+                <a href="payment.html">Соглашение для оплаты</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Security check
+            const user = window.App.user;
+            const adminIds = ["6360699049", "5304677735", "755843448"];
+            const isAdmin = user && (user.is_admin || adminIds.includes(String(user.user_id)));
+            
+            if (!isAdmin) {
+                console.log("Admin check failed for:", user ? user.user_id : "null");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const stats = await window.loadAdminStats();
+            if (stats.error) {
+                alert('Ошибка доступа к админ-панели');
+                return;
+            }
+            document.getElementById('stat-users').textContent = stats.total_users;
+            document.getElementById('stat-online').textContent = stats.online_users;
+            document.getElementById('stat-sales').textContent = stats.total_sales;
+            document.getElementById('stat-subs').textContent = stats.active_subs;
+            document.getElementById('stat-plugins').textContent = stats.total_plugins;
+        });
+    </script>
+</body>
+</html>
