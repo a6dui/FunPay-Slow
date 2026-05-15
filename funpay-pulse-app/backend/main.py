@@ -46,8 +46,8 @@ DB_FILE = os.path.join(BASE_DIR, "funpaypulse.db")
 
 # --- SETTINGS ---
 # Replace with your actual Telegram User ID (get it from @userinfobot)
-ADMIN_CHAT_ID = "755843448" 
-BOT_TOKEN = '8997989380:AAHxcNyf46EQ2_jsU7gZ-xST_9ey9Qcr1FE'
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID", "755843448")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8997989380:AAHxcNyf46EQ2_jsU7gZ-xST_9ey9Qcr1FE")
 FUNPAY_GOLDEN_KEY = "goomqs6ab8nho7areo9irc7cgorbc070"
 import requests
 import psycopg2
@@ -555,6 +555,17 @@ def post_support(msg: SupportMessage):
 def get_changelog():
     return [
         {
+            "version": "v2.2.2",
+            "date": "16 Мая 2026",
+            "changes": [
+                "Версия: v2.2.2 - Финальная полировка UI.",
+                "Оптимизация: Уменьшен размер футера и отступы для более компактного вида.",
+                "Исправление: Ссылка на 'Соглашение для оплаты' теперь корректно отображается во всех разделах (Профиль, Поддержка).",
+                "Дизайн: Исправлено растягивание плашек в главном блоке (Hero Section).",
+                "Брендинг: Обновлены стили ссылок в футере для более современного вида."
+            ]
+        },
+        {
             "version": "v2.2.1",
             "date": "15 Мая 2026",
             "changes": [
@@ -988,10 +999,30 @@ def verify_payment(invoice_id: str):
             c.execute("UPDATE payments SET status = 'paid' WHERE invoice_id = ?", (invoice_id,))
             c.execute("INSERT OR REPLACE INTO subscriptions (user_id, plan, expires_at, status) VALUES (?, ?, ?, 'active')",
                       (user_id, plan_name, expires_at))
+            
+            # --- Referral Commission (5%) ---
+            try:
+                c.execute("SELECT referrer_id FROM referral_stats WHERE user_id = ?", (user_id,))
+                ref_row = c.fetchone()
+                if ref_row and ref_row[0]:
+                    referrer_id = ref_row[0]
+                    # Get amount from payment record (row[0] is user_id, row[1] is plan, row[2] is status? No, check query at line 961)
+                    # Query at line 961: "SELECT user_id, plan, status FROM payments WHERE invoice_id = ?"
+                    # Wait, I need the amount too.
+                    c.execute("SELECT amount FROM payments WHERE invoice_id = ?", (invoice_id,))
+                    amount_row = c.fetchone()
+                    if amount_row:
+                        payment_amount = amount_row[0]
+                        commission = payment_amount * 0.05
+                        c.execute("UPDATE referral_stats SET balance = balance + ? WHERE user_id = ?", (commission, referrer_id))
+                        print(f"REFERRAL: Credited {commission} RUB to referrer {referrer_id} for user {user_id}")
+            except Exception as ref_err:
+                print(f"Referral commission error: {ref_err}")
+            
             conn.commit()
             
             # Notify Admin
-            send_admin_tg(f"💰 <b>Новая оплата!</b>\nUser ID: {user_id}\nPlan: {plan_name}\nAmount: {row[0]}")
+            send_admin_tg(f"💰 <b>Новая оплата!</b>\nUser ID: {user_id}\nPlan: {plan_name}\nAmount: {payment_amount} RUB")
             
             conn.close()
             return {"success": True, "message": f"Подписка {plan_name} активирована!"}

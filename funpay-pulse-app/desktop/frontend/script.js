@@ -281,14 +281,14 @@ window.loadAdminStats = async () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("--- FunPay Slow Desktop v.2.2.0 Loaded ---");
+    console.log("--- FunPay Slow Desktop v.2.2.2 Loaded ---");
     window.App.init();
 
     // Load dynamic version numbers on all pages
     const versionBadges = document.querySelectorAll('.hero-badge, .mockup-version, .logo span');
     versionBadges.forEach(b => {
-        if (b.textContent.includes('v.')) b.innerHTML = b.innerHTML.replace(/v\.[0-9.]+/, 'v.2.2.0');
-        if (b.textContent.includes('v2.')) b.innerHTML = b.innerHTML.replace(/v2\.[0-9.]+/, 'v2.2.0');
+        if (b.textContent.includes('v.')) b.innerHTML = b.innerHTML.replace(/v\.[0-9.]+/, 'v.2.2.2');
+        if (b.textContent.includes('v2.')) b.innerHTML = b.innerHTML.replace(/v2\.[0-9.]+/, 'v2.2.2');
     });
 
     if (window.location.pathname.includes('changelog.html')) {
@@ -476,9 +476,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const applyBox = document.getElementById('referral-apply-box');
             
             if (displayCode) displayCode.textContent = data.referral_code;
-            if (linkInput) linkInput.value = `https://funpaypulse.com/?ref=${data.referral_code}`;
+            if (linkInput) linkInput.value = `${window.location.origin}/?ref=${data.referral_code}`;
             if (balanceText) balanceText.textContent = data.balance.toFixed(2);
-            if (countText) countText.textContent = `${data.invited_count} из ${data.invited_count + 5} приглашённых`;
+            if (countText) countText.textContent = `${data.invited_count} приглашённых`;
             
             // Levels logic (example)
             let levelName = "Ур. 1 -- Новичок";
@@ -511,15 +511,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (tableBody) {
                     tableBody.innerHTML = data.referrals.map(ref => `
-                        <div class="last-op-row">
-                            <div class="op-main">
-                                <div class="op-icon" style="background: rgba(255,255,255,0.05); color: var(--text-muted);"><i class="fas fa-user"></i></div>
-                                <div class="op-info">
-                                    <span class="op-title">ID: ${ref.referred_id}</span>
-                                    <span class="op-date">${new Date(ref.created_at).toLocaleDateString()}</span>
-                                </div>
+                        <div class="referral-friend-row">
+                            <div class="friend-avatar">${ref.referred_id.toString().slice(-2)}</div>
+                            <div class="friend-info">
+                                <span class="friend-id">Пользователь #${ref.referred_id}</span>
+                                <span class="friend-date">Присоединился: ${new Date(ref.created_at).toLocaleDateString()}</span>
                             </div>
-                            <div class="op-amount plus">+0 ₽</div>
+                            <div class="friend-reward">+5% с оплат</div>
                         </div>
                     `).join('');
                 }
@@ -709,14 +707,30 @@ document.addEventListener('DOMContentLoaded', () => {
     window.selectedPlan = null;
     window.selectedPrice = 0;
 
-    window.selectPlan = (planId, price, element) => {
+    window.selectPlan = (planId, price, element, type) => {
         window.selectedPlan = planId;
         window.selectedPrice = price;
         
-        // Update UI
-        const options = element.parentElement.querySelectorAll('.plan-option');
-        options.forEach(opt => opt.classList.remove('active'));
+        // Remove active from all options
+        document.querySelectorAll('.plan-option').forEach(opt => opt.classList.remove('active'));
+        // Remove selected from all cards
+        document.querySelectorAll('.tier-card').forEach(card => card.classList.remove('selected'));
+        // Hide/Disable all buy buttons
+        document.querySelectorAll('.btn-buy-now').forEach(btn => btn.classList.remove('ready'));
+
+        // Add active to clicked option
         element.classList.add('active');
+        
+        // Add selected to parent card
+        const card = document.getElementById(`tier-${type}`);
+        if (card) card.classList.add('selected');
+        
+        // Enable corresponding button
+        const btn = document.getElementById(`btn-buy-${type}`);
+        if (btn) {
+            btn.classList.add('ready');
+            btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Оплатить ${price} ₽`;
+        }
     };
 
     window.buySelectedPlan = async () => {

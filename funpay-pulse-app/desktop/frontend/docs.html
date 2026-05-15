@@ -349,7 +349,7 @@
         <!-- Основной экран входа -->
         <div class="login-box" id="login-box-standard">
             <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'">&times;</div>
-            <div class="logo" style="font-size: 2rem; margin-bottom: 1.5rem;">FunPay Slow <span style="color: var(--accent); font-size: 0.8rem;">[v.2.2.0]</span></div>
+            <div class="logo" style="font-size: 2rem; margin-bottom: 1.5rem;">FunPay Slow <span style="color: var(--accent); font-size: 0.8rem;">[v.2.2.2]</span></div>
             <h2 style="color: white; margin-bottom: 1rem;">Добро пожаловать</h2>
             <p style="color: var(--text-muted); margin-bottom: 2.5rem;">Войдите через наш Telegram-бот для доступа к панели управления.</p>
             
@@ -365,7 +365,7 @@
         <!-- Окно с кодом подтверждения -->
         <div class="login-box" id="login-box-telegram" style="display: none;">
             <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'">&times;</div>
-            <div class="logo" style="font-size: 2rem; margin-bottom: 1.5rem;">FunPay Slow <span style="color: var(--accent); font-size: 0.8rem;">[v.2.2.0]</span></div>
+            <div class="logo" style="font-size: 2rem; margin-bottom: 1.5rem;">FunPay Slow <span style="color: var(--accent); font-size: 0.8rem;">[v.2.2.2]</span></div>
             <h3 style="color: white; margin-bottom: 0.5rem;">Подтвердите вход</h3>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Отправьте этот код нашему официальному боту:</p>
             
@@ -854,40 +854,41 @@
     </div>
 
 
-    <footer class="main-footer" style="margin-left: 0; position: relative; z-index: 10;">
+    <footer class="main-footer">
         <div class="footer-grid">
             <div class="footer-brand">
-                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;"><span class="snail-logo" style="font-size: 2.2rem;">🐌</span><div class="logo-text">FunPay <span>Slow</span></div></div>
-                <p>Профессиональные инструменты для автоматизации работы с FunPay. Экономьте время, зарабатывайте больше.</p>
+                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
+                    <span class="snail-logo">🐌</span>
+                    <div class="logo-text">FunPay <span>Slow</span></div>
+                </div>
+                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
                 <div class="footer-socials">
-                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i></a>
-                    <a href="#"><i class="fab fa-discord"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
                 </div>
             </div>
             <div class="footer-col">
                 <h4>Продукт</h4>
                 <a href="index.html">Главная</a>
-                <a href="plugins.html">Маркетплейс</a>
-                <a href="sdk.html">SDK для разработчиков</a>
-                <a href="changelog.html">Список изменений</a>
+                <a href="plugins.html">Плагины</a>
+                <a href="sdk.html">Разработчикам</a>
+                <a href="changelog.html">Обновления</a>
             </div>
             <div class="footer-col">
-                <h4>Ресурсы</h4>
-                <a href="docs.html">Документация</a>
+                <h4>Документация</h4>
+                <a href="docs.html" class="active">Документация</a>
                 <a href="media-partnership.html">Медиапартнерство</a>
-                <a href="report.html">Обратная связь</a>
-                <a href="status.html">Статус системы</a>
+                <a href="https://t.me/FunpaySlow">Telegram</a>
             </div>
             <div class="footer-col">
-                <h4>Правовая информация</h4>
+                <h4>Юридическое</h4>
                 <a href="terms.html">Условия использования</a>
-                <a href="privacy.html">Конфиденциальность</a>
+                <a href="privacy.html">Политика конфиденциальности</a>
                 <a href="payment.html">Соглашение для оплаты</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2026 FunPay Slow. Все права защищены. Разработано с ❤️ для комьюнити.</p>
+            <p>© 2026 FunPay Slow. Все права защищены.</p>
+            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
         </div>
     </footer>
 
@@ -901,7 +902,7 @@
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 const sectionHeight = section.clientHeight;
-                if (pageYOffset >= sectionTop - 180) {
+                if (window.pageYOffset >= sectionTop - 180) {
                     current = section.getAttribute('id');
                 }
             });
@@ -946,45 +947,6 @@
             });
         });
     </script>
-    <footer class="main-footer">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <div class="logo-container" style="margin-bottom: 1rem; border-bottom: none; background: none; padding: 0; justify-content: flex-start; gap: 10px;">
-                    <span class="snail-logo">🐌</span>
-                    <div class="logo-text">FunPay <span>Slow</span></div>
-                </div>
-                <p>Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
-                <div class="footer-socials">
-                    <a href="https://t.me/FunpaySlow"><i class="fab fa-telegram"></i> Telegram</a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h4>Продукт</h4>
-                <a href="index.html">Главная</a>
-                <a href="plugins.html">Плагины</a>
-                <a href="sdk.html">Разработчикам</a>
-                <a href="changelog.html">Обновления</a>
-                <a href="report.html">Поддержка</a>
-            </div>
-            <div class="footer-col">
-                <h4>Документация</h4>
-                <a href="docs.html">Документация</a>
-                <a href="media-partnership.html">Медиапартнерство</a>
-                <a href="report.html">Обратная связь</a>
-                <a href="https://t.me/FunpaySlow">Telegram</a>
-            </div>
-            <div class="footer-col">
-                <h4>Юридическое</h4>
-                <a href="terms.html">Условия использования</a>
-                <a href="privacy.html">Политика конфиденциальности</a>
-                <a href="payment.html">Соглашение для оплаты</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 FunPay Slow. Все права защищены.</p>
-            <p style="margin-top: 0.4rem; font-size: 0.8rem; color: var(--text-muted);">Не является официальным приложением FunPay.com</p>
-        </div>
-    </footer>
     <script src="script.js"></script>
 </body>
 </html>

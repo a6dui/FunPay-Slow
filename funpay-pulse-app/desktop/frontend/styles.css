@@ -587,7 +587,7 @@ h1 {
 .main-footer {
     background: rgba(8, 8, 12, 0.98);
     border-top: 1px solid var(--border-color);
-    margin-top: 8rem;
+    margin-top: 4rem;
 }
 
 .footer-grid {
@@ -596,7 +596,7 @@ h1 {
     gap: 3rem;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 3rem 2rem;
+    padding: 2rem 2rem;
 }
 
 .footer-brand .logo-text {
@@ -778,8 +778,10 @@ footer {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
     gap: 4rem;
-    padding: 80px 0;
+    padding: 100px 0 120px;
     align-items: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .hero-landing-content {
@@ -792,14 +794,26 @@ footer {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: rgba(16, 185, 129, 0.05);
-    border: 1px solid rgba(16, 185, 129, 0.1);
+    background: rgba(16, 185, 129, 0.03);
+    border: 1px solid rgba(16, 185, 129, 0.15);
     color: var(--accent);
-    padding: 8px 16px;
+    padding: 10px 20px;
     border-radius: 100px;
     font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 2rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    width: fit-content;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.hero-badge:hover {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+    transform: translateY(-2px);
 }
 
 .hero-branding {

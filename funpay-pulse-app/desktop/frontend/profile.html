@@ -568,6 +568,117 @@
             color: #10b981;
             font-weight: 600;
         }
+        
+    /* --- Subscription Selection --- */
+    .tier-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .tier-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .tier-card.selected {
+        border-color: #10b981;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+    
+    .tier-card.fast.selected {
+        border-color: #fbbf24;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+    }
+    
+    .plan-option {
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+    }
+    
+    .plan-option:hover {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .plan-option.active {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: #10b981;
+    }
+    
+    .tier-card.fast .plan-option.active {
+        background: rgba(251, 191, 36, 0.1);
+        border-color: #fbbf24;
+    }
+    
+    .btn-buy-now {
+        opacity: 0.5;
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-buy-now.ready {
+        opacity: 1;
+        pointer-events: auto;
+        background: #10b981;
+        color: white;
+    }
+    
+    .tier-card.fast .btn-buy-now.ready {
+        background: #fbbf24;
+        color: #000;
+    }
+
+    /* --- Referral List Styling --- */
+    .referral-friend-row {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s ease;
+    }
+    
+    .referral-friend-row:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .friend-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+    
+    .friend-info {
+        flex: 1;
+    }
+    
+    .friend-id {
+        font-weight: 600;
+        display: block;
+    }
+    
+    .friend-date {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    
+    .friend-reward {
+        font-weight: 700;
+        color: #10b981;
+    }
         .plan-price {
             text-align: right;
         }
@@ -1252,13 +1363,13 @@
                 <div class="pricing-section-container">
                     <div class="tiers-wrapper">
                         <!-- Slow Plan -->
-                        <div class="tier-card">
+                        <div class="tier-card" id="tier-slow">
                             <div class="tier-badge">ECONOMY</div>
                             <div class="tier-title"><i class="fas fa-leaf" style="color: #10b981;"></i> Slow</div>
                             <div class="tier-desc">Для экономных. Работает с 50% товаров и базовыми плагинами.</div>
                             
                             <div class="plan-options">
-                                <div class="plan-option" onclick="selectPlan('slow_1', 199, this)">
+                                <div class="plan-option" onclick="selectPlan('slow_1', 199, this, 'slow')">
                                     <div class="plan-info">
                                         <span class="plan-duration">1 месяц</span>
                                         <span class="plan-savings">Базовый тариф</span>
@@ -1268,7 +1379,7 @@
                                         <div class="price-mo">199 ₽/мес</div>
                                     </div>
                                 </div>
-                                <div class="plan-option" onclick="selectPlan('slow_6', 1100, this)">
+                                <div class="plan-option" onclick="selectPlan('slow_6', 1100, this, 'slow')">
                                     <div class="plan-info">
                                         <span class="plan-duration">6 месяцев</span>
                                         <span class="plan-savings">Экономия 94 ₽</span>
@@ -1278,7 +1389,7 @@
                                         <div class="price-mo">183 ₽/мес</div>
                                     </div>
                                 </div>
-                                <div class="plan-option" onclick="selectPlan('slow_12', 2300, this)">
+                                <div class="plan-option" onclick="selectPlan('slow_12', 2300, this, 'slow')">
                                     <div class="plan-info">
                                         <span class="plan-duration">12 месяцев</span>
                                         <span class="plan-savings">Экономия 88 ₽</span>
@@ -1289,17 +1400,17 @@
                                     </div>
                                 </div>
                             </div>
-                            <button class="btn-primary" style="width: 100%; margin-top: 1.5rem; justify-content: center; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white;" onclick="buySelectedPlan()"><i class="fas fa-shopping-cart"></i> Выбрать Slow</button>
+                            <button class="btn-primary btn-buy-now" id="btn-buy-slow" style="width: 100%; margin-top: 1.5rem; justify-content: center; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white;" onclick="buySelectedPlan()"><i class="fas fa-shopping-cart"></i> Выбрать Slow</button>
                         </div>
 
                         <!-- Fast Plan -->
-                        <div class="tier-card fast">
+                        <div class="tier-card fast" id="tier-fast">
                             <div class="tier-badge">PREMIUM</div>
                             <div class="tier-title"><i class="fas fa-bolt" style="color: #fbbf24;"></i> Fast</div>
                             <div class="tier-desc">Полный доступ. Все плагины, 100% товаров и эксклюзивные функции.</div>
                             
                             <div class="plan-options">
-                                <div class="plan-option" onclick="selectPlan('fast_1', 400, this)">
+                                <div class="plan-option" onclick="selectPlan('fast_1', 400, this, 'fast')">
                                     <div class="plan-info">
                                         <span class="plan-duration">1 месяц</span>
                                         <span class="plan-savings">Полный доступ</span>
@@ -1309,7 +1420,7 @@
                                         <div class="price-mo">400 ₽/мес</div>
                                     </div>
                                 </div>
-                                <div class="plan-option" onclick="selectPlan('fast_6', 2200, this)">
+                                <div class="plan-option" onclick="selectPlan('fast_6', 2200, this, 'fast')">
                                     <div class="plan-info">
                                         <span class="plan-duration">6 месяцев</span>
                                         <span class="plan-savings">Экономия 200 ₽</span>
@@ -1319,7 +1430,7 @@
                                         <div class="price-mo">366 ₽/мес</div>
                                     </div>
                                 </div>
-                                <div class="plan-option" onclick="selectPlan('fast_12', 4600, this)">
+                                <div class="plan-option" onclick="selectPlan('fast_12', 4600, this, 'fast')">
                                     <div class="plan-info">
                                         <span class="plan-duration">12 месяцев</span>
                                         <span class="plan-savings">Экономия 200 ₽</span>
@@ -1330,7 +1441,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button class="btn-primary" style="width: 100%; margin-top: 1.5rem; justify-content: center; height: 50px;" onclick="buySelectedPlan()"><i class="fas fa-crown"></i> Выбрать Fast</button>
+                            <button class="btn-primary btn-buy-now" id="btn-buy-fast" style="width: 100%; margin-top: 1.5rem; justify-content: center; height: 50px;" onclick="buySelectedPlan()"><i class="fas fa-crown"></i> Выбрать Fast</button>
                         </div>
                     </div>
                 </div>
