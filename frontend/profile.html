@@ -1443,81 +1443,45 @@
                 </div>
             </div>
 
-            <!-- Section: Subscription -->
             <div id="section-subscription" class="content-section">
-                <h2 style="font-size: 2rem; margin-bottom: 1rem;">Подписка</h2>
-                <p style="color: var(--text-muted); margin-bottom: 3rem;">Управление планом и оплата</p>
+                <h2 style="font-size: 2rem; margin-bottom: 1rem;">Управление подпиской</h2>
+                <p style="color: var(--text-muted); margin-bottom: 3rem;">Выберите подходящий тариф для автоматизации</p>
 
-                <div class="info-card">
-                    <div class="info-icon"><i class="fas fa-credit-card"></i></div>
-                    <div class="info-text">
-                        <span class="label">Текущий план</span>
-                        <span class="value">Статус подписки</span>
+                <!-- Trial Section -->
+                <div class="trial-card" id="trial-card" style="display: none; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(20, 20, 20, 0.4) 100%); border: 1px solid rgba(245, 158, 11, 0.2); padding: 2rem; border-radius: 24px; margin-bottom: 3rem; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span class="badge-trial" style="background: #f59e0b; color: black; padding: 4px 10px; border-radius: 100px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Free Trial</span>
+                        <h3 style="margin-top: 10px;">Пробный период 4 дня</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Попробуйте все возможности FunPay Slow бесплатно.</p>
                     </div>
-                    <div style="margin-left: auto;">
-                        <span class="status-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); font-weight: 600;">Бесплатно</span>
-                    </div>
-                    <div style="width: 100%; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
-                        У вас нет активной подписки. Выберите план ниже.
-                    </div>
-                </div>
-
-                <div class="trial-card" id="trial-activation-banner" style="display: none;">
-                    <div class="trial-text">
-                        <div class="badge-trial"><i class="fas fa-bolt"></i> Пробный период</div>
-                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Запустить пробный Fast период на 4 дня</h3>
-                        <p style="color: var(--text-muted); font-size: 0.95rem;">Активирует полную подписку <b>Fast</b> на 4 дня. Можно использовать один раз.</p>
-                    </div>
-                    <button class="btn-primary" id="btn-activate-trial" onclick="activateTrial()" style="background: #f59e0b; color: #000; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-rocket"></i> Активировать trial
-                    </button>
-                </div>
-
-                <h3 style="margin-bottom: 2rem;">Способ оплаты</h3>
-                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Через Platega теперь доступны международные платежи и крипта.</p>
-                
-                <div class="payment-methods">
-                    <div class="payment-card active" data-method="cryptobot">
-                        <div class="info-icon" style="background: rgba(0, 136, 204, 0.1); color: #0088cc;"><i class="fab fa-telegram-plane"></i></div>
-                        <div class="payment-info">
-                            <div style="font-weight: 700; color: white;">CryptoBot (Telegram)</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">USDT, TON, BTC — Идеально для всех стран</div>
-                            <div style="font-size: 0.75rem; color: #10b981; margin-top: 4px;">Комиссия: 0%</div>
-                        </div>
-                        <div class="check-icon"><i class="fas fa-check-circle"></i></div>
-                    </div>
+                    <button class="btn-marketplace" onclick="window.activateTrial()" style="background: #f59e0b; color: black; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; cursor: pointer;">Активировать</button>
                 </div>
 
                 <div class="pricing-section-container">
-                    <div class="tiers-wrapper">
-                        <!-- Slow Plan -->
-                        <div class="tier-card" id="tier-slow">
-                            <div class="tier-badge">ECONOMY</div>
-                            <div class="tier-title"><i class="fas fa-leaf" style="color: #10b981;"></i> Slow</div>
-                            <div class="tier-desc">Для экономных. Работает с 50% товаров и базовыми плагинами.</div>
-                            
-                            <div class="plan-options">
-                                <div class="plan-option" onclick="selectPlan('slow_1', 199, this, 'slow')">
-                                    <div class="plan-info">
-                                        <span class="plan-duration">1 месяц</span>
-                                        <span class="plan-savings">Базовый тариф</span>
-                                    </div>
-                                    <div class="plan-price">
-                                        <div class="price-val">199 ₽</div>
-                                        <div class="price-mo">199 ₽/мес</div>
-                                    </div>
-                                </div>
-                                <div class="plan-option" onclick="selectPlan('slow_6', 1100, this, 'slow')">
-                                    <div class="plan-info">
-                                        <span class="plan-duration">6 месяцев</span>
-                                        <span class="plan-savings">Экономия 94 ₽</span>
-                                    </div>
-                                    <div class="plan-price">
-                                        <div class="price-val">1100 ₽</div>
-                                        <div class="price-mo">183 ₽/мес</div>
-                                    </div>
-                                </div>
-                                <div class="plan-option" onclick="selectPlan('slow_12', 2300, this, 'slow')">
+                    <div class="tiers-wrapper" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <!-- FAST 1 Month -->
+                        <div class="tier-card fast" id="plan-card-fast_1m" onclick="window.selectPlan('fast_1m', 15)" style="cursor: pointer; position: relative; padding: 2.5rem; border-radius: 24px; background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); transition: 0.3s;">
+                            <div class="tier-badge" style="position: absolute; top: 20px; right: 20px; background: #fbbf24; color: black; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.7rem;">FAST</div>
+                            <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fas fa-bolt" style="color: #fbbf24;"></i> 1 Месяц</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Максимальная скорость и все плагины.</p>
+                            <div style="font-size: 2.5rem; font-weight: 800;">$15 <span style="font-size: 1rem; color: #555;">/ мес</span></div>
+                        </div>
+
+                        <!-- SLOW 6 Months -->
+                        <div class="tier-card" id="plan-card-slow_6m" onclick="window.selectPlan('slow_6m', 45)" style="cursor: pointer; position: relative; padding: 2.5rem; border-radius: 24px; background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); transition: 0.3s;">
+                            <div class="tier-badge" style="position: absolute; top: 20px; right: 20px; background: #10b981; color: black; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.7rem;">SLOW</div>
+                            <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fas fa-snail" style="color: #10b981;"></i> 6 Месяцев</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Стабильность и экономия 50%.</p>
+                            <div style="font-size: 2.5rem; font-weight: 800;">$45 <span style="font-size: 1rem; color: #555;">/ 6 мес</span></div>
+                        </div>
+                    </div>
+
+                    <button class="btn-buy-now" id="buy-subscription-btn" onclick="window.processPayment()" style="width: 100%; margin-top: 3rem; padding: 1.5rem; border-radius: 20px; border: none; background: #333; color: #888; font-weight: 800; font-size: 1.1rem; cursor: not-allowed; transition: 0.3s;">
+                        Выберите тариф для оплаты
+                    </button>
+                    <p style="text-align: center; color: #444; font-size: 0.8rem; margin-top: 1.5rem;">Оплата производится через Crypto Bot (Telegram Check).</p>
+                </div>
+            </div>
                                     <div class="plan-info">
                                         <span class="plan-duration">12 месяцев</span>
                                         <span class="plan-savings">Экономия 88 ₽</span>

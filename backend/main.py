@@ -181,8 +181,9 @@ def bot_confirm(code: str, user_id: str, first_name: str, username: str):
     c.execute("UPDATE auth_tokens SET user_id = ? WHERE code = ?", (user_id, code))
     
     # Create or update user
-    c.execute("INSERT OR IGNORE INTO users (user_id, first_name, username, plan) VALUES (?, ?, ?, 'none')", 
-              (user_id, first_name, username))
+    now = int(time.time())
+    c.execute("INSERT OR IGNORE INTO users (user_id, first_name, username, plan, created_at) VALUES (?, ?, ?, 'none', ?)", 
+              (user_id, first_name, username, now))
     
     conn.commit()
     conn.close()

@@ -5,7 +5,8 @@ window.App = {
     user: JSON.parse(localStorage.getItem('funpay_user')) || null,
     
     init() {
-        console.log("🐌 FunPay Slow Initializing...");
+        console.log("🐌 FunPay Slow v2.4.1 Initializing...");
+        this.ensureLoginOverlay();
         this.updateUI();
         if (this.user) {
             this.syncUser();
@@ -17,6 +18,50 @@ window.App = {
             window.FunPayWorker.start();
         }
     },
+
+    ensureLoginOverlay() {
+        if (document.getElementById('login-overlay')) return;
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'login-overlay';
+        overlay.className = 'login-overlay';
+        overlay.style.display = 'none';
+        overlay.innerHTML = `
+            <div class="login-box" id="login-box-standard">
+                <div class="login-header">
+                    <div class="login-logo">🐌</div>
+                    <h2>Войти в FunPay Slow</h2>
+                    <p>Выберите удобный способ авторизации</p>
+                </div>
+                <div class="login-methods">
+                    <button class="btn-login-method telegram" id="btn-telegram-login-injected">
+                        <i class="fab fa-telegram-plane"></i> Войти через Telegram
+                    </button>
+                </div>
+                <div class="login-footer">Нажимая «Войти», вы соглашаетесь с условиями</div>
+                <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
+            </div>
+            <div class="login-box" id="login-box-telegram" style="display: none;">
+                <div class="login-header">
+                    <div class="login-logo">🐌</div>
+                    <h2>Авторизация Telegram</h2>
+                    <p>Отправьте код нашему боту</p>
+                </div>
+                <div class="tg-auth-container">
+                    <div class="tg-auth-code" id="tg-auth-code">------</div>
+                    <p class="tg-auth-hint">Отправьте этот код боту</p>
+                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                        <i class="fab fa-telegram-plane"></i> Открыть бота
+                    </a>
+                </div>
+                <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        const btn = document.getElementById('btn-telegram-login-injected');
+        if (btn) btn.onclick = () => window.handleTelegramLogin();
+    },
     
     async syncUser() {
         if (!this.user || !this.user.user_id) return;
@@ -25,7 +70,6 @@ window.App = {
             if (res.ok) {
                 const sub = await res.json();
                 this.user.subscription = sub;
-                // Important: Update subscription_type based on server data
                 this.user.subscription_type = sub.plan ? sub.plan.toLowerCase() : 'free';
                 localStorage.setItem('funpay_user', JSON.stringify(this.user));
                 this.updateUI();
@@ -61,7 +105,7 @@ window.App = {
                 if (adminSidebar) adminSidebar.style.display = 'block';
             }
 
-            // --- Update Profile Fields ---
+            // --- Update Profile UI ---
             const planName = document.getElementById('profile-plan-name');
             const statusBadge = document.getElementById('profile-status-badge');
             const trialBanner = document.getElementById('trial-activation-banner');
@@ -88,11 +132,14 @@ window.App = {
                 if (trialBanner) trialBanner.style.display = 'none';
             } else {
                 if (planName) planName.textContent = "FREE PLAN";
-                if (statusBadge) statusBadge.textContent = "Бесплатно";
+                if (statusBadge) {
+                    statusBadge.textContent = "Не активна";
+                    statusBadge.style.color = "var(--text-muted)";
+                }
                 if (trialBanner && !this.user.is_trial_used) trialBanner.style.display = 'flex';
             }
 
-            // --- Referral Link (Fixed Branding) ---
+            // --- Referral Link ---
             const refInput = document.getElementById('ref-link-input');
             if (refInput) {
                 refInput.value = `https://t.me/FunpaySlowBot?start=ref_${this.user.user_id}`;
@@ -127,9 +174,11 @@ window.App = {
         });
     },
 
-    // --- Account Management (Golden Key) ---
+    // --- Account Management ---
     showAddAccountModal() {
-        document.getElementById('add-account-modal').style.display = 'flex';
+        const modal = document.getElementById('add-account-modal');
+        if (modal) modal.style.display = 'flex';
+        else alert("Ошибка: Модальное окно не найдено.");
     },
 
     addNewAccount() {
@@ -145,10 +194,6 @@ window.App = {
 
         document.getElementById('add-account-modal').style.display = 'none';
         this.loadAccountsList();
-        
-        document.getElementById('acc-name').value = '';
-        document.getElementById('acc-cookie').value = '';
-        document.getElementById('acc-proxy').value = '';
     },
 
     deleteAccount(id) {
@@ -165,130 +210,89 @@ window.App = {
         const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
         
         if (accounts.length === 0) {
-            body.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">Аккаунты не добавлены. Нажмите кнопку выше.</td></tr>';
+            body.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">Аккаунты не добавлены.</td></tr>';
             return;
         }
 
         body.innerHTML = accounts.map(acc => `
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 15px;">
-                    <div style="font-weight: 600;">${acc.name}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Cookie: ****${acc.cookie.slice(-4)}</div>
-                </td>
-                <td style="padding: 15px; font-family: monospace; font-size: 0.8rem;">
-                    ${acc.proxy || '<span style="color: #666;">Без прокси</span>'}
-                </td>
-                <td style="padding: 15px;">
-                    <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem;">РАБОТАЕТ</span>
-                </td>
-                <td style="padding: 15px; text-align: right;">
-                    <button class="btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.App.deleteAccount(${acc.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
+            <tr>
+                <td style="padding: 15px;"><b>${acc.name}</b><br><small>****${acc.cookie.slice(-4)}</small></td>
+                <td style="padding: 15px;">${acc.proxy || 'Без прокси'}</td>
+                <td style="padding: 15px;"><span class="status-badge" style="color:#10b981">АКТИВЕН</span></td>
+                <td style="padding: 15px; text-align:right;"><button class="btn-outline" onclick="window.App.deleteAccount(${acc.id})"><i class="fas fa-trash"></i></button></td>
             </tr>
         `).join('');
     }
 };
 
-// --- Automation Worker (Core v2.4.1) ---
+// --- Automation Worker ---
 window.FunPayWorker = {
     isRunning: false,
-    lastLog: "Ожидание запуска...",
     
     start() {
         if (this.isRunning) return;
         this.isRunning = true;
-        this.log("🚀 Воркер запущен");
+        console.log("🚀 Воркер активен");
         this.loop();
     },
     
-    log(msg) {
-        console.log(`[Worker] ${msg}`);
-        this.lastLog = msg;
-        const logEl = document.getElementById('worker-status-log');
-        if (logEl) logEl.textContent = msg;
-        this.notifyTelegram(msg);
-    },
-
-    async notifyTelegram(msg) {
-        const chatId = localStorage.getItem('tg_chat_id');
-        if (!chatId) return;
-        // Simple throttling
-        const now = Date.now();
-        if (this.lastNotifyTime && now - this.lastNotifyTime < 30000) return; 
-        this.lastNotifyTime = now;
-        // fetch(...) would go here
-    },
-
     async loop() {
         while (this.isRunning) {
-            try {
-                const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-                if (accounts.length === 0) {
-                    this.log("⏳ Аккаунты не добавлены. Добавьте в профиле.");
-                } else {
-                    for (const acc of accounts) {
-                        this.log(`👤 Обработка: ${acc.name}`);
-                        await this.processAutoBump(acc);
-                        await this.processAutoDelivery(acc);
-                    }
-                }
-            } catch (e) { console.error("Worker Error:", e); }
+            const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
+            for (const acc of accounts) {
+                console.log(`[Worker] Обработка ${acc.name}`);
+                // Automation logic placeholder
+            }
             await new Promise(r => setTimeout(r, 60000));
         }
-    },
-
-    async processAutoBump(acc) {
-        const config = JSON.parse(localStorage.getItem('plugin_bump_config') || '{"enabled":false}');
-        if (!config.enabled || !acc.cookie) return;
-        this.log(`⏰ [${acc.name}] Поднимаю лоты...`);
-        // Logic for request...
-    },
-
-    async processAutoDelivery(acc) {
-        const config = JSON.parse(localStorage.getItem('plugin_delivery_config') || '{"enabled":false}');
-        if (!config.enabled || !acc.cookie) return;
-        this.log(`📦 [${acc.name}] Проверка заказов...`);
     }
 };
 
-// --- Trial Activation ---
-window.activateTrial = async function() {
-    const user = window.App.user;
-    if (!user) return alert("Войдите в аккаунт!");
-    if (user.is_trial_used) return alert("Вы уже использовали пробный период.");
+// --- Auth Logic ---
+window.handleTelegramLogin = async function() {
+    const overlay = document.getElementById('login-overlay');
+    const boxTelegram = document.getElementById('login-box-telegram');
+    const codeDisplay = document.getElementById('tg-auth-code');
+    overlay.style.display = 'flex';
+    document.getElementById('login-box-standard').style.display = 'none';
+    boxTelegram.style.display = 'block';
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/generate`);
+        const { code, token } = await res.json();
+        codeDisplay.textContent = code;
+        document.getElementById('link-to-bot').href = `https://t.me/FunpaySlowBot?start=${code}`;
+        const poll = setInterval(async () => {
+            const check = await fetch(`${API_BASE}/api/auth/check/${token}`);
+            if (check.ok) {
+                const userData = await check.json();
+                clearInterval(poll);
+                localStorage.setItem('funpay_user', JSON.stringify(userData));
+                window.location.reload();
+            }
+        }, 3000);
+    } catch (e) { alert("Ошибка связи с сервером."); }
+};
 
+window.logout = function() {
+    localStorage.removeItem('funpay_user');
+    window.location.href = 'index.html';
+};
+
+window.activateTrial = async function() {
+    if (!window.App.user) return alert("Войдите в аккаунт!");
     try {
         const res = await fetch(`${API_BASE}/api/user/activate-trial`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ user_id: String(user.user_id) })
+            body: JSON.stringify({ user_id: String(window.App.user.user_id) })
         });
         if (res.ok) {
-            alert("Fast подписка на 4 дня активирована! 🚀");
+            alert("Подписка на 4 дня активирована!");
             window.App.syncUser();
         } else {
-            alert("Ошибка активации. Попробуйте через 5 минут.");
+            alert("Ошибка или триал уже использован.");
         }
     } catch (e) { alert("Сервер недоступен."); }
-};
-
-// --- Global UI Functions ---
-window.savePluginConfig = function(type) {
-    const config = {};
-    if (type === 'bump') {
-        config.enabled = document.getElementById('plugin-bump-enabled').checked;
-        config.interval = document.getElementById('plugin-bump-interval').value;
-        localStorage.setItem('plugin_bump_config', JSON.stringify(config));
-    }
-    alert('Настройки сохранены!');
-};
-
-window.saveTgSettings = function() {
-    const cid = document.getElementById('tg-chat-id').value;
-    localStorage.setItem('tg_chat_id', cid);
-    alert('TG ID сохранен!');
 };
 
 // --- Initialization ---
@@ -298,32 +302,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.App.loadAccountsList();
     }
     
-    // Auth logic
     const trigger = document.getElementById('login-trigger-btn');
     if (trigger) trigger.onclick = () => document.getElementById('login-overlay').style.display = 'flex';
     
     const tgBtn = document.getElementById('btn-telegram-login');
-    if (tgBtn) tgBtn.onclick = async () => {
-        const overlay = document.getElementById('login-overlay');
-        const boxTelegram = document.getElementById('login-box-telegram');
-        const codeDisplay = document.getElementById('tg-auth-code');
-        overlay.style.display = 'flex';
-        document.getElementById('login-box-standard').style.display = 'none';
-        boxTelegram.style.display = 'block';
-        try {
-            const res = await fetch(`${API_BASE}/api/auth/generate`);
-            const { code, token } = await res.json();
-            codeDisplay.textContent = code;
-            document.getElementById('link-to-bot').href = `https://t.me/FunpaySlowBot?start=${code}`;
-            const poll = setInterval(async () => {
-                const check = await fetch(`${API_BASE}/api/auth/check/${token}`);
-                if (check.ok) {
-                    const userData = await check.json();
-                    clearInterval(poll);
-                    localStorage.setItem('funpay_user', JSON.stringify(userData));
-                    window.location.reload();
-                }
-            }, 3000);
-        } catch (e) { alert("Ошибка авторизации."); }
-    };
+    if (tgBtn) tgBtn.onclick = () => window.handleTelegramLogin();
 });
