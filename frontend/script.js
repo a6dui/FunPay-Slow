@@ -64,7 +64,7 @@ window.App = {
                 body: JSON.stringify({
                     admin_id: String(this.user.user_id),
                     target_user_id: String(targetUserId),
-                    action: "update_balance", # I should add this to main.py
+                    action: "update_balance", // Fixed comment
                     balance_delta: amount
                 })
             });
