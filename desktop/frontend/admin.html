@@ -102,6 +102,33 @@
                 </table>
             </div>
         </div>
+
+        <div class="admin-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Управление пользователями</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="search-user" class="admin-input" placeholder="Поиск по ID или имени..." oninput="filterUsers()" style="margin: 0; padding: 8px 15px; font-size: 0.85rem;">
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Имя</th>
+                            <th>Тариф</th>
+                            <th>Истекает</th>
+                            <th>Баланс</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <tr><td colspan="7" style="text-align: center; padding: 2rem;">Загрузка списка...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </main>
 
     <script src="script.js?v=2.4.1"></script>
@@ -114,32 +141,90 @@
                 return;
             }
 
+            loadAdminData();
+        });
+
+        async function loadAdminData() {
             // Load Stats
             const stats = await window.App.fetchAdminStats();
             if (stats) {
-                document.getElementById('stat-users').textContent = stats.total_users;
-                document.getElementById('stat-subs').textContent = stats.active_subs;
-                document.getElementById('stat-sales').textContent = stats.total_sales;
+                document.getElementById('stat-users').textContent = stats.total_users || 0;
+                document.getElementById('stat-subs').textContent = stats.active_fast || 0;
+                document.getElementById('stat-sales').textContent = (stats.revenue_estimated || 0) + ' руб.';
             }
 
-            // Load Payments
+            // Load Payments (Placeholder for now)
             const payments = await window.App.fetchAdminPayments();
-            const tbody = document.getElementById('payments-table-body');
-            if (payments && payments.length > 0) {
-                tbody.innerHTML = payments.map(p => `
-                    <tr>
-                        <td style="font-family: monospace; color: var(--text-muted); font-size: 0.8rem;">${p.id}</td>
-                        <td>${p.user_id}</td>
-                        <td style="font-weight: 700;">${p.amount} руб.</td>
-                        <td>${p.plan}</td>
-                        <td><span class="status-pill status-${p.status}">${p.status === 'completed' ? 'Успешно' : 'В процессе'}</span></td>
-                        <td style="color: var(--text-muted); font-size: 0.8rem;">${p.date}</td>
-                    </tr>
-                `).join('');
+            const ptbody = document.getElementById('payments-table-body');
+            ptbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">История платежей пуста</td></tr>';
+
+            // Load Users
+            await renderUsers();
+        }
+
+        async function renderUsers() {
+            const users = await window.App.fetchAdminUsers();
+            const utbody = document.getElementById('users-table-body');
+            if (users && users.length > 0) {
+                window.allUsers = users; // For filtering
+                displayUsers(users);
             } else {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Платежей пока нет</td></tr>';
+                utbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">Пользователей не найдено</td></tr>';
             }
-        });
+        }
+
+        function displayUsers(usersList) {
+            const utbody = document.getElementById('users-table-body');
+            utbody.innerHTML = usersList.map(u => {
+                const expires = u.sub_end > 0 ? new Date(u.sub_end * 1000).toLocaleDateString() : '—';
+                const isBanned = u.is_banned === 1;
+                return `
+                    <tr style="${isBanned ? 'opacity: 0.5; background: rgba(244, 63, 94, 0.05);' : ''}">
+                        <td style="font-family: monospace; font-size: 0.8rem;">${u.user_id}</td>
+                        <td>${u.first_name || '—'} <span style="color: var(--text-muted); font-size: 0.75rem;">@${u.username || ''}</span></td>
+                        <td><span class="status-pill ${u.plan === 'FAST' ? 'status-completed' : (u.plan === 'SLOW' ? 'status-pending' : '')}">${u.plan || 'none'}</span></td>
+                        <td>${expires}</td>
+                        <td style="font-weight: 700;">${Math.floor(u.balance)} ₽</td>
+                        <td>
+                            ${isBanned ? '<span style="color: #f43f5e; font-weight: bold;">BANNED</span>' : '<span style="color: #10b981;">OK</span>'}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-primary" onclick="userAction('${u.user_id}', 'set_sub', 'SLOW', 30)" title="Дать SLOW" style="padding: 5px 10px; font-size: 0.7rem; background: #3b82f6;">S</button>
+                                <button class="btn-primary" onclick="userAction('${u.user_id}', 'set_sub', 'FAST', 30)" title="Дать FAST" style="padding: 5px 10px; font-size: 0.7rem; background: #10b981;">F</button>
+                                <button class="btn-outline" onclick="userAction('${u.user_id}', 'set_sub', 'none', 0)" title="Сбросить" style="padding: 5px 10px; font-size: 0.7rem; color: #888;">X</button>
+                                ${isBanned ? 
+                                    `<button class="btn-primary" onclick="userAction('${u.user_id}', 'unban')" style="padding: 5px 10px; font-size: 0.7rem; background: #10b981;">UNBAN</button>` :
+                                    `<button class="btn-primary" onclick="userAction('${u.user_id}', 'ban')" style="padding: 5px 10px; font-size: 0.7rem; background: #f43f5e;">BAN</button>`
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterUsers() {
+            const q = document.getElementById('search-user').value.toLowerCase();
+            if (!window.allUsers) return;
+            const filtered = window.allUsers.filter(u => 
+                String(u.user_id).includes(q) || 
+                (u.first_name && u.first_name.toLowerCase().includes(q)) || 
+                (u.username && u.username.toLowerCase().includes(q))
+            );
+            displayUsers(filtered);
+        }
+
+        async function userAction(targetId, action, plan = "none", days = 0) {
+            if (!confirm(`Выполнить ${action} для ${targetId}?`)) return;
+            
+            const res = await window.App.adminUserAction(targetId, action, plan, days);
+            if (res && res.status === "success") {
+                renderUsers();
+            } else {
+                alert("Ошибка при выполнении действия");
+            }
+        }
 
         async function handleBalanceUpdate() {
             const userId = document.getElementById('target-user-id').value;
@@ -150,14 +235,14 @@
                 return;
             }
 
-            if (!confirm(`Вы действительно хотите изменить баланс пользователя ${userId} на ${amount} руб.?`)) return;
+            if (!confirm(`Изменить баланс ${userId} на ${amount} руб.?`)) return;
 
             const res = await window.App.updateUserBalance(userId, amount);
-            if (res.success) {
-                alert(`Успешно! Новый баланс: ${res.new_balance}`);
-                location.reload();
+            if (res && res.status === "success") {
+                alert(`Успешно!`);
+                loadAdminData();
             } else {
-                alert('Ошибка: ' + (res.message || 'неизвестная ошибка'));
+                alert('Ошибка');
             }
         }
     </script>

@@ -22,6 +22,12 @@ app.add_middleware(
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "funpay_slow.db")
 
+# Crypto Bot API Token
+CRYPTO_BOT_TOKEN = "581922:AA78JPxCzqnhyX8n6tyzrTJysjB4zbpFC9q"
+CRYPTO_PAY_URL = "https://pay.cryptobot.pay/api" # Mainnet
+
+import httpx # Ensure httpx is used for async requests
+
 def get_db_conn():
     conn = sqlite3.connect(DB_PATH)
     return conn
@@ -32,7 +38,7 @@ def init_db():
     c.execute('''CREATE TABLE IF NOT EXISTS users 
                  (user_id TEXT PRIMARY KEY, first_name TEXT, username TEXT, plan TEXT, 
                   sub_end INTEGER, ref_code TEXT, referrer_id TEXT, balance REAL DEFAULT 0,
-                  has_trial INTEGER DEFAULT 0, created_at INTEGER)''')
+                  has_trial INTEGER DEFAULT 0, created_at INTEGER, is_banned INTEGER DEFAULT 0)''')
     c.execute('''CREATE TABLE IF NOT EXISTS auth_tokens 
                  (token TEXT PRIMARY KEY, code TEXT, user_id TEXT, expires INTEGER)''')
     c.execute('''CREATE TABLE IF NOT EXISTS referrals_list 
@@ -90,10 +96,21 @@ def check_auth(token: str):
     
     if row:
         user_id = row[0]
-        c.execute("SELECT user_id, first_name, username, plan FROM users WHERE user_id = ?", (user_id,))
+        c.execute("SELECT user_id, first_name, username, plan, balance, ref_code, is_banned FROM users WHERE user_id = ?", (user_id,))
         user = c.fetchone()
         conn.close()
-        return {"user_id": user[0], "first_name": user[1], "username": user[2], "plan": user[3]}
+        
+        if user[6] == 1:
+            raise HTTPException(status_code=403, detail="Ваш аккаунт заблокирован.")
+            
+        return {
+            "user_id": user[0], 
+            "first_name": user[1], 
+            "username": user[2], 
+            "plan": user[3],
+            "balance": user[4],
+            "ref_code": user[5]
+        }
     
     conn.close()
     raise HTTPException(status_code=404, detail="Not authorized yet")
@@ -102,7 +119,7 @@ def check_auth(token: str):
 def get_subscription(user_id: str):
     conn = get_db_conn()
     c = conn.cursor()
-    c.execute("SELECT plan, sub_end, has_trial, created_at FROM users WHERE user_id = ?", (user_id,))
+    c.execute("SELECT plan, sub_end, has_trial, balance, ref_code FROM users WHERE user_id = ?", (user_id,))
     row = c.fetchone()
     conn.close()
     
@@ -111,31 +128,43 @@ def get_subscription(user_id: str):
             "plan": row[0], 
             "expires": row[1], 
             "has_trial": bool(row[2]),
-            "created_at": row[3]
+            "balance": row[3],
+            "ref_code": row[4]
         }
-    return {"plan": "none", "expires": 0, "has_trial": False, "created_at": 0}
+    return {"plan": "none", "expires": 0, "has_trial": False, "balance": 0, "ref_code": ""}
 
-@app.post("/api/subscription/trial")
-def activate_trial(user_id: str):
+class TrialRequest(BaseModel):
+    user_id: str
+    plan: Optional[str] = "FAST"
+
+@app.post("/api/user/activate-trial")
+def activate_trial(data: TrialRequest):
+    user_id = data.user_id
     conn = get_db_conn()
     c = conn.cursor()
     c.execute("SELECT has_trial, plan FROM users WHERE user_id = ?", (user_id,))
     row = c.fetchone()
     
     if not row:
-        conn.close()
-        raise HTTPException(status_code=404, detail="User not found")
+        # Create user if doesn't exist (e.g. first login via trial)
+        now = int(time.time())
+        c.execute("INSERT INTO users (user_id, plan, has_trial, created_at) VALUES (?, 'none', 0, ?)", (user_id, now))
+        row = (0, "none")
     
-    if row[0] == 1 or row[1] != "none":
+    if row[0] == 1:
         conn.close()
-        raise HTTPException(status_code=400, detail="Trial already used or active subscription")
+        raise HTTPException(status_code=400, detail="Вы уже использовали пробный период.")
     
-    # Activate 4 days trial (Slow plan by default for trial)
+    if row[1] != "none" and row[1] is not None:
+        conn.close()
+        raise HTTPException(status_code=400, detail="У вас уже есть активная подписка.")
+    
+    # Activate 4 days trial (FAST plan)
     sub_end = int(time.time()) + (4 * 24 * 3600)
-    c.execute("UPDATE users SET plan = 'slow', sub_end = ?, has_trial = 1 WHERE user_id = ?", (sub_end, user_id))
+    c.execute("UPDATE users SET plan = 'FAST', sub_end = ?, has_trial = 1 WHERE user_id = ?", (sub_end, user_id))
     conn.commit()
     conn.close()
-    return {"status": "success", "expires": sub_end}
+    return {"status": "success", "expires": sub_end, "plan": "FAST"}
 
 class PaymentRequest(BaseModel):
     user_id: str
@@ -143,13 +172,165 @@ class PaymentRequest(BaseModel):
     price: float
 
 @app.post("/api/payment/create")
-def create_payment(data: PaymentRequest):
-    # This is a placeholder for Crypto Bot API or a simple bot link
-    # For now we return a deep link to the bot
-    amount = data.price
-    payload = f"sub_{data.plan_type}_{data.user_id}"
-    bot_url = f"https://t.me/CryptoBot?start=pay_{amount}_USD" # Example
-    return {"payment_url": bot_url}
+async def create_payment(data: PaymentRequest):
+    # Create Invoice via Crypto Bot API
+    headers = {
+        "Crypto-Pay-API-Token": CRYPTO_BOT_TOKEN
+    }
+    
+    plan_names = {
+        "slow_1m": "SLOW (1 месяц)", "slow_3m": "SLOW (3 месяца)", "slow_6m": "SLOW (6 месяцев)", "slow_12m": "SLOW (12 месяцев)",
+        "fast_1m": "FAST (1 месяц)", "fast_3m": "FAST (3 месяца)", "fast_6m": "FAST (6 месяцев)", "fast_12m": "FAST (12 месяцев)"
+    }
+    
+    description = f"Подписка FunPay Slow: {plan_names.get(data.plan_type, data.plan_type)}"
+    
+    payload = {
+        "asset": "USDT", 
+        "amount": str(data.price), 
+        "currency_type": "fiat",
+        "fiat": "RUB",
+        "description": description,
+        "payload": f"pay_{data.plan_type}_{data.user_id}",
+        "allow_comments": False,
+        "allow_anonymous": False
+    }
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.post(f"{CRYPTO_PAY_URL}/createInvoice", json=payload, headers=headers)
+            res_data = resp.json()
+            if res_data.get("ok"):
+                return {"payment_url": res_data["result"]["pay_url"]}
+            else:
+                raise HTTPException(status_code=500, detail="Ошибка Crypto Bot")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail="Ошибка связи")
+
+@app.post("/api/payment/webhook")
+async def crypto_bot_webhook(request: Request):
+    # Verify signature would go here (omitted for simplicity but recommended)
+    data = await request.json()
+    
+    if data.get("update_type") == "invoice_paid":
+        payload_str = data["payload"]["payload"] # Format: pay_planId_userId
+        if not payload_str.startswith("pay_"):
+            return {"status": "ignored"}
+            
+        parts = payload_str.split("_")
+        if len(parts) < 3:
+            return {"status": "error"}
+            
+        plan_id = f"{parts[1]}_{parts[2]}" # slow_1m
+        user_id = parts[3]
+        amount_rub = float(data["payload"]["fiat_amount"]) if "fiat_amount" in data["payload"] else 0
+        
+        # Determine duration and plan tier
+        duration_days = 30
+        if "3m" in plan_id: duration_days = 90
+        elif "6m" in plan_id: duration_days = 180
+        elif "12m" in plan_id: duration_days = 365
+        
+        plan_tier = "SLOW" if "slow" in plan_id else "FAST"
+        
+        conn = get_db_conn()
+        c = conn.cursor()
+        
+        # 1. Activate Subscription
+        now = int(time.time())
+        sub_end = now + (duration_days * 24 * 3600)
+        c.execute("UPDATE users SET plan = ?, sub_end = ? WHERE user_id = ?", (plan_tier, sub_end, user_id))
+        
+        # 2. Handle Referrals (5% reward)
+        c.execute("SELECT referrer_id FROM users WHERE user_id = ?", (user_id,))
+        ref_row = c.fetchone()
+        if ref_row and ref_row[0]:
+            referrer_id = ref_row[0]
+            reward = amount_rub * 0.05
+            c.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (reward, referrer_id))
+            print(f"Referral reward: {reward} RUB sent to {referrer_id}")
+            
+        conn.commit()
+        conn.close()
+        print(f"Payment Confirmed: User {user_id} activated {plan_tier} for {duration_days} days.")
+        
+    return {"ok": True}
+
+@app.post("/api/payment/pay-with-balance")
+def pay_with_balance(data: PaymentRequest):
+    user_id = data.user_id
+    plan_id = data.plan_type
+    price = data.price
+    
+    conn = get_db_conn()
+    c = conn.cursor()
+    c.execute("SELECT balance, plan FROM users WHERE user_id = ?", (user_id,))
+    row = c.fetchone()
+    
+    if not row or row[0] < price:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Недостаточно средств на балансе.")
+        
+    # Deduct balance
+    new_balance = row[0] - price
+    
+    # Determine duration
+    duration_days = 30
+    if "3m" in plan_id: duration_days = 90
+    elif "6m" in plan_id: duration_days = 180
+    elif "12m" in plan_id: duration_days = 365
+    
+    plan_tier = "SLOW" if "slow" in plan_id else "FAST"
+    
+    now = int(time.time())
+    sub_end = now + (duration_days * 24 * 3600)
+    
+    c.execute("UPDATE users SET balance = ?, plan = ?, sub_end = ? WHERE user_id = ?", 
+              (new_balance, plan_tier, sub_end, user_id))
+    
+    conn.commit()
+    conn.close()
+    return {"status": "success", "new_balance": new_balance}
+
+# --- Telegram Bot Webhook Logic (Placeholder) ---
+
+@app.get("/api/admin/users")
+def list_users(admin_id: str):
+    if not is_admin(admin_id): raise HTTPException(status_code=403)
+    conn = get_db_conn()
+    c = conn.cursor()
+    c.execute("SELECT user_id, first_name, username, plan, sub_end, balance, is_banned FROM users ORDER BY created_at DESC")
+    rows = c.fetchall()
+    conn.close()
+    return [{"user_id": r[0], "first_name": r[1], "username": r[2], "plan": r[3], "sub_end": r[4], "balance": r[5], "is_banned": r[6]} for r in rows]
+
+class AdminUserAction(BaseModel):
+    admin_id: str
+    target_user_id: str
+    action: str # ban, unban, set_sub, update_balance
+    plan: Optional[str] = "none"
+    duration_days: Optional[int] = 0
+    balance_delta: Optional[float] = 0
+
+@app.post("/api/admin/user/action")
+def admin_user_action(data: AdminUserAction):
+    if not is_admin(data.admin_id): raise HTTPException(status_code=403)
+    conn = get_db_conn()
+    c = conn.cursor()
+    
+    if data.action == "ban":
+        c.execute("UPDATE users SET is_banned = 1 WHERE user_id = ?", (data.target_user_id,))
+    elif data.action == "unban":
+        c.execute("UPDATE users SET is_banned = 0 WHERE user_id = ?", (data.target_user_id,))
+    elif data.action == "set_sub":
+        sub_end = int(time.time()) + (data.duration_days * 24 * 3600) if data.duration_days > 0 else 0
+        c.execute("UPDATE users SET plan = ?, sub_end = ? WHERE user_id = ?", (data.plan, sub_end, data.target_user_id))
+    elif data.action == "update_balance":
+        c.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (data.balance_delta, data.target_user_id))
+        
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.get("/api/admin/stats")
 def get_admin_stats(admin_id: str):

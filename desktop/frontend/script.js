@@ -12,11 +12,64 @@ window.App = {
             this.syncUser();
         }
         this.initTabs();
-        
-        // Start automation worker
-        if (window.FunPayWorker) {
-            window.FunPayWorker.start();
-        }
+    },
+
+    // --- Admin Functions ---
+    async fetchAdminStats() {
+        if (!this.user) return null;
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/stats?admin_id=${this.user.user_id}`);
+            return await res.json();
+        } catch (e) { return null; }
+    },
+
+    async fetchAdminUsers() {
+        if (!this.user) return [];
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/users?admin_id=${this.user.user_id}`);
+            return await res.json();
+        } catch (e) { return []; }
+    },
+
+    async fetchAdminPayments() {
+        // Mock or actual API call for payments
+        return [];
+    },
+
+    async adminUserAction(targetUserId, action, plan = "none", days = 0) {
+        if (!this.user) return null;
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/user/action`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    admin_id: String(this.user.user_id),
+                    target_user_id: String(targetUserId),
+                    action: action,
+                    plan: plan,
+                    duration_days: days
+                })
+            });
+            return await res.json();
+        } catch (e) { return null; }
+    },
+
+    async updateUserBalance(targetUserId, amount) {
+        // Reuse adminUserAction or a specific balance endpoint if added
+        // For now, let's assume we use a specific balance update for legacy compat
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/user/action`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    admin_id: String(this.user.user_id),
+                    target_user_id: String(targetUserId),
+                    action: "update_balance", # I should add this to main.py
+                    balance_delta: amount
+                })
+            });
+            return await res.json();
+        } catch (e) { return null; }
     },
 
     ensureLoginOverlay() {
@@ -177,13 +230,26 @@ window.App = {
                 if (trialBanner && !this.user.is_trial_used) trialBanner.style.display = 'flex';
             }
 
-            // --- Referral Link ---
+            // --- Referral & Balance UI ---
             const refInput = document.getElementById('ref-link-input');
-            if (refInput) {
-                refInput.value = `https://t.me/FunpaySlowBot?start=ref_${this.user.user_id}`;
-            }
             const refCodeDisplay = document.getElementById('display-ref-code');
-            if (refCodeDisplay) refCodeDisplay.textContent = this.user.user_id || "OFFLINE";
+            const refBalanceDisplay = document.getElementById('ref-balance');
+            const btnBalanceDisplay = document.getElementById('btn-current-balance');
+            
+            const userBalance = Math.floor(this.user.balance || 0);
+            const userRefCode = this.user.ref_code || "UNKNOWN";
+
+            if (refInput) refInput.value = `https://t.me/FunPaySlov_Bot?start=ref_${userRefCode}`;
+            if (refCodeDisplay) refCodeDisplay.textContent = userRefCode;
+            if (refBalanceDisplay) refBalanceDisplay.textContent = userBalance;
+            if (btnBalanceDisplay) btnBalanceDisplay.textContent = userBalance;
+
+            // Update progress bar (just visual example based on balance)
+            const progressBar = document.getElementById('ref-progress-bar');
+            if (progressBar) {
+                const progress = Math.min((userBalance / 500) * 100, 100);
+                progressBar.style.width = `${progress}%`;
+            }
         }
     },
 
@@ -343,6 +409,177 @@ document.addEventListener('DOMContentLoaded', () => {
     const trigger = document.getElementById('login-trigger-btn');
     if (trigger) trigger.onclick = () => document.getElementById('login-overlay').style.display = 'flex';
     
-    const tgBtn = document.getElementById('btn-telegram-login');
+        const tgBtn = document.getElementById('btn-telegram-login');
     if (tgBtn) tgBtn.onclick = () => window.handleTelegramLogin();
 });
+
+// --- Subscription Logic ---
+window.selectedPlan = null;
+
+window.selectPlan = function(planId, price) {
+    window.selectedPlan = { id: planId, price: price };
+    
+    // UI Feedback: Remove active class from all buttons
+    document.querySelectorAll('.btn-tier-select').forEach(btn => {
+        btn.style.borderColor = 'rgba(255,255,255,0.05)';
+        btn.style.background = 'rgba(255,255,255,0.02)';
+        btn.style.color = '#ccc';
+        btn.style.boxShadow = 'none';
+    });
+
+    // Add active class to selected button
+    const selectedBtn = document.getElementById(`btn-${planId}`);
+    if (selectedBtn) {
+        const isFast = planId.startsWith('fast');
+        const activeColor = isFast ? '#10b981' : '#3b82f6';
+        selectedBtn.style.borderColor = activeColor;
+        selectedBtn.style.background = isFast ? 'rgba(16, 185, 129, 0.05)' : 'rgba(59, 130, 246, 0.05)';
+        selectedBtn.style.color = 'white';
+        selectedBtn.style.boxShadow = `0 0 20px ${isFast ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)'}`;
+    }
+
+    // Enable Crypto Buy Button
+    const buyBtn = document.getElementById('buy-subscription-btn');
+    if (buyBtn) {
+        buyBtn.style.opacity = '1';
+        buyBtn.style.cursor = 'pointer';
+        buyBtn.style.background = 'var(--accent)';
+        buyBtn.style.color = 'black';
+        buyBtn.style.boxShadow = '0 10px 25px var(--accent-glow)';
+        buyBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Оплатить ${price} ₽`;
+    }
+
+    // Handle Balance Button
+    const balanceBtn = document.getElementById('pay-balance-btn');
+    if (balanceBtn && window.App.user) {
+        const userBalance = window.App.user.balance || 0;
+        const btnBalanceEl = document.getElementById('btn-current-balance');
+        if (btnBalanceEl) btnBalanceEl.textContent = Math.floor(userBalance);
+
+        if (userBalance >= price) {
+            balanceBtn.style.opacity = '1';
+            balanceBtn.style.cursor = 'pointer';
+            balanceBtn.style.borderColor = '#10b981';
+            balanceBtn.style.color = '#10b981';
+            balanceBtn.style.background = 'rgba(16, 185, 129, 0.05)';
+        } else {
+            balanceBtn.style.opacity = '0.3';
+            balanceBtn.style.cursor = 'not-allowed';
+            balanceBtn.style.borderColor = 'rgba(255,255,255,0.05)';
+            balanceBtn.style.color = '#444';
+            balanceBtn.style.background = 'none';
+        }
+    }
+};
+
+window.payWithBalance = async function() {
+    if (!window.selectedPlan) return alert("Выберите тариф!");
+    if (!window.App.user) return;
+    
+    const { id, price } = window.selectedPlan;
+    const userBalance = window.App.user.balance || 0;
+    
+    if (userBalance < price) {
+        return alert(`Недостаточно средств. У вас ${Math.floor(userBalance)} ₽, а нужно ${price} ₽. Приглашайте друзей!`);
+    }
+    
+    if (!confirm(`Вы уверены, что хотите оплатить подписку ${id.toUpperCase()} с баланса (${price} ₽)?`)) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/payment/pay-with-balance`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                user_id: String(window.App.user.user_id),
+                plan_type: id,
+                price: price
+            })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+            alert("✅ Подписка успешно оплачена с баланса и активирована!");
+            window.App.syncUser();
+        } else {
+            alert(data.detail || "Ошибка при оплате.");
+        }
+    } catch (e) {
+        alert("Ошибка связи с сервером.");
+    }
+};
+
+window.processPayment = async function() {
+    if (!window.selectedPlan) return alert("Пожалуйста, выберите тариф!");
+    if (!window.App.user) {
+        document.getElementById('login-overlay').style.display = 'flex';
+        return;
+    }
+
+    const { id, price } = window.selectedPlan;
+    const userId = window.App.user.user_id || window.App.user.telegram_id;
+    
+    // UI Feedback: Disable button while loading
+    const buyBtn = document.getElementById('buy-subscription-btn');
+    const originalContent = buyBtn.innerHTML;
+    buyBtn.disabled = true;
+    buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создаем счет...';
+    buyBtn.style.opacity = '0.7';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/payment/create`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                user_id: String(userId),
+                plan_type: id,
+                price: price
+            })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok && data.payment_url) {
+            // Redirect to the actual Crypto Bot invoice
+            window.open(data.payment_url, '_blank');
+            alert(`Счет на ${price} ₽ создан! Оплатите его в открывшемся окне Telegram.`);
+        } else {
+            alert(data.detail || "Ошибка при создании счета. Попробуйте позже.");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Ошибка связи с сервером платежей.");
+    } finally {
+        buyBtn.disabled = false;
+        buyBtn.innerHTML = originalContent;
+        buyBtn.style.opacity = '1';
+    }
+};
+
+window.activateTrial = async function() {
+    if (!window.App.user) {
+        document.getElementById('login-overlay').style.display = 'flex';
+        return;
+    }
+    
+    try {
+        const res = await fetch(`${API_BASE}/api/user/activate-trial`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                user_id: String(window.App.user.user_id),
+                plan: "FAST" // Force FAST trial as requested
+            })
+        });
+        
+        if (res.ok) {
+            alert("🔥 FAST-подписка на 4 дня активирована! Все плагины доступны.");
+            window.App.syncUser();
+        } else {
+            const data = await res.json();
+            alert(data.detail || "Вы уже использовали пробный период.");
+        }
+    } catch (e) { 
+        console.error(e);
+        alert("Ошибка при активации. Попробуйте позже."); 
+    }
+};
