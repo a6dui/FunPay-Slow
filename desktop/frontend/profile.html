@@ -1375,21 +1375,55 @@
                     </div>
                 </div>
 
-                <div class="info-card" style="flex-direction: column; align-items: stretch; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div class="info-icon"><i class="fas fa-cookie-bite"></i></div>
-                        <div class="info-text">
-                            <span class="label">FunPay Golden Key (Cookie)</span>
-                            <span class="value">Автоматизация аккаунта</span>
+                <div class="list-card highlight" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <div>
+                            <h3 class="card-title" style="margin: 0;"><i class="fas fa-users"></i> Менеджер аккаунтов FunPay</h3>
+                            <p class="card-subtitle">Добавьте один или несколько аккаунтов для автоматизации.</p>
                         </div>
-                    </div>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <input type="password" id="funpay-cookie-input" class="dev-input" placeholder="Введите ваш golden_key из куков FunPay" style="flex: 1;">
-                        <button class="btn-primary blue" onclick="saveFunPayCookie(document.getElementById('funpay-cookie-input').value)">
-                            <i class="fas fa-key"></i> Сохранить
+                        <button class="btn-primary blue" onclick="showAddAccountModal()">
+                            <i class="fas fa-plus"></i> Добавить аккаунт
                         </button>
                     </div>
-                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">Cookie хранится локально в приложении и не передается на наши серверы.</p>
+
+                    <div class="accounts-table-wrapper" style="overflow-x: auto;">
+                        <table class="accounts-table" style="width: 100%; border-collapse: collapse; color: white;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 12px; color: var(--text-muted); font-size: 0.8rem;">АККАУНТ</th>
+                                    <th style="padding: 12px; color: var(--text-muted); font-size: 0.8rem;">PROXY</th>
+                                    <th style="padding: 12px; color: var(--text-muted); font-size: 0.8rem;">СТАТУС</th>
+                                    <th style="padding: 12px; color: var(--text-muted); font-size: 0.8rem; text-align: right;">ДЕЙСТВИЯ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accounts-list-body">
+                                <!-- Accounts will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Add Account Modal (hidden by default) -->
+                    <div id="add-account-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+                        <div class="modal-content" style="background: var(--bg-dark); border: 1px solid var(--border-color); padding: 2rem; border-radius: 24px; width: 100%; max-width: 500px;">
+                            <h2 style="margin-bottom: 1.5rem;">Добавить аккаунт</h2>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label>Название (для вас)</label>
+                                <input type="text" id="acc-name" class="dev-input" placeholder="Напр. Личный или Фарм 1">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label>FunPay Golden Key (Cookie)</label>
+                                <input type="password" id="acc-cookie" class="dev-input" placeholder="Введите куки">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label>Прокси (опционально, IP:PORT:USER:PASS)</label>
+                                <input type="text" id="acc-proxy" class="dev-input" placeholder="1.1.1.1:8000:user:pass">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-primary blue" style="flex: 1;" onclick="addNewAccount()">Сохранить</button>
+                                <button class="btn-outline" style="flex: 1;" onclick="document.getElementById('add-account-modal').style.display='none'">Отмена</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <button class="btn-logout" onclick="window.logout()">
@@ -1428,11 +1462,11 @@
                     </div>
                 </div>
 
-                <div class="trial-card">
+                <div class="trial-card" id="trial-activation-banner" style="display: none;">
                     <div class="trial-text">
                         <div class="badge-trial"><i class="fas fa-bolt"></i> Пробный период</div>
                         <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Запустить пробный Fast период на 4 дня</h3>
-                        <p style="color: var(--text-muted); font-size: 0.95rem;">Активирует полную подписку <b>Fast</b> на 4 дня. Можно использовать один раз для проверки всех возможностей.</p>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">Активирует полную подписку <b>Fast</b> на 4 дня. Можно использовать один раз.</p>
                     </div>
                     <button class="btn-primary" id="btn-activate-trial" onclick="activateTrial()" style="background: #f59e0b; color: #000; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-rocket"></i> Активировать trial
@@ -1648,6 +1682,48 @@
                                 </button>
                                 <button class="btn-primary green" style="width: 100%; margin-top: 1rem;" onclick="savePluginConfig('delivery')">
                                     <i class="fas fa-save"></i> Сохранить настройки
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="list-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Авто-ответчик</h3>
+                                <p class="card-subtitle">Умные ответы на сообщения покупателей.</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Включить авто-ответчик</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="plugin-responder-enabled">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Шаблон ответа</label>
+                                    <textarea id="plugin-responder-template" class="dev-input" style="height: 100px;" placeholder="Здравствуйте! Ваш товар выдан. Спасибо за покупку!"></textarea>
+                                </div>
+                                <button class="btn-primary purple" style="width: 100%; margin-top: 1rem;" onclick="savePluginConfig('responder')">
+                                    <i class="fas fa-save"></i> Сохранить настройки
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="list-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Telegram Уведомления</h3>
+                                <p class="card-subtitle">Логи воркера прямо в ваш Telegram.</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Telegram Chat ID</label>
+                                    <input type="text" id="tg-chat-id" class="dev-input" placeholder="Введите ваш ID">
+                                </div>
+                                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 10px;">
+                                    Узнать свой ID можно у бота <a href="https://t.me/userinfobot" target="_blank" style="color: var(--accent);">@userinfobot</a>.
+                                </p>
+                                <button class="btn-primary blue" style="width: 100%; margin-top: 1rem;" onclick="saveTgSettings()">
+                                    <i class="fas fa-paper-plane"></i> Привязать Telegram
                                 </button>
                             </div>
                         </div>

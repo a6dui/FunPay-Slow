@@ -143,7 +143,7 @@ def ensure_referral_stats(user_id: str):
 
 # --- ENDPOINTS ---
 @app.get("/")
-def root(): return {"status": "ok", "version": "2.2.3"}
+def root(): return {"status": "ok", "version": "2.4.1"}
 
 @app.get("/api/plugins")
 def get_plugins():

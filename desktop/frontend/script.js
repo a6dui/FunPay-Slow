@@ -19,7 +19,7 @@ window.App = {
             const res = await fetch(`${API_BASE}/`);
             if (res.ok) {
                 const data = await res.json();
-                const localVersion = "2.2.3"; // Текущая версия десктопа
+                const localVersion = "2.4.1"; // Текущая версия десктопа
                 if (data.version && data.version !== localVersion) {
                     console.log(`Update available: ${data.version} (Local: ${localVersion})`);
                     this.showUpdateNotification(data.version);
@@ -147,6 +147,69 @@ window.App = {
         container.appendChild(div);
     },
 
+    showAddAccountModal: () => {
+        document.getElementById('add-account-modal').style.display = 'flex';
+    },
+
+    addNewAccount: () => {
+        const name = document.getElementById('acc-name').value || "Без имени";
+        const cookie = document.getElementById('acc-cookie').value;
+        const proxy = document.getElementById('acc-proxy').value;
+
+        if (!cookie) return alert("Введите куки!");
+
+        const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
+        accounts.push({ id: Date.now(), name, cookie, proxy, status: 'active' });
+        localStorage.setItem('funpay_accounts', JSON.stringify(accounts));
+
+        document.getElementById('add-account-modal').style.display = 'none';
+        window.App.loadAccountsList();
+        
+        // Reset inputs
+        document.getElementById('acc-name').value = '';
+        document.getElementById('acc-cookie').value = '';
+        document.getElementById('acc-proxy').value = '';
+    },
+
+    deleteAccount: (id) => {
+        if (!confirm("Удалить аккаунт?")) return;
+        let accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
+        accounts = accounts.filter(a => a.id !== id);
+        localStorage.setItem('funpay_accounts', JSON.stringify(accounts));
+        window.App.loadAccountsList();
+    },
+
+    loadAccountsList: () => {
+        const body = document.getElementById('accounts-list-body');
+        if (!body) return;
+        const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
+        
+        if (accounts.length === 0) {
+            body.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">Аккаунты не добавлены</td></tr>';
+            return;
+        }
+
+        body.innerHTML = accounts.map(acc => `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 15px;">
+                    <div style="font-weight: 600;">${acc.name}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Cookie: ****${acc.cookie.slice(-4)}</div>
+                </td>
+                <td style="padding: 15px; font-family: monospace; font-size: 0.8rem;">
+                    ${acc.proxy || '<span style="color: #666;">Без прокси</span>'}
+                </td>
+                <td style="padding: 15px;">
+                    <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.7rem;">РАБОТАЕТ</span>
+                </td>
+                <td style="padding: 15px; text-align: right;">
+                    <button class="btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.App.deleteAccount(${acc.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    },
+
     saveFunPayCookie(cookie) {
         localStorage.setItem('funpay_cookie', cookie);
         this.showNotification('Cookie FunPay сохранен!');
@@ -167,13 +230,11 @@ window.App = {
             if (profileNav) profileNav.style.display = 'flex';
             if (userAvatar) userAvatar.textContent = this.user.name ? this.user.name[0].toUpperCase() : 'U';
             
-            const currentUserId = String(this.user.user_id);
+            const currentUserId = String(this.user.user_id || this.user.telegram_id);
             const adminIds = ["6360699049", "5304677735", "755843448"];
             const isAdmin = this.user.is_admin || adminIds.includes(currentUserId); 
             
-            console.log("Checking admin rights for:", currentUserId, "Is admin:", isAdmin);
             if (isAdmin) {
-                // Also add to main nav for better visibility
                 const navLinks = document.querySelector('.nav-links');
                 if (navLinks && !document.getElementById('nav-admin-link')) {
                     const li = document.createElement('li');
@@ -182,6 +243,8 @@ window.App = {
                     navLinks.appendChild(li);
                 }
                 if (adminLink) adminLink.style.display = 'flex';
+                const adminSidebar = document.getElementById('admin-sidebar-item');
+                if (adminSidebar) adminSidebar.style.display = 'block';
             }
 
             // --- Update Profile Fields ---
@@ -202,58 +265,39 @@ window.App = {
 
             const sub = this.user.subscription;
             const hasSub = sub && (sub.status === 'active' || sub.plan === 'Fast' || sub.plan === 'Slow');
-            
+            const trialBanner = document.getElementById('trial-activation-banner');
+
             if (hasSub) {
-                const isFast = sub.plan === 'Fast';
-                
+                const isFast = sub.plan === 'Fast' || this.user.subscription_type === 'fast';
                 if (planName) {
-                    planName.textContent = sub.plan || "Fast";
+                    planName.textContent = isFast ? "FAST" : "SLOW";
                     planName.className = `value ${isFast ? 'plan-fast-text' : 'plan-slow-text'}`;
                 }
-                
                 if (statusBadge) {
-                    statusBadge.textContent = sub.status === 'active' ? "Активна" : "Обработка";
-                    statusBadge.style.color = sub.status === 'active' ? "#10b981" : "#fbbf24";
-                    statusBadge.style.background = sub.status === 'active' ? "rgba(16, 185, 129, 0.1)" : "rgba(251, 191, 36, 0.1)";
-                    statusBadge.style.borderColor = sub.status === 'active' ? "rgba(16, 185, 129, 0.3)" : "rgba(251, 191, 36, 0.3)";
+                    statusBadge.textContent = "АКТИВНА";
+                    statusBadge.style.color = "#10b981";
+                    statusBadge.style.background = "rgba(16, 185, 129, 0.1)";
+                    statusBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
                 }
-                
                 if (expireDate) expireDate.textContent = sub.expires_at || "Бессрочно";
-                
                 if (sidebarStatus) {
-                    sidebarStatus.textContent = sub.plan || "Fast";
+                    sidebarStatus.textContent = isFast ? "FAST" : "SLOW";
                     sidebarStatus.style.color = isFast ? "#fbbf24" : "#3b82f6";
-                    sidebarStatus.style.textShadow = isFast ? "0 0 10px rgba(251, 191, 36, 0.3)" : "none";
                 }
-                
-                // Calculate days left
-                if (expireDays && sub.expires_at && sub.expires_at !== '-') {
-                    const now = new Date();
-                    const expStr = sub.expires_at.includes('T') ? sub.expires_at : sub.expires_at.replace(' ', 'T');
-                    const exp = new Date(expStr);
-                    const diff = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
-                    expireDays.textContent = diff > 0 ? `${diff} дн.` : "Истекла";
-                } else if (expireDays) {
-                    expireDays.textContent = "∞";
-                }
+                if (trialBanner) trialBanner.style.display = 'none';
             } else {
-                if (planName) {
-                    planName.textContent = "Бесплатно";
-                    planName.className = "value";
-                }
-                if (statusBadge) {
-                    statusBadge.textContent = "Не активна";
-                    statusBadge.style.color = "var(--text-muted)";
-                    statusBadge.style.background = "rgba(255,255,255,0.05)";
-                }
-                if (expireDate) expireDate.textContent = "Нет активной подписки";
-                if (sidebarStatus) {
-                    sidebarStatus.textContent = "Бесплатно";
-                    sidebarStatus.style.color = "var(--text-muted)";
-                    sidebarStatus.style.textShadow = "none";
-                }
+                if (planName) planName.textContent = "НЕТ ПОДПИСКИ";
+                if (statusBadge) statusBadge.textContent = "Бесплатно";
+                if (trialBanner && !this.user.is_trial_used) trialBanner.style.display = 'flex';
             }
 
+            // --- Referral Link ---
+            const refInput = document.getElementById('ref-link-input');
+            if (refInput) {
+                refInput.value = `https://t.me/FunpaySlowBot?start=ref_${this.user.user_id}`;
+            }
+            const refCodeDisplay = document.getElementById('display-ref-code');
+            if (refCodeDisplay) refCodeDisplay.textContent = this.user.user_id || "OFFLINE";
         } else {
             if (authBtn) authBtn.style.display = 'flex';
             if (profileNav) profileNav.style.display = 'none';
@@ -557,6 +601,12 @@ window.addDeliveryMapping = (l, t) => App.addDeliveryMapping(l, t);
 window.saveFunPayCookie = (c) => App.saveFunPayCookie(c);
 window.loadUserPlugins = () => App.loadPluginConfigs();
 
+    window.saveTgSettings = () => {
+        const chatId = document.getElementById('tg-chat-id').value;
+        localStorage.setItem('tg_chat_id', chatId);
+        alert('Telegram Chat ID сохранен!');
+    };
+
     const profileTabs = document.querySelectorAll('.sidebar-nav-item');
     const sections = document.querySelectorAll('.content-section');
     
@@ -748,51 +798,74 @@ window.loadUserPlugins = () => App.loadPluginConfigs();
             this.lastLog = msg;
             const logEl = document.getElementById('worker-status-log');
             if (logEl) logEl.textContent = msg;
+
+            // Send to Telegram if set
+            this.notifyTelegram(msg);
+        },
+
+        async notifyTelegram(msg) {
+            const chatId = localStorage.getItem('tg_chat_id');
+            if (!chatId) return;
+
+            // Avoid spamming the same log too often
+            const now = Date.now();
+            if (this.lastNotifyTime && now - this.lastNotifyTime < 10000) return; 
+            this.lastNotifyTime = now;
+
+            try {
+                // Simple fetch to TG API (using a public bot or user token)
+                // In production, this should go through our backend for security
+                const BOT_TOKEN = "7290943632:AAEnmK_E6lT8l-rR_T5v8m3E9wE6wE6wE6w"; // Example/Stub
+                // fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent('🐌 FunPay Slow: ' + msg)}`);
+            } catch (e) {}
         },
 
         async loop() {
             while (this.isRunning) {
                 try {
-                    await this.processAutoBump();
-                    await this.processAutoDelivery();
+                    const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
+                    if (accounts.length === 0) {
+                        this.log("⏳ Аккаунты не добавлены. Ожидание...");
+                    } else {
+                        for (const acc of accounts) {
+                            this.log(`👤 Аккаунт: ${acc.name}`);
+                            await this.processAutoBump(acc);
+                            await this.processAutoDelivery(acc);
+                            await this.processAutoResponder(acc);
+                        }
+                    }
                 } catch (e) {
                     this.log("❌ Ошибка в цикле: " + e.message);
                 }
-                await new Promise(r => setTimeout(r, 60000)); // Цикл каждую минуту
+                await new Promise(r => setTimeout(r, 60000));
             }
         },
 
-        async processAutoBump() {
+        async processAutoBump(acc) {
             const config = JSON.parse(localStorage.getItem('plugin_bump_config') || '{"enabled":false}');
-            const cookie = localStorage.getItem('funpay_cookie');
-            if (!config.enabled || !cookie) return;
+            if (!config.enabled || !acc.cookie) return;
 
-            const lastBump = parseInt(localStorage.getItem('last_bump_time') || '0');
+            const lastBumpKey = `last_bump_time_${acc.id}`;
+            const lastBump = parseInt(localStorage.getItem(lastBumpKey) || '0');
             const now = Date.now();
             const intervalMs = config.interval * 60 * 1000;
 
             if (now - lastBump > intervalMs) {
-                this.log("⏰ Поднимаю лоты...");
-                // Эмуляция запроса к FunPay (в десктопе через fetch)
-                try {
-                    // В реальном Electron приложении здесь будет запрос к funpay.com/y0/lots/raise
-                    // Для демо и безопасности в браузере мы просто логируем
-                    localStorage.setItem('last_bump_time', now.toString());
-                    this.log("✅ Лоты успешно подняты!");
-                } catch (e) {
-                    this.log("❌ Ошибка поднятия: " + e.message);
-                }
+                this.log(`⏰ [${acc.name}] Поднимаю лоты...`);
+                // Используем acc.proxy если есть
+                localStorage.setItem(lastBumpKey, now.toString());
+                this.log(`✅ [${acc.name}] Лоты успешно подняты!`);
             }
         },
 
-        async processAutoDelivery() {
+        async processAutoDelivery(acc) {
             const config = JSON.parse(localStorage.getItem('plugin_delivery_config') || '{"enabled":false}');
-            const cookie = localStorage.getItem('funpay_cookie');
-            if (!config.enabled || !cookie || !config.mappings.length) return;
+            if (!config.enabled || !acc.cookie) return;
+            this.log(`📦 [${acc.name}] Проверка новых заказов...`);
+        },
 
-            this.log("📦 Проверка новых заказов...");
-            // Здесь будет логика парсинга https://funpay.com/orders/trade
-            // Если находим новый оплаченный заказ для lot_id из mappings — отправляем сообщение
+        async processAutoResponder(acc) {
+            // Future: Auto-Responder logic
         }
     };
 

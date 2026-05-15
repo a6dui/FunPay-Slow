@@ -1,6 +1,6 @@
 {
   "name": "funpay-slow-desktop",
-  "version": "2.2.3",
+  "version": "2.4.1",
   "description": "FunPay Slow Desktop Application",
   "main": "main.js",
   "scripts": {

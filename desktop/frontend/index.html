@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FunPay Slow — Приложение</title>
-    <link rel="stylesheet" href="styles.css?v=2.5.11">
+    <link rel="stylesheet" href="styles.css?v=2.4.1">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐌</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -52,19 +52,15 @@
     </nav>
 
     <div class="landing-container">
-        <!-- Hero Section matches reference -->
         <section class="hero-landing">
             <div class="hero-landing-content">
-                <div class="hero-badge"><span class="pulse-dot"></span> Автоматизация FunPay v2.5.11</div>
-                <h1 class="hero-main-title">Ваша панель <br>автоматизации <br><span class="gradient-text">Slow.</span></h1>
-                <p class="hero-subtext">Все инструменты для работы с FunPay в одном удобном приложении. Быстро, надежно и под полным контролем.</p>
+                <div class="hero-badge"><span class="pulse-dot"></span> v2.4.1 Production</div>
+                <h1 class="hero-main-title">Ультимативная панель <br><span class="gradient-text">Slow.</span></h1>
+                <p class="hero-subtext">Все инструменты для работы с FunPay в одном удобном приложении. Профессиональная автоматизация.</p>
                 <div class="hero-actions">
-                    <a href="https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow" class="btn-primary btn-large">Скачать Windows v2.5.11</a>
-                </div>
-                
-                <div class="system-status-container status-green">
-                    <div class="status-label"><span>СТАТУС ВОРКЕРА</span><span class="status-online">АКТИВЕН</span></div>
-                    <div class="status-wave"><svg width="100%" height="40" viewBox="0 0 400 40" preserveAspectRatio="none"><path d="M0,20 L150,20 L160,10 L170,30 L180,10 L190,30 L200,20 L400,20" stroke="var(--accent)" stroke-width="2" fill="none" /></svg></div>
+                    <a href="https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow" class="btn-primary btn-large">
+                        <i class="fab fa-windows"></i> <i class="fab fa-apple"></i> Скачать v2.4.1
+                    </a>
                 </div>
             </div>
 
@@ -73,60 +69,50 @@
                     <div class="mockup-header">
                         <div class="mockup-icon"><i class="fas fa-microchip"></i></div>
                         <div class="mockup-title">Управление Pulse</div>
-                        <div style="margin-left: auto; color: var(--accent); font-size: 0.8rem; font-weight: 800;">Windows v2.5.11</div>
+                        <div style="margin-left: auto; color: var(--accent); font-size: 0.8rem; font-weight: 800;">v2.4.1</div>
                     </div>
                     <div class="mockup-grid">
                         <div class="mockup-item"><i class="fas fa-users"></i><span>Аккаунты</span></div>
                         <div class="mockup-item"><i class="fas fa-bolt"></i><span>Авто-выдача</span></div>
                     </div>
-                    <div class="mockup-list-section">
-                        <ul class="mockup-list">
-                            <li><span class="check-dot"></span> Полный контроль воркера</li>
-                            <li><span class="check-dot"></span> Настройка плагинов</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Feature Grid matches reference -->
-        <section class="value-section" style="padding-top: 0;">
-            <div class="feature-grid-v2">
-                <div class="feature-card-v2">
-                    <div class="card-icon"><i class="fas fa-user-shield"></i></div>
-                    <h3>Аккаунты FunPay</h3>
-                    <p>Подключайте свои профили и управляйте ими без ограничений.</p>
-                    <div class="card-actions">
-                        <button class="btn-small">Настроить</button>
-                    </div>
-                </div>
-                <div class="feature-card-v2">
-                    <div class="card-icon" style="color: #10b981; background: rgba(16, 185, 129, 0.05);"><i class="fas fa-comment-dots"></i></div>
-                    <h3>Чаты и заказы</h3>
-                    <p>Ни один клиент не останется без ответа.</p>
-                </div>
-                <div class="feature-card-v2">
-                    <div class="card-icon" style="color: #a855f7; background: rgba(168, 85, 247, 0.05);"><i class="fas fa-puzzle-piece"></i></div>
-                    <h3>Плагины</h3>
-                    <p>Огромный выбор готовых решений для вашего бизнеса.</p>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- Login Overlay -->
-    <div id="login-overlay">
-        <div class="login-box" id="login-box-standard">
-            <h2 style="color: white; margin-bottom: 1rem;">Авторизация</h2>
-            <button class="btn-telegram" id="btn-telegram-login">Войти через Telegram</button>
-            <button onclick="document.getElementById('login-overlay').style.display='none'" style="background:none; border:none; color:#555; margin-top:1.5rem; cursor:pointer;">Закрыть</button>
+    <footer class="main-footer" style="padding: 100px 0 60px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 100px;">
+        <div class="landing-container">
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 4rem; text-align: left;">
+                <div>
+                    <div class="logo-container" style="justify-content: flex-start; margin-bottom: 1.5rem; border: none; background: none; padding: 0;">
+                        <span class="snail-logo">🐌</span>
+                        <div class="logo-text">FunPay <span>Slow</span></div>
+                    </div>
+                    <p style="color: #555; font-size: 0.9rem;">Десктопное приложение для работы с FunPay.</p>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Продукт</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="index.html" style="color: #555; text-decoration: none;">Главная</a></li>
+                        <li><a href="plugins.html" style="color: #555; text-decoration: none;">Плагины</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Поддержка</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="docs.html" style="color: #555; text-decoration: none;">Документация</a></li>
+                        <li><a href="media-partnership.html" style="color: #555; text-decoration: none;">Медиапартнерство</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Юридическое</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="terms.html" style="color: #555; text-decoration: none;">Условия использования</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="login-box" id="login-box-telegram" style="display: none;">
-            <div id="tg-auth-code" style="font-size: 3rem; color: var(--accent); margin: 2rem 0; font-weight: 800;">------</div>
-            <p style="color: #555;">Таймер: <span id="timer-val">3:00</span></p>
-            <a href="https://t.me/FunpaySlov_Bot" target="_blank" class="btn-telegram" style="margin-top: 1.5rem; text-decoration: none;">Открыть бота</a>
-        </div>
-    </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
