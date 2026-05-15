@@ -283,7 +283,7 @@ async def process_auth(message, code):
             c.execute(f"INSERT INTO users (tg_id, name, created_at) VALUES ({ph}, {ph}, {ph})", 
                       (str(message.from_user.id), message.from_user.first_name, datetime.now().isoformat()))
         conn.commit()
-        await message.answer("✅ Авторизация успешна! Вернитесь на сайт.")
+        await message.answer(f"👋 С возвращением, {message.from_user.first_name}!\n\n✅ Авторизация успешна!\nВернитесь на сайт — панель уже открыта.")
     else:
         await message.answer("❌ Код недействителен.")
     conn.close()

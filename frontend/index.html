@@ -206,11 +206,22 @@
             <h2 style="color: white; margin-bottom: 1rem;">Авторизация</h2>
             <button class="btn-telegram" id="btn-telegram-login"><i class="fab fa-telegram-plane"></i> Войти через Telegram</button>
         </div>
-        <div class="login-box" id="login-box-telegram" style="display: none;">
+        <div class="login-box" id="login-box-telegram" style="display: none; text-align: center; padding: 3rem;">
             <div class="close-login-btn" onclick="document.getElementById('login-overlay').style.display='none'">&times;</div>
-            <div id="tg-auth-code" style="font-size: 3rem; letter-spacing: 5px; color: var(--accent); margin: 2rem 0; font-weight: 800;">------</div>
-            <p style="color: #555;">Таймер: <span id="timer-val">3:00</span></p>
-            <a href="https://t.me/FunpaySlov_Bot" target="_blank" class="btn-telegram" style="text-decoration: none; margin-top: 1.5rem;">Открыть бота</a>
+            <div style="width: 80px; height: 80px; background: rgba(0, 136, 204, 0.1); color: #0088cc; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; font-size: 2.5rem;">
+                <i class="fab fa-telegram-plane"></i>
+            </div>
+            <h2 style="color: white; margin-bottom: 0.5rem;">Подтвердите вход</h2>
+            <p style="color: #666; margin-bottom: 2rem; font-size: 0.95rem;">Нажмите кнопку ниже, чтобы перейти в бота и завершить авторизацию автоматически.</p>
+            
+            <a href="https://t.me/FunpaySlov_Bot" id="link-to-bot" target="_blank" class="btn-telegram" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 1.2rem; border-radius: 16px; font-weight: 700;">
+                <i class="fas fa-external-link-alt"></i> Открыть Telegram
+            </a>
+            
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                <div id="tg-auth-code" style="font-size: 1.5rem; color: #333; font-weight: 800; letter-spacing: 3px;">------</div>
+                <p style="color: #444; font-size: 0.8rem; margin-top: 0.5rem;">Таймер: <span id="timer-val">3:00</span></p>
+            </div>
         </div>
     </div>
 

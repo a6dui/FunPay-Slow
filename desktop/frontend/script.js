@@ -11,7 +11,12 @@ window.App = {
         if (this.user) {
             this.syncUser();
         }
-        this.checkVersion();
+        
+        // Показываем обновление ТОЛЬКО в приложении (не в браузере)
+        const isDesktop = !window.location.hostname.includes('.') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (isDesktop) {
+            this.checkVersion();
+        }
     },
     
     async checkVersion() {
