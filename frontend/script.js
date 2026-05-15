@@ -27,34 +27,34 @@ window.App = {
         overlay.className = 'login-overlay';
         overlay.style.display = 'none';
         overlay.innerHTML = `
-            <div class="login-box" id="login-box-standard">
+            <div class="login-box" id="login-box-standard" style="position: relative;">
+                <button class="btn-close-modal" onclick="document.getElementById('login-overlay').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #555; font-size: 1.5rem; cursor: pointer; transition: 0.3s; z-index: 10;">&times;</button>
                 <div class="login-header">
                     <div class="login-logo">🐌</div>
                     <h2>Войти в FunPay Slow</h2>
                     <p>Выберите удобный способ авторизации</p>
                 </div>
                 <div class="login-methods">
-                    <button class="btn-login-method telegram" id="btn-telegram-login-injected">
+                    <button class="btn-login-method telegram" id="btn-telegram-login-injected" style="width: 100%; padding: 16px; border-radius: 12px; border: none; background: #0088cc; color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
                         <i class="fab fa-telegram-plane"></i> Войти через Telegram
                     </button>
                 </div>
-                <div class="login-footer">Нажимая «Войти», вы соглашаетесь с условиями</div>
-                <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
+                <div class="login-footer" style="margin-top: 2rem; font-size: 0.8rem; color: #555; text-align: center;">Нажимая «Войти», вы соглашаетесь с условиями</div>
             </div>
-            <div class="login-box" id="login-box-telegram" style="display: none;">
+            <div class="login-box" id="login-box-telegram" style="display: none; position: relative;">
+                <button class="btn-close-modal" onclick="document.getElementById('login-overlay').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #555; font-size: 1.5rem; cursor: pointer; z-index: 10;">&times;</button>
                 <div class="login-header">
                     <div class="login-logo">🐌</div>
                     <h2>Авторизация Telegram</h2>
                     <p>Отправьте код нашему боту</p>
                 </div>
-                <div class="tg-auth-container">
-                    <div class="tg-auth-code" id="tg-auth-code">------</div>
-                    <p class="tg-auth-hint">Отправьте этот код боту</p>
-                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                <div class="tg-auth-container" style="text-align: center; padding: 1rem 0;">
+                    <div class="tg-auth-code" id="tg-auth-code" style="font-size: 2.5rem; font-weight: 900; letter-spacing: 5px; color: var(--accent); margin: 1rem 0;">------</div>
+                    <p class="tg-auth-hint" style="color: #888; font-size: 0.9rem;">Нажмите на кнопку ниже и отправьте этот код боту</p>
+                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; justify-content: center; margin-top: 1.5rem; height: 50px;">
                         <i class="fab fa-telegram-plane"></i> Открыть бота
                     </a>
                 </div>
-                <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
             </div>
         `;
         document.body.appendChild(overlay);
@@ -260,7 +260,7 @@ window.handleTelegramLogin = async function() {
         const res = await fetch(`${API_BASE}/api/auth/generate`);
         const { code, token } = await res.json();
         codeDisplay.textContent = code;
-        document.getElementById('link-to-bot').href = `https://t.me/FunpaySlowBot?start=${code}`;
+        document.getElementById('link-to-bot').href = `https://t.me/FunPaySlov_Bot?start=${code}`;
         const poll = setInterval(async () => {
             const check = await fetch(`${API_BASE}/api/auth/check/${token}`);
             if (check.ok) {
