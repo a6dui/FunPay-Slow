@@ -1334,3 +1334,48 @@ footer {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
 }
+
+/* --- Update Notification --- */
+.update-notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(124, 58, 237, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 100px;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(124, 58, 237, 0.4);
+    animation: slideUpFade 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.update-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.95rem;
+}
+
+.update-content button {
+    background: white;
+    color: var(--primary);
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.update-content button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}

@@ -245,6 +245,113 @@ def get_referral(user_id: str):
         return {"referral_code": row[0], "balance": row[1], "invited_count": row[2], "level": row[3], "referrals": friends}
     return None
 
+@app.post("/api/user/referral/apply")
+def apply_referral(req: ReferralApplyRequest):
+    conn = get_db_conn()
+    c = conn.cursor()
+    ph = get_ph()
+    # Check if already has referrer
+    c.execute(f"SELECT referrer_id FROM referral_stats WHERE user_id = {ph}", (str(req.user_id),))
+    row = c.fetchone()
+    if row and row[0]:
+        conn.close()
+        return {"success": False, "message": "Код уже введен."}
+    
+    # Check if code exists
+    c.execute(f"SELECT user_id FROM referral_stats WHERE referral_code = {ph}", (req.code,))
+    ref_row = c.fetchone()
+    if not ref_row:
+        conn.close()
+        return {"success": False, "message": "Код не найден."}
+    
+    referrer_id = ref_row[0]
+    if str(referrer_id) == str(req.user_id):
+        conn.close()
+        return {"success": False, "message": "Свой код нельзя."}
+    
+    c.execute(f"UPDATE referral_stats SET referrer_id = {ph} WHERE user_id = {ph}", (str(referrer_id), str(req.user_id)))
+    c.execute(f"UPDATE referral_stats SET invited_count = invited_count + 1 WHERE user_id = {ph}", (str(referrer_id),))
+    c.execute(f"INSERT INTO referrals_list (referrer_id, referred_id, created_at) VALUES ({ph}, {ph}, {ph})", 
+              (str(referrer_id), str(req.user_id), datetime.now().isoformat()))
+    conn.commit()
+    conn.close()
+    return {"success": True}
+
+@app.post("/api/payment/create")
+def create_payment(user_id: str, plan: str, amount: float):
+    invoice_id = f"INV-{random.randint(100000, 999999)}"
+    pay_url = f"https://t.me/CryptoBot?start=pay_{invoice_id}"
+    conn = get_db_conn()
+    c = conn.cursor()
+    ph = get_ph()
+    c.execute(f"INSERT INTO payments (invoice_id, user_id, amount, plan_id, status, created_at) VALUES ({ph}, {ph}, {ph}, {ph}, 'pending', {ph})",
+              (invoice_id, str(user_id), amount, plan, datetime.now().isoformat()))
+    conn.commit()
+    conn.close()
+    return {"success": True, "pay_url": pay_url, "invoice_id": invoice_id}
+
+@app.get("/api/payment/verify/{invoice_id}")
+def verify_payment(invoice_id: str):
+    conn = get_db_conn()
+    c = conn.cursor()
+    ph = get_ph()
+    c.execute(f"SELECT user_id, plan_id, status, amount FROM payments WHERE invoice_id = {ph}", (invoice_id,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return {"success": False, "message": "Платеж не найден."}
+    
+    user_id, plan, status, amount = row
+    if status == 'paid':
+        conn.close()
+        return {"success": True, "message": "Уже оплачено."}
+    
+    # Mock approval for test
+    is_paid = True
+    if is_paid:
+        days = 30
+        if "6" in plan: days = 180
+        if "12" in plan: days = 365
+        expires = (datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M")
+        plan_name = "Fast" if "fast" in plan else "Slow"
+        
+        c.execute(f"UPDATE payments SET status = 'paid' WHERE invoice_id = {ph}", (invoice_id,))
+        c.execute(f"INSERT INTO subscriptions (user_id, plan, expires_at, status) VALUES ({ph}, {ph}, {ph}, 'active') ON CONFLICT(user_id) DO UPDATE SET plan=excluded.plan, expires_at=excluded.expires_at, status='active'",
+                  (str(user_id), plan_name, expires))
+        
+        # Referral Commission (5%)
+        c.execute(f"SELECT referrer_id FROM referral_stats WHERE user_id = {ph}", (str(user_id),))
+        ref_row = c.fetchone()
+        if ref_row and ref_row[0]:
+            ref_id = ref_row[0]
+            comm = amount * 0.05
+            c.execute(f"UPDATE referral_stats SET balance = balance + {ph} WHERE user_id = {ph}", (comm, str(ref_id)))
+            
+        conn.commit()
+        send_admin_tg(f"💰 Оплата: {user_id} - {plan_name} ({amount} RUB)")
+        conn.close()
+        return {"success": True, "message": "Оплачено!"}
+    
+    conn.close()
+    return {"success": False, "message": "Не оплачено."}
+
+@app.get("/api/changelog")
+def get_changelog():
+    return [
+        {
+            "version": "v2.2.2",
+            "date": "16 Мая 2026",
+            "changes": [
+                "Версия: v2.2.2 - Финальная полировка UI.",
+                "Оптимизация: Уменьшен размер футера и отступы для более компактного вида.",
+                "Исправление: Ссылка на 'Соглашение для оплаты' теперь корректно отображается во всех разделах.",
+                "Дизайн: Исправлено растягивание плашек в главном блоке.",
+                "Брендинг: Обновлены стили ссылок в футере."
+            ],
+            "improvements": []
+        }
+    ]
+
 @app.get("/api/admin/stats")
 def get_admin_stats():
     conn = get_db_conn()

@@ -11,6 +11,36 @@ window.App = {
         if (this.user) {
             this.syncUser();
         }
+        this.checkVersion();
+    },
+    
+    async checkVersion() {
+        try {
+            const res = await fetch(`${API_BASE}/`);
+            if (res.ok) {
+                const data = await res.json();
+                const localVersion = "2.2.2"; // Текущая версия десктопа
+                if (data.version && data.version !== localVersion) {
+                    console.log(`Update available: ${data.version} (Local: ${localVersion})`);
+                    this.showUpdateNotification(data.version);
+                }
+            }
+        } catch (e) {
+            console.error("Version Check Error:", e);
+        }
+    },
+
+    showUpdateNotification(newVersion) {
+        const notify = document.createElement('div');
+        notify.className = 'update-notification';
+        notify.innerHTML = `
+            <div class="update-content">
+                <i class="fas fa-sync-alt fa-spin"></i>
+                <span>Доступна новая версия <b>v.${newVersion}</b></span>
+                <button onclick="window.location.reload()">Обновить</button>
+            </div>
+        `;
+        document.body.appendChild(notify);
     },
     
     async syncUser() {
@@ -711,8 +741,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.selectedPlan = planId;
         window.selectedPrice = price;
         
-        // Remove active from all options
-        document.querySelectorAll('.plan-option').forEach(opt => opt.classList.remove('active'));
+        // Remove active from all options in the current type
+        document.querySelectorAll(`.tier-card#tier-${type} .plan-option`).forEach(opt => opt.classList.remove('active'));
+        // Remove active from other types to be safe
+        document.querySelectorAll(`.tier-card:not(#tier-${type}) .plan-option`).forEach(opt => opt.classList.remove('active'));
+        
         // Remove selected from all cards
         document.querySelectorAll('.tier-card').forEach(card => card.classList.remove('selected'));
         // Hide/Disable all buy buttons
@@ -731,6 +764,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('ready');
             btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Оплатить ${price} ₽`;
         }
+        
+        console.log(`Plan selected: ${planId} (${price} RUB)`);
     };
 
     window.buySelectedPlan = async () => {
@@ -779,12 +814,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         try {
-            const res = await fetch(`${API_BASE}/api/user/activate-trial?user_id=${user.user_id}`, {
-                method: 'POST'
+            const res = await fetch(`${API_BASE}/api/subscription/trial`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.user_id.toString() })
             });
             const data = await res.json();
             if (data.success) {
-                alert("✅ " + data.message);
+                alert("✅ Пробный период активирован на 4 дня!");
                 window.location.reload();
             } else {
                 alert("❌ " + (data.message || data.detail));
