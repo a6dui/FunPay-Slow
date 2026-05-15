@@ -1,4 +1,12 @@
 import asyncio
+import sqlite3
+import os
+import hashlib
+import random
+from datetime import datetime, timedelta
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command, CommandObject
 from contextlib import asynccontextmanager
