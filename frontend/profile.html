@@ -1425,89 +1425,93 @@
             <!-- Section: Subscription -->
             <div id="section-subscription" class="content-section" style="display: none;">
                 <!-- Trial Banner -->
-                <div class="trial-banner-new" id="trial-activation-banner" style="margin-bottom: 2.5rem;">
-                    <div class="trial-icon">⚡</div>
-                    <div class="trial-content">
-                        <div class="trial-badge">LIMITED OFFER</div>
-                        <h3>FAST Trial — 4 дня бесплатно</h3>
-                        <p>Активируйте FAST-доступ и получите все плагины прямо сейчас.</p>
-                        <button class="btn-trial-new" onclick="window.activateTrial()">Попробовать FAST</button>
+                <div class="trial-card" id="trial-card" style="display: flex; background: linear-gradient(135deg, rgba(244, 63, 94, 0.1) 0%, rgba(20, 20, 20, 0.4) 100%); border: 1px solid rgba(244, 63, 94, 0.3); padding: 2.5rem; border-radius: 28px; margin-bottom: 3.5rem; justify-content: space-between; align-items: center; box-shadow: 0 15px 35px rgba(244, 63, 94, 0.1);">
+                    <div style="display: flex; align-items: center; gap: 2rem;">
+                        <div style="width: 70px; height: 70px; background: rgba(244, 63, 94, 0.2); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">⚡</div>
+                        <div>
+                            <span class="badge-trial" style="background: #f43f5e; color: white; padding: 5px 12px; border-radius: 100px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: inline-block;">Limited Offer</span>
+                            <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 4px;">FAST Trial — 4 дня бесплатно</h3>
+                            <p style="color: #888; font-size: 0.95rem;">Активируйте FAST-доступ и получите все плагины прямо сейчас.</p>
+                        </div>
                     </div>
+                    <button class="btn-marketplace" onclick="window.activateTrial()" style="background: #f43f5e; color: white; border: none; padding: 16px 32px; border-radius: 16px; font-weight: 800; cursor: pointer; font-size: 1rem; transition: 0.3s; box-shadow: 0 10px 20px rgba(244, 63, 94, 0.3);">Попробовать FAST</button>
                 </div>
 
-                <div class="pricing-header">
-                    <h2>Тарифные планы</h2>
-                    <p>Выберите подходящий уровень мощности для вашего бизнеса</p>
+                <div class="pricing-header" style="text-align: center; margin-bottom: 3rem;">
+                    <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem; background: linear-gradient(to right, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Тарифные планы</h2>
+                    <p style="color: #666;">Выберите подходящий уровень мощности для вашего бизнеса</p>
                 </div>
 
-                <div class="pricing-container-new">
+                <div class="tiers-wrapper" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
                     <!-- SLOW Plan -->
-                    <div class="price-card-new" id="plan-slow">
-                        <div class="plan-type-badge">BASIC</div>
-                        <h3 class="plan-title">SLOW</h3>
-                        <p class="plan-desc">Оптимально для старта и одного аккаунта.</p>
-                        <div class="price-options">
-                            <div class="price-option" onclick="window.selectPlan('slow_1m', 199)">
-                                <span class="period">1 Месяц</span>
-                                <span class="price">199 ₽</span>
+                    <div class="plan-card-group" style="background: rgba(30, 30, 30, 0.4); border: 1px solid rgba(59, 130, 246, 0.2); padding: 2.5rem; border-radius: 24px; position: relative;">
+                        <div class="plan-header" style="margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h3 style="font-size: 2rem; font-weight: 800; color: #3b82f6;">SLOW</h3>
+                                <span style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 4px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 800;">BASIC</span>
                             </div>
-                            <div class="price-option" onclick="window.selectPlan('slow_3m', 500)">
-                                <div class="save-badge">Экономия 97 ₽</div>
-                                <span class="period">3 Месяца</span>
-                                <span class="price">500 ₽</span>
-                            </div>
-                            <div class="price-option" onclick="window.selectPlan('slow_6m', 1100)">
-                                <div class="save-badge">Экономия 94 ₽</div>
-                                <span class="period">6 Месяцев</span>
-                                <span class="price">1100 ₽</span>
-                            </div>
-                            <div class="price-option" onclick="window.selectPlan('slow_12m', 2200)">
-                                <div class="save-badge">Экономия 188 ₽</div>
-                                <span class="period">12 Месяцев</span>
-                                <span class="price">2200 ₽</span>
-                            </div>
+                            <p style="color: #666; font-size: 0.9rem;">Оптимально для старта и одного аккаунта.</p>
+                        </div>
+                        <div class="plan-selection" style="display: grid; gap: 12px;">
+                            <button class="btn-tier-select" onclick="window.selectPlan('slow_1m', 199)" id="btn-slow_1m">
+                                <div><div style="font-weight: 700;">1 Месяц</div><div style="font-size: 0.7rem; color: #555;">Базовая цена</div></div>
+                                <b style="font-size: 1.2rem;">199 ₽</b>
+                            </button>
+                            <button class="btn-tier-select" onclick="window.selectPlan('slow_3m', 500)" id="btn-slow_3m">
+                                <div><div style="font-weight: 700;">3 Месяца</div><div style="font-size: 0.7rem; color: #10b981;">Экономия 97 ₽</div></div>
+                                <b style="font-size: 1.2rem;">500 ₽</b>
+                            </button>
+                            <button class="btn-tier-select" onclick="window.selectPlan('slow_6m', 1100)" id="btn-slow_6m">
+                                <div><div style="font-weight: 700;">6 Месяцев</div><div style="font-size: 0.7rem; color: #10b981;">Экономия 94 ₽</div></div>
+                                <b style="font-size: 1.2rem;">1100 ₽</b>
+                            </button>
+                            <button class="btn-tier-select" onclick="window.selectPlan('slow_12m', 2200)" id="btn-slow_12m">
+                                <div><div style="font-weight: 700;">12 Месяцев</div><div style="font-size: 0.7rem; color: #10b981;">Экономия 188 ₽</div></div>
+                                <b style="font-size: 1.2rem;">2200 ₽</b>
+                            </button>
                         </div>
                     </div>
 
                     <!-- FAST Plan -->
-                    <div class="price-card-new featured" id="plan-fast">
-                        <div class="plan-type-badge">ULTIMATE</div>
-                        <h3 class="plan-title">FAST</h3>
-                        <p class="plan-desc">Максимальная производительность и все плагины.</p>
-                        <div class="price-options">
-                            <div class="price-option" onclick="window.selectPlan('fast_1m', 599)">
-                                <span class="period">1 Месяц</span>
-                                <span class="price">599 ₽</span>
+                    <div class="plan-card-group" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.3); padding: 2.5rem; border-radius: 24px; position: relative;">
+                        <div class="plan-header" style="margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h3 style="font-size: 2rem; font-weight: 800; color: #10b981;">FAST</h3>
+                                <span style="background: #fbbf24; color: black; padding: 4px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 800;">ULTIMATE</span>
                             </div>
-                            <div class="price-option" onclick="window.selectPlan('fast_3m', 1699)">
-                                <div class="save-badge">Экономия 98 ₽</div>
-                                <span class="period">3 Месяца</span>
-                                <span class="price">1699 ₽</span>
-                            </div>
-                            <div class="price-option" onclick="window.selectPlan('fast_6m', 3500)">
-                                <div class="save-badge">Экономия 94 ₽</div>
-                                <span class="period">6 Месяцев</span>
-                                <span class="price">3500 ₽</span>
-                            </div>
-                            <div class="price-option" onclick="window.selectPlan('fast_12m', 7100)">
-                                <div class="save-badge">Экономия 88 ₽</div>
-                                <span class="period">12 Месяцев</span>
-                                <span class="price">7100 ₽</span>
-                            </div>
+                            <p style="color: #888; font-size: 0.9rem;">Максимальная производительность и все плагины.</p>
+                        </div>
+                        <div class="plan-selection" style="display: grid; gap: 12px;">
+                            <button class="btn-tier-select" onclick="window.selectPlan('fast_1m', 599)" id="btn-fast_1m">
+                                <div><div style="font-weight: 700;">1 Месяц</div><div style="font-size: 0.7rem; color: #555;">Базовая цена</div></div>
+                                <b style="font-size: 1.2rem;">599 ₽</b>
+                            </button>
+                            <button class="btn-tier-select" onclick="window.selectPlan('fast_3m', 1699)" id="btn-fast_3m">
+                                <div><div style="font-weight: 700;">3 Месяца</div><div style="font-size: 0.7rem; color: #fbbf24;">Экономия 98 ₽</div></div>
+                                <b style="font-size: 1.2rem;">1699 ₽</b>
+                            </button>
+                            <button class="btn-tier-select" onclick="window.selectPlan('fast_6m', 3500)" id="btn-fast_6m">
+                                <div><div style="font-weight: 700;">6 Месяцев</div><div style="font-size: 0.7rem; color: #fbbf24;">Экономия 94 ₽</div></div>
+                                <b style="font-size: 1.2rem;">3500 ₽</b>
+                            </button>
+                            <button class="btn-tier-select" onclick="window.selectPlan('fast_12m', 7100)" id="btn-fast_12m">
+                                <div><div style="font-weight: 700;">12 Месяцев</div><div style="font-size: 0.7rem; color: #fbbf24;">Экономия 88 ₽</div></div>
+                                <b style="font-size: 1.2rem;">7100 ₽</b>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3.5rem;">
-                    <button class="btn-primary" id="buy-subscription-btn" onclick="window.processPayment()" style="width: 100%; height: 75px; border-radius: 22px; font-weight: 800; font-size: 1.1rem; opacity: 0.5; cursor: not-allowed; transition: 0.4s; background: #222; color: #444; border: 1px solid rgba(255,255,255,0.05); box-shadow: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 4rem;">
+                    <button class="btn-primary" id="buy-subscription-btn" onclick="window.processPayment()" style="width: 100%; height: 75px; border-radius: 22px; font-weight: 800; font-size: 1.1rem; opacity: 0.5; cursor: not-allowed; background: #222; color: #444; border: 1px solid rgba(255,255,255,0.05);">
                         <i class="fas fa-shopping-cart"></i> Crypto Bot
                     </button>
-                    <button class="btn-outline" id="pay-balance-btn" onclick="window.payWithBalance()" style="width: 100%; height: 75px; border-radius: 22px; font-weight: 800; font-size: 1.1rem; opacity: 0.5; cursor: not-allowed; transition: 0.4s; border: 1px solid rgba(255,255,255,0.05); color: #444;">
+                    <button class="btn-outline" id="pay-balance-btn" onclick="window.payWithBalance()" style="width: 100%; height: 75px; border-radius: 22px; font-weight: 800; font-size: 1.1rem; opacity: 0.5; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.05); color: #444;">
                         <i class="fas fa-wallet"></i> С баланса (<span id="btn-current-balance">0</span> ₽)
                     </button>
                 </div>
-                <p style="text-align: center; color: #444; font-size: 0.85rem; margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <i class="fas fa-shield-halved" style="color: #10b981;"></i> Безопасная оплата и мгновенная активация.
+                <p style="text-align: center; color: #444; font-size: 0.85rem; margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-shield-halved" style="color: #10b981;"></i> Безопасная оплата через Crypto Bot.
                 </p>
             </div>
                 </div>
