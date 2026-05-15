@@ -1,5 +1,6 @@
 fastapi
-uvicorn
-pydantic
-pyTelegramBotAPI
+uvicorn[standard]
 httpx
+pyTelegramBotAPI
+pydantic
+python-multipart

@@ -317,9 +317,16 @@ window.App = {
         try {
             const res = await fetch(`${API_BASE}/api/user/subscription/${this.user.user_id}`);
             if (res.ok) {
-                const sub = await res.json();
-                this.user.subscription = sub;
-                this.user.subscription_type = sub.plan ? sub.plan.toLowerCase() : 'free';
+                const fresh = await res.json();
+                // Merge ALL fresh fields into user object
+                this.user.plan      = fresh.plan      || 'NONE';
+                this.user.balance   = fresh.balance   || 0;
+                this.user.sub_end   = fresh.sub_end   || 0;
+                this.user.has_trial = fresh.has_trial || false;
+                this.user.ref_code  = fresh.ref_code  || this.user.ref_code;
+                // legacy compatibility fields
+                this.user.subscription = fresh;
+                this.user.subscription_type = (fresh.plan || 'none').toLowerCase();
                 localStorage.setItem('funpay_user', JSON.stringify(this.user));
                 this.updateUI();
             }
@@ -356,17 +363,16 @@ window.App = {
 
             this.syncUserUI();
 
-            // --- Update Profile UI ---
-            const planName = document.getElementById('profile-plan-name');
+            // --- Plan detection using top-level this.user.plan ---
+            const plan = (this.user.plan || 'NONE').toUpperCase();
+            const hasSub = plan === 'FAST' || plan === 'SLOW';
+            const isFast = plan === 'FAST';
+
+            const planName    = document.getElementById('profile-plan-name');
             const statusBadge = document.getElementById('profile-status-badge');
-            const trialBanner = document.getElementById('trial-activation-banner');
             const sidebarStatus = document.getElementById('sidebar-user-status');
-            
-            const sub = this.user.subscription || {};
-            const hasSub = (sub.status === 'active' || this.user.subscription_type === 'fast' || this.user.subscription_type === 'slow');
 
             if (hasSub) {
-                const isFast = this.user.subscription_type === 'fast' || sub.plan === 'Fast';
                 if (planName) {
                     planName.textContent = isFast ? "FAST" : "SLOW";
                     planName.className = `value ${isFast ? 'plan-fast-text' : 'plan-slow-text'}`;
@@ -377,17 +383,15 @@ window.App = {
                     statusBadge.style.background = "rgba(16, 185, 129, 0.1)";
                 }
                 if (sidebarStatus) {
-                    sidebarStatus.textContent = isFast ? "FAST" : "SLOW";
+                    sidebarStatus.textContent = plan;
                     sidebarStatus.style.color = isFast ? "#fbbf24" : "#3b82f6";
                 }
-                if (trialBanner) trialBanner.style.display = 'none';
             } else {
                 if (planName) planName.textContent = "FREE PLAN";
                 if (statusBadge) {
                     statusBadge.textContent = "Не активна";
                     statusBadge.style.color = "var(--text-muted)";
                 }
-                if (trialBanner && !this.user.is_trial_used) trialBanner.style.display = 'flex';
             }
 
             // --- Referral & Balance UI ---
@@ -404,7 +408,6 @@ window.App = {
             if (refBalanceDisplay) refBalanceDisplay.textContent = userBalance;
             if (btnBalanceDisplay) btnBalanceDisplay.textContent = userBalance;
 
-            // Update progress bar (just visual example based on balance)
             const progressBar = document.getElementById('ref-progress-bar');
             if (progressBar) {
                 const progress = Math.min((userBalance / 500) * 100, 100);
@@ -416,6 +419,7 @@ window.App = {
     initTabs() {
         const tabs = document.querySelectorAll('.sidebar-nav-item');
         const sections = document.querySelectorAll('.content-section');
+
         
         tabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
@@ -434,6 +438,14 @@ window.App = {
                         s.style.display = 'block';
                     }
                 });
+
+                // Load data for specific tabs
+                if (tabId === 'devices') {
+                    window.App.loadAccountsList();
+                }
+                if (tabId === 'subscription') {
+                    window.App.syncUser(); // Refresh balance and plan
+                }
             });
         });
     },
@@ -445,47 +457,93 @@ window.App = {
         else alert("Ошибка: Модальное окно не найдено.");
     },
 
-    addNewAccount() {
-        const name = document.getElementById('acc-name').value || "Без имени";
-        const cookie = document.getElementById('acc-cookie').value;
-        const proxy = document.getElementById('acc-proxy').value;
+    async addNewAccount() {
+        const name   = document.getElementById('acc-name')?.value?.trim();
+        const cookie = document.getElementById('acc-cookie')?.value?.trim();
+        const proxy  = document.getElementById('acc-proxy')?.value?.trim() || '';
 
-        if (!cookie) return alert("Введите куки (Golden Key)!");
+        if (!name)   return alert('Введите название аккаунта!');
+        if (!cookie) return alert('Введите Golden Key (cookie)!');
+        if (!this.user) return alert('Войдите в аккаунт!');
 
-        const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-        accounts.push({ id: Date.now(), name, cookie, proxy, status: 'active' });
-        localStorage.setItem('funpay_accounts', JSON.stringify(accounts));
+        const btn = document.querySelector('#add-account-modal .btn-primary');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохраняем...'; }
 
-        document.getElementById('add-account-modal').style.display = 'none';
-        this.loadAccountsList();
-    },
-
-    deleteAccount(id) {
-        if (!confirm("Удалить аккаунт?")) return;
-        let accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-        accounts = accounts.filter(a => a.id !== id);
-        localStorage.setItem('funpay_accounts', JSON.stringify(accounts));
-        this.loadAccountsList();
-    },
-
-    loadAccountsList() {
-        const body = document.getElementById('accounts-list-body');
-        if (!body) return;
-        const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-        
-        if (accounts.length === 0) {
-            body.innerHTML = '<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">Аккаунты не добавлены.</td></tr>';
-            return;
+        try {
+            const res = await fetch(`${API_BASE}/api/accounts/add`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: String(this.user.user_id), name, cookie, proxy })
+            });
+            if (res.ok) {
+                document.getElementById('add-account-modal').style.display = 'none';
+                document.getElementById('acc-name').value   = '';
+                document.getElementById('acc-cookie').value = '';
+                document.getElementById('acc-proxy').value  = '';
+                await this.loadAccountsList();
+            } else {
+                const d = await res.json();
+                alert(d.detail || 'Ошибка при добавлении аккаунта.');
+            }
+        } catch (e) {
+            alert('Ошибка связи с сервером.');
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = 'Сохранить аккаунт'; }
         }
+    },
 
-        body.innerHTML = accounts.map(acc => `
-            <tr>
-                <td style="padding: 15px;"><b>${acc.name}</b><br><small>****${acc.cookie.slice(-4)}</small></td>
-                <td style="padding: 15px;">${acc.proxy || 'Без прокси'}</td>
-                <td style="padding: 15px;"><span class="status-badge" style="color:#10b981">АКТИВЕН</span></td>
-                <td style="padding: 15px; text-align:right;"><button class="btn-outline" onclick="window.App.deleteAccount(${acc.id})"><i class="fas fa-trash"></i></button></td>
-            </tr>
-        `).join('');
+    async deleteAccount(id) {
+        if (!confirm('Удалить аккаунт?')) return;
+        try {
+            await fetch(`${API_BASE}/api/accounts/${id}?user_id=${this.user.user_id}`, { method: 'DELETE' });
+            await this.loadAccountsList();
+        } catch (e) { alert('Ошибка при удалении.'); }
+    },
+
+    async loadAccountsList() {
+        const body = document.getElementById('accounts-list-body');
+        if (!body || !this.user) return;
+
+        body.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#555"><i class="fas fa-spinner fa-spin"></i> Загрузка...</td></tr>';
+
+        try {
+            const res = await fetch(`${API_BASE}/api/accounts/list?user_id=${this.user.user_id}`);
+            const accounts = await res.json();
+
+            if (accounts.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" style="padding:50px;text-align:center;color:#333;font-size:0.95rem"><i class="fas fa-plus-circle" style="font-size:2rem;display:block;margin-bottom:12px;color:#222"></i>Аккаунты не добавлены.<br><small style="color:#2a2a2a">Нажмите «+ Добавить аккаунт»</small></td></tr>';
+                return;
+            }
+
+            body.innerHTML = accounts.map(acc => `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.02);transition:0.2s" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding:20px">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <div style="width:40px;height:40px;background:rgba(16,185,129,0.08);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1.1rem">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:700;color:#fff">${acc.name}</div>
+                                <div style="font-size:0.75rem;color:#333;font-family:monospace">key: ****</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding:20px;color:#555;font-family:monospace;font-size:0.85rem">${acc.proxy || '<span style="color:#222">—</span>'}</td>
+                    <td style="padding:20px">
+                        <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(16,185,129,0.07);color:#10b981;border-radius:100px;font-size:0.73rem;font-weight:800;border:1px solid rgba(16,185,129,0.1)">
+                            <div style="width:5px;height:5px;background:#10b981;border-radius:50%"></div> АКТИВЕН
+                        </span>
+                    </td>
+                    <td style="padding:20px;text-align:right">
+                        <button onclick="window.App.deleteAccount(${acc.id})" style="width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#f43f5e;border:1px solid rgba(244,63,94,0.1);background:rgba(244,63,94,0.04);cursor:pointer">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch(e) {
+            body.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#f43f5e">Ошибка загрузки</td></tr>';
+        }
     }
 };
 
