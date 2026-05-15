@@ -22,36 +22,74 @@ window.App = {
     ensureLoginOverlay() {
         if (document.getElementById('login-overlay')) return;
         
+        // Add CSS for the modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .login-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+                display: flex; align-items: center; justify-content: center; z-index: 10000;
+            }
+            .login-box {
+                background: #111; border: 1px solid rgba(255,255,255,0.1);
+                padding: 40px; border-radius: 24px; width: 100%; max-width: 400px;
+                position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+                animation: modalAppear 0.3s ease-out;
+            }
+            @keyframes modalAppear {
+                from { opacity: 0; transform: scale(0.9); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            .btn-close-modal-new {
+                position: absolute; top: -15px; right: -15px;
+                width: 35px; height: 35px; border-radius: 50%;
+                background: #f43f5e; color: white; border: none;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer; font-size: 1.2rem; font-weight: bold;
+                box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+                transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                z-index: 11000;
+            }
+            .btn-close-modal-new:hover {
+                transform: scale(1.15) rotate(90deg);
+                background: #fb7185;
+            }
+            .login-logo-circle {
+                width: 60px; height: 60px; background: rgba(255,255,255,0.05);
+                border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                margin: 0 auto 20px; font-size: 2rem;
+            }
+        `;
+        document.head.appendChild(style);
+
         const overlay = document.createElement('div');
         overlay.id = 'login-overlay';
         overlay.className = 'login-overlay';
         overlay.style.display = 'none';
         overlay.innerHTML = `
-            <div class="login-box" id="login-box-standard" style="position: relative;">
-                <button class="btn-close-modal" onclick="document.getElementById('login-overlay').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #555; font-size: 1.5rem; cursor: pointer; transition: 0.3s; z-index: 10;">&times;</button>
-                <div class="login-header">
-                    <div class="login-logo">🐌</div>
-                    <h2>Войти в FunPay Slow</h2>
-                    <p>Выберите удобный способ авторизации</p>
+            <div class="login-box" id="login-box-standard">
+                <button class="btn-close-modal-new" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
+                <div class="login-logo-circle">🐌</div>
+                <div class="login-header" style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 1.5rem; color: white; margin-bottom: 10px;">Авторизация</h2>
+                    <p style="color: #666; font-size: 0.9rem;">Выберите способ входа в систему</p>
                 </div>
-                <div class="login-methods">
-                    <button class="btn-login-method telegram" id="btn-telegram-login-injected" style="width: 100%; padding: 16px; border-radius: 12px; border: none; background: #0088cc; color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        <i class="fab fa-telegram-plane"></i> Войти через Telegram
-                    </button>
-                </div>
-                <div class="login-footer" style="margin-top: 2rem; font-size: 0.8rem; color: #555; text-align: center;">Нажимая «Войти», вы соглашаетесь с условиями</div>
+                <button class="btn-login-method telegram" id="btn-telegram-login-injected" style="width: 100%; padding: 18px; border-radius: 16px; border: none; background: linear-gradient(135deg, #0088cc, #00aaff); color: white; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 10px 20px -5px rgba(0, 136, 204, 0.4); transition: 0.3s;">
+                    <i class="fab fa-telegram-plane"></i> Войти через Telegram
+                </button>
+                <div style="margin-top: 25px; font-size: 0.75rem; color: #444; text-align: center;">Безопасный вход через официальный API</div>
             </div>
-            <div class="login-box" id="login-box-telegram" style="display: none; position: relative;">
-                <button class="btn-close-modal" onclick="document.getElementById('login-overlay').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #555; font-size: 1.5rem; cursor: pointer; z-index: 10;">&times;</button>
-                <div class="login-header">
-                    <div class="login-logo">🐌</div>
-                    <h2>Авторизация Telegram</h2>
-                    <p>Отправьте код нашему боту</p>
+            
+            <div class="login-box" id="login-box-telegram" style="display: none;">
+                <button class="btn-close-modal-new" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
+                <div class="login-logo-circle">🐌</div>
+                <div class="login-header" style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="font-size: 1.5rem; color: white; margin-bottom: 10px;">Код доступа</h2>
+                    <p style="color: #666; font-size: 0.9rem;">Отправьте этот код нашему боту</p>
                 </div>
-                <div class="tg-auth-container" style="text-align: center; padding: 1rem 0;">
-                    <div class="tg-auth-code" id="tg-auth-code" style="font-size: 2.5rem; font-weight: 900; letter-spacing: 5px; color: var(--accent); margin: 1rem 0;">------</div>
-                    <p class="tg-auth-hint" style="color: #888; font-size: 0.9rem;">Нажмите на кнопку ниже и отправьте этот код боту</p>
-                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; justify-content: center; margin-top: 1.5rem; height: 50px;">
+                <div class="tg-auth-container" style="text-align: center;">
+                    <div class="tg-auth-code" id="tg-auth-code" style="font-size: 2.8rem; font-weight: 900; letter-spacing: 8px; color: #10b981; margin: 20px 0; font-family: 'Courier New', monospace; background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 12px; border: 1px dashed rgba(16, 185, 129, 0.3);">------</div>
+                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; justify-content: center; margin-top: 1.5rem; height: 55px; border-radius: 16px; font-weight: 800; background: #10b981; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);">
                         <i class="fab fa-telegram-plane"></i> Открыть бота
                     </a>
                 </div>
