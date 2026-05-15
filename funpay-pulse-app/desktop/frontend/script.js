@@ -31,13 +31,18 @@ window.App = {
     },
 
     showUpdateNotification(newVersion) {
+        if (document.querySelector('.update-notification')) return;
+        
         const notify = document.createElement('div');
         notify.className = 'update-notification';
         notify.innerHTML = `
             <div class="update-content">
                 <i class="fas fa-sync-alt fa-spin"></i>
                 <span>Доступна новая версия <b>v.${newVersion}</b></span>
-                <button onclick="window.location.reload()">Обновить</button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button onclick="window.location.reload()">Обновить</button>
+                    <div onclick="this.parentElement.parentElement.parentElement.remove()" style="cursor: pointer; opacity: 0.6; padding: 5px;">&times;</div>
+                </div>
             </div>
         `;
         document.body.appendChild(notify);
