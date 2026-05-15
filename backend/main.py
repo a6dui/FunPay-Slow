@@ -205,7 +205,8 @@ def get_referral(user_id: str):
 
 # --- ADMIN ENDPOINTS ---
 def is_admin(user_id: str):
-    admin_ids = ["6360699049", "5304677735", "755843448"]
+    # Добавляем ID Димы и других админов
+    admin_ids = ["6360699049", "5304677735", "755843448", "123456789"] 
     return str(user_id) in admin_ids
 
 @app.get("/api/admin/stats")

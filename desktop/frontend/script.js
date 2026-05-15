@@ -12,11 +12,13 @@ window.App = {
             this.syncUser();
         }
         
-        // Показываем обновление ТОЛЬКО в приложении (не в браузере)
+        // Полностью отключаем уведомления об обновлении везде
+        /*
         const isDesktop = !window.location.hostname.includes('.') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         if (isDesktop) {
             this.checkVersion();
         }
+        */
     },
     
     async checkVersion() {
@@ -303,7 +305,7 @@ window.App = {
             // --- Referral Link ---
             const refInput = document.getElementById('ref-link-input');
             if (refInput) {
-                refInput.value = `https://t.me/FunpaySlowBot?start=ref_${this.user.user_id}`;
+                refInput.value = `https://funpayslow.com/?ref=${this.user.user_id}`;
             }
             const refCodeDisplay = document.getElementById('display-ref-code');
             if (refCodeDisplay) refCodeDisplay.textContent = this.user.user_id || "OFFLINE";
