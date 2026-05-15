@@ -15,6 +15,10 @@ window.App = {
     },
     
     async checkVersion() {
+        // Отключаем уведомления об обновлении для браузерной версии
+        if (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('funpaypulse.com')) {
+            return;
+        }
         try {
             const res = await fetch(`${API_BASE}/`);
             if (res.ok) {
@@ -40,7 +44,7 @@ window.App = {
                 <i class="fas fa-sync-alt fa-spin"></i>
                 <span>Доступна новая версия <b>v.${newVersion}</b></span>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button onclick="window.location.reload()">Обновить</button>
+                    <button onclick="window.open('https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow')">Скачать новую версию</button>
                     <div onclick="this.parentElement.parentElement.parentElement.remove()" style="cursor: pointer; opacity: 0.6; padding: 5px;">&times;</div>
                 </div>
             </div>
