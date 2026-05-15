@@ -31,7 +31,6 @@ window.App = {
         const loginBtn = document.getElementById('login-trigger-btn');
         const profileNav = document.getElementById('user-profile-nav');
         const avatar = document.getElementById('user-avatar');
-        const adminLink = document.getElementById('admin-link');
         
         if (this.user) {
             if (loginBtn) loginBtn.style.display = 'none';
@@ -70,27 +69,38 @@ window.App = {
     },
 
     initTabs() {
+        // Кнопки в сайдбаре могут иметь класс .sidebar-nav-item
         const tabs = document.querySelectorAll('.sidebar-nav-item');
         const sections = document.querySelectorAll('.content-section');
         
         tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const target = tab.getAttribute('data-section');
-                if (!target) return;
+            tab.addEventListener('click', (e) => {
+                const tabId = tab.getAttribute('data-tab');
+                if (!tabId) return;
                 
+                e.preventDefault();
+
+                // 1. Убираем активный класс у всех кнопок
                 tabs.forEach(t => t.classList.remove('active'));
+                // 2. Добавляем активный класс текущей кнопке
                 tab.classList.add('active');
                 
+                // 3. Прячем все секции и показываем нужную
                 sections.forEach(s => {
                     s.classList.remove('active');
-                    if (s.id === target) s.classList.add('active');
+                    s.style.display = 'none'; // Гарантированное скрытие
+                    
+                    // Сопоставляем data-tab="profile" с id="section-profile"
+                    if (s.id === `section-${tabId}` || s.id === tabId) {
+                        s.classList.add('active');
+                        s.style.display = 'block'; // Показываем
+                    }
                 });
             });
         });
     }
 };
 
-// --- Support Function (v2 for report.html) ---
 window.sendSupport = async function(title, desc, contact, type) {
     const user = JSON.parse(localStorage.getItem('funpay_user'));
     const message = `[${type.toUpperCase()}] ${title}\n\n${desc}\n\nКонтакт: ${contact || 'не указан'}`;
@@ -100,13 +110,17 @@ window.sendSupport = async function(title, desc, contact, type) {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                user_id: user ? user.user_id : 0,
+                user_id: String(user ? user.user_id : "0"),
                 username: user ? user.username : 'Anonymous',
                 message: message
             })
         });
+        const data = await res.json();
         return { success: res.ok };
-    } catch (e) { return { success: false }; }
+    } catch (e) { 
+        console.error("Support Send Error:", e);
+        return { success: false }; 
+    }
 };
 
 window.logout = function() {
@@ -114,7 +128,6 @@ window.logout = function() {
     window.location.href = 'index.html';
 };
 
-// --- Admin Stats ---
 async function loadAdminStats() {
     const user = JSON.parse(localStorage.getItem('funpay_user'));
     if (!user) return;

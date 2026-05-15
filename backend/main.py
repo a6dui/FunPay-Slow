@@ -146,6 +146,18 @@ def bot_confirm(code: str, user_id: str, first_name: str, username: str):
     conn.close()
     return {"status": "success"}
 
+class ReportData(BaseModel):
+    user_id: str
+    username: str
+    message: str
+
+@app.post("/api/report/send")
+def send_report(data: ReportData):
+    # Здесь логика отправки сообщения в Telegram Bot
+    # Для теста просто логируем и возвращаем успех
+    print(f"REPORT from {data.username} ({data.user_id}): {data.message}")
+    return {"status": "success", "detail": "Report received"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8080)

@@ -31,7 +31,6 @@ window.App = {
         const loginBtn = document.getElementById('login-trigger-btn');
         const profileNav = document.getElementById('user-profile-nav');
         const avatar = document.getElementById('user-avatar');
-        const adminLink = document.getElementById('admin-link');
         
         if (this.user) {
             if (loginBtn) loginBtn.style.display = 'none';
@@ -74,16 +73,21 @@ window.App = {
         const sections = document.querySelectorAll('.content-section');
         
         tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const target = tab.getAttribute('data-section');
-                if (!target) return;
+            tab.addEventListener('click', (e) => {
+                const tabId = tab.getAttribute('data-tab');
+                if (!tabId) return;
                 
+                e.preventDefault();
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 
                 sections.forEach(s => {
                     s.classList.remove('active');
-                    if (s.id === target) s.classList.add('active');
+                    s.style.display = 'none';
+                    if (s.id === `section-${tabId}` || s.id === tabId) {
+                        s.classList.add('active');
+                        s.style.display = 'block';
+                    }
                 });
             });
         });
@@ -98,7 +102,7 @@ window.sendSupport = async function(title, desc, contact, type) {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                user_id: user ? user.user_id : 0,
+                user_id: String(user ? user.user_id : "0"),
                 username: user ? user.username : 'Anonymous',
                 message: message
             })
