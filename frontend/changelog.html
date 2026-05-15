@@ -3,23 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Обновления — FunPay Slow</title>
+    <title>История версий — FunPay Slow</title>
     <link rel="stylesheet" href="styles.css?v=2.4.1">
-    <link rel="icon" href="icon.png">
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" href="icon.png"><link rel="shortcut icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .changelog-container { max-width: 800px; margin: 60px auto; }
-        .version-block { border-left: 2px solid var(--accent); padding-left: 30px; position: relative; margin-bottom: 50px; }
-        .version-block::before { content: ''; position: absolute; left: -7px; top: 0; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent-glow); }
-        .version-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 15px; }
-        .version-tag { background: var(--accent); color: black; font-weight: 800; padding: 4px 12px; border-radius: 6px; font-size: 0.9rem; }
-        .version-date { color: var(--text-muted); font-size: 0.9rem; }
-        .changelog-list { list-style: none; padding: 0; }
-        .changelog-list li { margin-bottom: 10px; color: #ccc; display: flex; gap: 10px; }
-        .changelog-list li::before { content: '—'; color: var(--accent); }
+        .changelog-header { padding: 80px 0 40px; text-align: center; }
+        .version-table { width: 100%; border-collapse: separate; border-spacing: 0 15px; margin-bottom: 100px; }
+        .version-row { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); transition: 0.3s; }
+        .version-row:hover { background: rgba(255, 255, 255, 0.04); transform: scale(1.01); }
+        .version-cell { padding: 25px; vertical-align: middle; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .version-cell:first-child { border-left: 1px solid var(--border-color); border-top-left-radius: 20px; border-bottom-left-radius: 20px; width: 150px; }
+        .version-cell:last-child { border-right: 1px solid var(--border-color); border-top-right-radius: 20px; border-bottom-right-radius: 20px; width: 120px; text-align: center; }
+        
+        .v-tag { background: var(--accent); color: black; font-weight: 800; padding: 6px 15px; border-radius: 10px; font-size: 1rem; display: inline-block; }
+        .v-logs { color: #ccc; font-size: 0.95rem; line-height: 1.6; }
+        .v-logs ul { list-style: none; padding: 0; }
+        .v-logs li { margin-bottom: 8px; display: flex; gap: 10px; }
+        .v-logs li::before { content: '—'; color: var(--accent); }
+        
+        .beta-badge { background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+        .stable-badge { background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -43,11 +49,8 @@
             </ul>
             <div class="nav-actions">
                 <a href="https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow" target="_blank" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
-                <a href="#" class="btn-download-nav" id="login-trigger-btn">
-                    <i class="fas fa-sign-in-alt"></i> Войти
-                </a>
-                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
-                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
                     <div class="profile-dropdown" id="profile-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: #111; border: 1px solid #333; border-radius: 12px; flex-direction: column; padding: 10px; width: 180px; z-index: 100;">
                         <a href="profile.html" style="color: white; text-decoration: none; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-user"></i> Профиль</a>
                         <a href="admin.html" id="admin-link" style="color: white; text-decoration: none; padding: 10px; border-radius: 8px; display: none; align-items: center; gap: 10px;"><i class="fas fa-shield-alt"></i> Админка</a>
@@ -59,38 +62,112 @@
     </nav>
 
     <main class="container">
-        <div class="changelog-container">
-            <h1 style="font-size: 3rem; margin-bottom: 50px;">История <span class="gradient-text">версий</span></h1>
+        <div class="changelog-header">
+            <h1 style="font-size: 3.5rem; font-family: 'Outfit', sans-serif;">История <span class="gradient-text">версий</span></h1>
+            <p style="color: var(--text-muted); margin-top: 1rem;">Прозрачность разработки и список всех изменений в одном месте.</p>
+        </div>
 
-            <!-- v2.4.1 -->
-            <div class="version-block">
-                <div class="version-header">
-                    <span class="version-tag">v2.4.1</span>
-                    <span class="version-date">15 мая 2026</span>
+        <table class="version-table">
+            <thead>
+                <tr style="text-align: left; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">
+                    <th style="padding: 0 25px 15px;">Версия</th>
+                    <th style="padding: 0 25px 15px;">Записи (Logs)</th>
+                    <th style="padding: 0 25px 15px; text-align: center;">Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- v2.4.1 -->
+                <tr class="version-row">
+                    <td class="version-cell"><span class="v-tag">v2.4.1</span><br><small style="color: #555; display: block; margin-top: 5px;">15.05.2026</small></td>
+                    <td class="version-cell">
+                        <div class="v-logs">
+                            <ul>
+                                <li>Финальная стабилизация системы подписок FAST/SLOW.</li>
+                                <li>Полное удаление уведомлений об обновлении (hard-disable).</li>
+                                <li>Новая система «авто-входа» через Telegram Bot.</li>
+                                <li>Обновление реферальных ссылок на домен funpayslow.com.</li>
+                                <li>Исправлены иконки профиля и переключение вкладок.</li>
+                            </ul>
+                        </div>
+                    </td>
+                    <td class="version-cell"><span class="stable-badge">Stable</span></td>
+                </tr>
+
+                <!-- v2.3.0 (Beta) -->
+                <tr class="version-row">
+                    <td class="version-cell"><span class="v-tag" style="background: #3b82f6;">v2.3.0</span><br><small style="color: #555; display: block; margin-top: 5px;">12.05.2026</small></td>
+                    <td class="version-cell">
+                        <div class="v-logs">
+                            <ul>
+                                <li>Тестирование новой архитектуры реферальной системы.</li>
+                                <li>Предварительная поддержка SDK для сторонних плагинов.</li>
+                            </ul>
+                        </div>
+                    </td>
+                    <td class="version-cell"><span class="beta-badge">Beta</span></td>
+                </tr>
+
+                <!-- v2.2.2 -->
+                <tr class="version-row">
+                    <td class="version-cell"><span class="v-tag" style="background: #555;">v2.2.2</span><br><small style="color: #555; display: block; margin-top: 5px;">10.05.2026</small></td>
+                    <td class="version-cell">
+                        <div class="v-logs">
+                            <ul>
+                                <li>Первый публичный релиз FunPay Slow.</li>
+                                <li>Базовая автоматизация ответов и заказов.</li>
+                            </ul>
+                        </div>
+                    </td>
+                    <td class="version-cell"><span class="stable-badge">Stable</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <footer class="main-footer" style="padding: 100px 0 60px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 100px;">
+        <div class="landing-container">
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 4rem; text-align: left;">
+                <div>
+                    <div class="logo-container" style="justify-content: flex-start; margin-bottom: 1.5rem; border: none; background: none; padding: 0;">
+                        <span class="snail-logo">🐌</span>
+                        <div class="logo-text">FunPay <span>Slow</span></div>
+                    </div>
+                    <p style="color: #555; font-size: 0.9rem; line-height: 1.6;">Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                    <a href="https://t.me/FunpaySlow" target="_blank" style="color: #888; text-decoration: none; display: flex; align-items: center; gap: 10px; margin-top: 1.5rem;"><i class="fab fa-telegram"></i> Telegram Channel</a>
                 </div>
-                <ul class="changelog-list">
-                    <li>Финальная стабилизация системы подписок FAST/SLOW.</li>
-                    <li>Полное удаление уведомлений об обновлении.</li>
-                    <li>Новая система «авто-входа» через Telegram Bot.</li>
-                    <li>Обновление реферальных ссылок на домен funpayslow.com.</li>
-                    <li>Исправлены иконки профиля во всех разделах.</li>
-                </ul>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Продукт</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="index.html" style="color: #555; text-decoration: none;">Главная</a></li>
+                        <li><a href="plugins.html" style="color: #555; text-decoration: none;">Плагины</a></li>
+                        <li><a href="sdk.html" style="color: #555; text-decoration: none;">Разработчикам</a></li>
+                        <li><a href="changelog.html" style="color: #555; text-decoration: none;">Обновления</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Поддержка</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="docs.html" style="color: #555; text-decoration: none;">Документация</a></li>
+                        <li><a href="media-partnership.html" style="color: #555; text-decoration: none;">Медиапартнерство</a></li>
+                        <li><a href="report.html" style="color: #555; text-decoration: none;">Обратная связь</a></li>
+                        <li><a href="https://t.me/FunpaySlov_Bot" target="_blank" style="color: #555; text-decoration: none;">Telegram Bot</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Юридическое</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="terms.html" style="color: #555; text-decoration: none;">Условия использования</a></li>
+                        <li><a href="privacy.html" style="color: #555; text-decoration: none;">Политика конфиденциальности</a></li>
+                        <li><a href="payment.html" style="color: #555; text-decoration: none;">Соглашение для оплаты</a></li>
+                    </ul>
+                </div>
             </div>
-
-            <!-- v2.2.2 -->
-            <div class="version-block">
-                <div class="version-header">
-                    <span class="version-tag">v2.2.2</span>
-                    <span class="version-date">10 мая 2026</span>
-                </div>
-                <ul class="changelog-list">
-                    <li>Первый релиз FunPay Slow.</li>
-                    <li>Базовая автоматизация ответов.</li>
-                    <li>Поддержка мульти-аккаунтов.</li>
-                </ul>
+            <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4rem; padding-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <p style="color: #333; font-size: 0.85rem;">© 2026 FunPay Slow. Все права защищены.</p>
+                <p style="color: #222; font-size: 0.8rem;">Не является официальным приложением FunPay.com</p>
             </div>
         </div>
-    </main>
+    </footer>
 
     <script src="script.js"></script>
 </body>

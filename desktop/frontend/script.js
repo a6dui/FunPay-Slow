@@ -9,6 +9,7 @@ window.App = {
         if (this.user) {
             this.syncUser();
         }
+        this.initTabs();
     },
     
     async syncUser() {
@@ -18,14 +19,12 @@ window.App = {
             if (res.ok) {
                 const sub = await res.json();
                 this.user.subscription = sub;
-                this.user.plan = sub.plan; // fast, slow, none
+                this.user.plan = sub.plan; 
                 localStorage.setItem('funpay_user', JSON.stringify(this.user));
                 this.updateUI();
                 this.updateProfilePage(sub);
             }
-        } catch (e) {
-            console.error("Sync Error:", e);
-        }
+        } catch (e) { console.error("Sync Error:", e); }
     },
 
     updateUI() {
@@ -41,22 +40,21 @@ window.App = {
                 if (avatar) avatar.textContent = (this.user.first_name || 'U').charAt(0).toUpperCase();
             }
 
-            // --- Admin Visibility ---
             const admins = ["6360699049", "5304677735", "755843448"];
             if (admins.includes(String(this.user.user_id))) {
-                if (adminLink) {
-                    adminLink.style.display = 'flex';
-                    const adminDrop = document.querySelectorAll('#admin-link');
-                    adminDrop.forEach(el => el.style.display = 'flex');
-                }
+                const adminLinks = document.querySelectorAll('#admin-link');
+                adminLinks.forEach(el => el.style.display = 'flex');
             }
 
-            const profileName = document.getElementById('profile-name');
-            const profileID = document.getElementById('profile-tg-id');
-            const heroAvatar = document.getElementById('hero-avatar-letter');
-            if (profileName) profileName.textContent = this.user.first_name || "Пользователь";
-            if (profileID) profileID.textContent = "@id" + this.user.user_id;
-            if (heroAvatar) heroAvatar.textContent = (this.user.first_name || 'U').charAt(0).toUpperCase();
+            const pName = document.getElementById('profile-name');
+            const pID = document.getElementById('profile-tg-id');
+            const hAvatar = document.getElementById('hero-avatar-letter');
+            if (pName) pName.textContent = this.user.first_name || "Пользователь";
+            if (pID) pID.textContent = "@id" + this.user.user_id;
+            if (hAvatar) hAvatar.textContent = (this.user.first_name || 'U').charAt(0).toUpperCase();
+            
+            const refInput = document.getElementById('ref-link-input');
+            if (refInput) refInput.value = `https://funpayslow.com/?ref=${this.user.user_id}`;
         }
     },
 
@@ -66,13 +64,47 @@ window.App = {
         if (planVal) planVal.textContent = (sub.plan || 'none').toUpperCase();
         if (expiresVal) {
             if (sub.expires && sub.expires > 0) {
-                const date = new Date(sub.expires * 1000);
-                expiresVal.textContent = date.toLocaleDateString();
-            } else {
-                expiresVal.textContent = "Нет активной подписки";
-            }
+                expiresVal.textContent = new Date(sub.expires * 1000).toLocaleDateString();
+            } else { expiresVal.textContent = "Нет активной подписки"; }
         }
+    },
+
+    initTabs() {
+        const tabs = document.querySelectorAll('.sidebar-nav-item');
+        const sections = document.querySelectorAll('.content-section');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-section');
+                if (!target) return;
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                sections.forEach(s => {
+                    s.classList.remove('active');
+                    if (s.id === target) s.classList.add('active');
+                });
+            });
+        });
     }
+};
+
+window.sendSupport = async function(title, desc, contact, type) {
+    const user = JSON.parse(localStorage.getItem('funpay_user'));
+    const message = `[${type.toUpperCase()}] ${title}\n\n${desc}\n\nКонтакт: ${contact || 'не указан'}`;
+    try {
+        const res = await fetch(`${API_BASE}/api/report/send`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                user_id: user ? user.user_id : 0,
+                username: user ? user.username : 'Anonymous',
+                message: message
+            })
+        });
+        return { success: res.ok };
+    } catch (e) { return { success: false }; }
 };
 
 window.logout = function() {
