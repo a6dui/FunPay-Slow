@@ -1158,21 +1158,21 @@
                     <div class="info-icon"><i class="fas fa-credit-card"></i></div>
                     <div class="info-text">
                         <span class="label">Подписка</span>
-                        <span class="value">Текущий план</span>
+                        <span class="value" id="profile-plan-name">Загрузка...</span>
                     </div>
                     <div style="margin-left: auto;">
-                        <span class="status-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); font-weight: 600;">Бесплатно</span>
+                        <span class="status-badge" id="profile-status-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); font-weight: 600;">Бесплатно</span>
                     </div>
                 </div>
 
                 <div class="info-card">
                     <div class="info-icon"><i class="fas fa-calendar"></i></div>
                     <div class="info-text">
-                        <span class="label">Аккаунт</span>
-                        <span class="value">Дата регистрации</span>
+                        <span class="label">Истекает</span>
+                        <span class="value" id="profile-expire-date">Нет активной подписки</span>
                     </div>
-                    <div style="margin-left: auto; color: var(--text-muted); font-weight: 600;">
-                        6 мая 2026 г.
+                    <div style="margin-left: auto; color: var(--text-muted); font-weight: 600;" id="profile-expire-days">
+                        --
                     </div>
                 </div>
 

@@ -55,6 +55,54 @@ window.App = {
                 }
                 if (adminLink) adminLink.style.display = 'flex';
             }
+
+            // --- Update Profile Fields ---
+            const planName = document.getElementById('profile-plan-name');
+            const statusBadge = document.getElementById('profile-status-badge');
+            const expireDate = document.getElementById('profile-expire-date');
+            const expireDays = document.getElementById('profile-expire-days');
+            const sidebarStatus = document.getElementById('sidebar-user-status');
+            const sidebarAvatar = document.getElementById('sidebar-avatar-char');
+            const sidebarName = document.getElementById('sidebar-user-name');
+            const heroName = document.getElementById('hero-user-name');
+            const heroAvatar = document.getElementById('hero-avatar-char');
+
+            if (sidebarAvatar) sidebarAvatar.textContent = userAvatar.textContent;
+            if (heroAvatar) heroAvatar.textContent = userAvatar.textContent;
+            if (sidebarName) sidebarName.textContent = this.user.name || "Пользователь";
+            if (heroName) heroName.textContent = this.user.name || "Пользователь";
+
+            if (this.user.subscription && this.user.subscription.status === 'active') {
+                const sub = this.user.subscription;
+                if (planName) planName.textContent = sub.plan || "Fast";
+                if (statusBadge) {
+                    statusBadge.textContent = "Активна";
+                    statusBadge.style.color = "#10b981";
+                    statusBadge.style.background = "rgba(16, 185, 129, 0.1)";
+                }
+                if (expireDate) expireDate.textContent = sub.expires_at || "Не указано";
+                if (sidebarStatus) {
+                    sidebarStatus.textContent = sub.plan || "Fast";
+                    sidebarStatus.style.color = "#fbbf24";
+                }
+                
+                // Calculate days left
+                if (expireDays && sub.expires_at) {
+                    const now = new Date();
+                    const exp = new Date(sub.expires_at.replace(' ', 'T'));
+                    const diff = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+                    expireDays.textContent = diff > 0 ? `${diff} дн.` : "Истекла";
+                }
+            } else {
+                if (planName) planName.textContent = "Бесплатно";
+                if (statusBadge) {
+                    statusBadge.textContent = "Не активна";
+                    statusBadge.style.color = "var(--text-muted)";
+                }
+                if (expireDate) expireDate.textContent = "Нет активной подписки";
+                if (sidebarStatus) sidebarStatus.textContent = "Бесплатно";
+            }
+
         } else {
             if (authBtn) authBtn.style.display = 'flex';
             if (profileNav) profileNav.style.display = 'none';
