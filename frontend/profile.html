@@ -1375,6 +1375,57 @@
                     </div>
                 </div>
 
+                <div class="list-card highlight" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <div>
+                            <h3 class="card-title" style="margin: 0;"><i class="fas fa-users"></i> Менеджер аккаунтов FunPay</h3>
+                            <p class="card-subtitle">Добавьте один или несколько аккаунтов для автоматизации.</p>
+                        </div>
+                        <button class="btn-primary blue" onclick="showAddAccountModal()">
+                            <i class="fas fa-plus"></i> Добавить аккаунт
+                        </button>
+                    </div>
+
+                    <div class="accounts-table-wrapper" style="overflow-x: auto;">
+                        <table class="accounts-table" style="width: 100%; border-collapse: collapse; color: white;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 12px; color: var(--text-muted); font-size: 0.8rem;">АККАУНТ</th>
+                                    <th style="padding: 12px; color: var(--text-muted); font-size: 0.8rem;">PROXY</th>
+                                    <th style="padding: 12px; color: var(--text-muted); font-size: 0.8rem;">СТАТУС</th>
+                                    <th style="padding: 12px; color: var(--text-muted); font-size: 0.8rem; text-align: right;">ДЕЙСТВИЯ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accounts-list-body">
+                                <!-- Accounts will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Add Account Modal (hidden by default) -->
+                    <div id="add-account-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+                        <div class="modal-content" style="background: var(--bg-dark); border: 1px solid var(--border-color); padding: 2rem; border-radius: 24px; width: 100%; max-width: 500px;">
+                            <h2 style="margin-bottom: 1.5rem;">Добавить аккаунт</h2>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label>Название (для вас)</label>
+                                <input type="text" id="acc-name" class="dev-input" placeholder="Напр. Личный или Фарм 1">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label>FunPay Golden Key (Cookie)</label>
+                                <input type="password" id="acc-cookie" class="dev-input" placeholder="Введите куки">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label>Прокси (опционально, IP:PORT:USER:PASS)</label>
+                                <input type="text" id="acc-proxy" class="dev-input" placeholder="1.1.1.1:8000:user:pass">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-primary blue" style="flex: 1;" onclick="addNewAccount()">Сохранить</button>
+                                <button class="btn-outline" style="flex: 1;" onclick="document.getElementById('add-account-modal').style.display='none'">Отмена</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <button class="btn-logout" onclick="window.logout()">
                     <i class="fas fa-sign-out-alt"></i> Выйти из аккаунта
                 </button>
@@ -1411,11 +1462,11 @@
                     </div>
                 </div>
 
-                <div class="trial-card">
+                <div class="trial-card" id="trial-activation-banner" style="display: none;">
                     <div class="trial-text">
                         <div class="badge-trial"><i class="fas fa-bolt"></i> Пробный период</div>
                         <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Запустить пробный Fast период на 4 дня</h3>
-                        <p style="color: var(--text-muted); font-size: 0.95rem;">Активирует полную подписку <b>Fast</b> на 4 дня. Можно использовать один раз для проверки всех возможностей.</p>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">Активирует полную подписку <b>Fast</b> на 4 дня. Можно использовать один раз.</p>
                     </div>
                     <button class="btn-primary" id="btn-activate-trial" onclick="activateTrial()" style="background: #f59e0b; color: #000; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-rocket"></i> Активировать trial
@@ -1532,7 +1583,7 @@
                         <p class="section-subtitle">Купленные marketplace-плагины FunPay Slow, установка на VPS и настройки.</p>
                     </div>
                     <div class="header-actions">
-                        <a href="index.html#marketplace" class="btn-marketplace">
+                        <a href="plugins.html" class="btn-marketplace">
                             <i class="fas fa-shopping-bag"></i> Открыть маркетплейс
                         </a>
                     </div>
@@ -1571,32 +1622,109 @@
                     </div>
                 </div>
 
+                <div class="list-card highlight" style="grid-column: 1 / -1; margin-bottom: 1.5rem; background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, rgba(20, 20, 20, 0.4) 100%);">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 class="card-title"><i class="fas fa-robot"></i> Статус автоматизации</h3>
+                            <p class="card-subtitle">Движок работает в фоновом режиме пока открыта вкладка.</p>
+                        </div>
+                        <div id="worker-status-badge" class="status-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">АКТИВЕН</div>
+                    </div>
+                    <div id="worker-status-log" style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-top: 10px;">
+                        Ожидание настроек...
+                    </div>
+                </div>
+
                 <div class="plugins-layout">
                     <!-- Left Column: Lists -->
                     <div class="plugins-lists">
                         <div class="list-card">
                             <div class="card-header">
-                                <h3 class="card-title">Доступные плагины</h3>
-                                <p class="card-subtitle">Плагины, доступные для установки на ваши устройства.</p>
+                                <h3 class="card-title">Авто-поднятие</h3>
+                                <p class="card-subtitle">Автоматическое поднятие лотов на FunPay.</p>
                             </div>
-                            <div class="card-content empty-state" style="padding: 3rem 1rem; background: none; border: none;">
-                                <div class="empty-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">
-                                    <i class="fas fa-box-open"></i>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Включить авто-поднятие</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="plugin-bump-enabled">
+                                        <span class="slider"></span>
+                                    </div>
                                 </div>
-                                <p style="font-size: 0.9rem;">У вас пока нет доступных плагинов.</p>
+                                <div class="form-group">
+                                    <label>Интервал (минуты)</label>
+                                    <input type="number" id="plugin-bump-interval" class="dev-input" value="120" min="5">
+                                </div>
+                                <button class="btn-primary blue" style="width: 100%; margin-top: 1rem;" onclick="savePluginConfig('bump')">
+                                    <i class="fas fa-save"></i> Сохранить настройки
+                                </button>
                             </div>
                         </div>
 
                         <div class="list-card">
                             <div class="card-header">
-                                <h3 class="card-title">Установки</h3>
-                                <p class="card-subtitle">Активные сессии плагинов на внешних серверах.</p>
+                                <h3 class="card-title">Авто-выдача</h3>
+                                <p class="card-subtitle">Моментальная доставка товара после оплаты.</p>
                             </div>
-                            <div class="card-content empty-state" style="padding: 3rem 1rem; background: none; border: none;">
-                                <div class="empty-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin-bottom: 1rem;">
-                                    <i class="fas fa-server"></i>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Включить авто-выдачу</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="plugin-delivery-enabled">
+                                        <span class="slider"></span>
+                                    </div>
                                 </div>
-                                <p style="font-size: 0.9rem;">Активных установок не найдено.</p>
+                                <div id="delivery-mapping-container">
+                                    <!-- Mapping items will be added here -->
+                                </div>
+                                <button class="btn-outline" style="width: 100%; margin-top: 1rem;" onclick="addDeliveryMapping()">
+                                    <i class="fas fa-plus"></i> Добавить лот
+                                </button>
+                                <button class="btn-primary green" style="width: 100%; margin-top: 1rem;" onclick="savePluginConfig('delivery')">
+                                    <i class="fas fa-save"></i> Сохранить настройки
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="list-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Авто-ответчик</h3>
+                                <p class="card-subtitle">Умные ответы на сообщения покупателей.</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Включить авто-ответчик</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="plugin-responder-enabled">
+                                        <span class="slider"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Шаблон ответа</label>
+                                    <textarea id="plugin-responder-template" class="dev-input" style="height: 100px;" placeholder="Здравствуйте! Ваш товар выдан. Спасибо за покупку!"></textarea>
+                                </div>
+                                <button class="btn-primary purple" style="width: 100%; margin-top: 1rem;" onclick="savePluginConfig('responder')">
+                                    <i class="fas fa-save"></i> Сохранить настройки
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="list-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Telegram Уведомления</h3>
+                                <p class="card-subtitle">Логи воркера прямо в ваш Telegram.</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Telegram Chat ID</label>
+                                    <input type="text" id="tg-chat-id" class="dev-input" placeholder="Введите ваш ID">
+                                </div>
+                                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 10px;">
+                                    Узнать свой ID можно у бота <a href="https://t.me/userinfobot" target="_blank" style="color: var(--accent);">@userinfobot</a>.
+                                </p>
+                                <button class="btn-primary blue" style="width: 100%; margin-top: 1rem;" onclick="saveTgSettings()">
+                                    <i class="fas fa-paper-plane"></i> Привязать Telegram
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -2017,8 +2145,8 @@
 
             <div id="section-referral" class="content-section">
                 <div style="margin-bottom: 2rem;">
-                    <h2 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1px;">Реферальная программа</h2>
-                    <p style="color: var(--text-muted); font-size: 1rem;">Приглашайте друзей и получайте 5% с каждой их оплаты</p>
+                    <h2 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1px;">Партнерская программа FunPay Slow</h2>
+                    <p style="color: var(--text-muted); font-size: 1rem;">Приглашайте друзей в FunPay Slow и получайте 5% с каждой их оплаты</p>
                 </div>
 
                 <!-- Step 1: Apply Code (if not applied) -->
@@ -2141,7 +2269,7 @@
                         <li><a href="docs.html" style="color: #555; text-decoration: none;">Документация</a></li>
                         <li><a href="media-partnership.html" style="color: #555; text-decoration: none;">Медиапартнерство</a></li>
                         <li><a href="report.html" style="color: #555; text-decoration: none;">Обратная связь</a></li>
-                        <li><a href="https://t.me/FunpaySlov_Bot" target="_blank" style="color: #555; text-decoration: none;">Telegram Bot</a></li>
+                        <li><a href="https://t.me/FunpaySlowBot" target="_blank" style="color: #555; text-decoration: none;">Telegram Bot</a></li>
                     </ul>
                 </div>
                 <div>
@@ -2161,7 +2289,7 @@
     </footer>
 
 
-    <script src="script.js?v=2.2.2"></script>
+    <script src="script.js?v=2.4.1"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const user = window.App.user;

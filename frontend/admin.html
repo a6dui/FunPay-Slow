@@ -6,55 +6,26 @@
     <title>Админ-панель — FunPay Slow</title>
     <link rel="stylesheet" href="styles.css?v=2.2">
     <link rel="icon" href="icon.png"><link rel="shortcut icon" href="favicon.ico">
-    <link rel="apple-touch-icon" href="icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .admin-container {
-            max-width: 1200px;
-            margin: 80px auto;
-            padding: 0 2rem;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        .stat-card {
-            background: rgba(20, 20, 20, 0.4);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-        }
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: white;
-        }
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-        }
-        .badge-admin {
-            background: rgba(244, 63, 94, 0.1);
-            color: #f43f5e;
-            padding: 6px 12px;
-            border-radius: 100px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
+        .admin-container { max-width: 1200px; margin: 80px auto; padding: 0 2rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .stat-card { background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; backdrop-filter: blur(10px); }
+        .stat-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: white; }
+        .admin-section { margin-top: 4rem; background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); border-radius: 24px; padding: 2.5rem; }
+        .admin-section h2 { margin-bottom: 2rem; font-size: 1.5rem; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .data-table th { text-align: left; padding: 1rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        .data-table td { padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .status-pill { padding: 4px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }
+        .status-completed { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .status-pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+        .balance-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; margin-top: 1rem; }
+        .admin-input { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; color: white; outline: none; }
+        .admin-input:focus { border-color: var(--accent); }
     </style>
 </head>
 <body>
@@ -69,138 +40,126 @@
                 <span class="snail-logo">🐌</span>
                 <div class="logo-text">FunPay <span>Slow</span></div>
             </div>
-            
             <ul class="nav-links">
                 <li><a href="index.html">Главная</a></li>
                 <li><a href="plugins.html">Плагины</a></li>
-                <li><a href="sdk.html">SDK</a></li>
-                <li><a href="changelog.html">Обновления</a></li>
-                <li><a href="report.html">Поддержка</a></li>
-                <li><a href="media-partnership.html">Медиа</a></li>
+                <li><a href="profile.html">Профиль</a></li>
             </ul>
-
-            <div class="nav-actions">
-                <a href="https://github.com/a6dui/FunPay-Slow/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
-                <a href="#" class="btn-download-nav" id="login-trigger-btn">
-                    <i class="fas fa-sign-in-alt"></i> Войти
-                </a>
-                
-                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
-                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
-                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
-                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
-                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
-                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
-                    </div>
-                </div>
-            </div>
         </div>
     </nav>
 
     <main class="admin-container">
-        <div class="admin-header">
+        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
             <div>
-                <div class="badge-admin"><i class="fas fa-shield-alt"></i> ПАНЕЛЬ УПРАВЛЕНИЯ</div>
-                <h1 style="font-size: 3rem; margin-top: 1rem;">Статистика системы</h1>
+                <h1 style="font-size: 2.5rem;">Админ-панель</h1>
+                <p style="color: var(--text-muted);">Управление пользователями и платежами</p>
             </div>
-            <button class="btn-download-nav" onclick="location.reload()"><i class="fas fa-sync"></i> Обновить</button>
+            <button class="btn-primary" onclick="location.reload()"><i class="fas fa-sync"></i> Обновить данные</button>
         </div>
 
         <div class="stats-grid" id="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Пользователей</div>
+                <div class="stat-label">Всего юзеров</div>
                 <div class="stat-value" id="stat-users">...</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Онлайн</div>
-                <div class="stat-value" id="stat-online" style="color: #10b981;">...</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Продаж всего</div>
-                <div class="stat-value" id="stat-sales">...</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Активных подписок</div>
+                <div class="stat-label">Активные подписки</div>
                 <div class="stat-value" id="stat-subs">...</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Плагинов</div>
-                <div class="stat-value" id="stat-plugins">...</div>
+                <div class="stat-label">Доход</div>
+                <div class="stat-value" id="stat-sales" style="color: #10b981;">...</div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2>Управление балансом</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Введите Telegram ID пользователя и сумму (положительную для выдачи, отрицательную для забора).</p>
+            <div class="balance-form">
+                <input type="text" id="target-user-id" class="admin-input" placeholder="User ID (например: 755843448)">
+                <input type="number" id="balance-amount" class="admin-input" placeholder="Сумма (например: 500)">
+                <button class="btn-primary" onclick="handleBalanceUpdate()">Применить</button>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2>Последние платежи</h2>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID Платежа</th>
+                            <th>Пользователь</th>
+                            <th>Сумма</th>
+                            <th>План</th>
+                            <th>Статус</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payments-table-body">
+                        <tr><td colspan="6" style="text-align: center; padding: 2rem;">Загрузка данных...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
-    
-    <footer class="main-footer" style="padding: 100px 0 60px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 100px;">
-        <div class="landing-container">
-            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 4rem; text-align: left;">
-                <div>
-                    <div class="logo-container" style="justify-content: flex-start; margin-bottom: 1.5rem; border: none; background: none; padding: 0;">
-                        <span class="snail-logo">🐌</span>
-                        <div class="logo-text">FunPay <span>Slow</span></div>
-                    </div>
-                    <p style="color: #555; font-size: 0.9rem; line-height: 1.6;">Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
-                    <a href="https://t.me/FunpaySlow" target="_blank" style="color: #888; text-decoration: none; display: flex; align-items: center; gap: 10px; margin-top: 1.5rem;"><i class="fab fa-telegram"></i> Telegram Channel</a>
-                </div>
-                <div>
-                    <h4 style="color: white; margin-bottom: 1.5rem;">Продукт</h4>
-                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
-                        <li><a href="index.html" style="color: #555; text-decoration: none;">Главная</a></li>
-                        <li><a href="plugins.html" style="color: #555; text-decoration: none;">Плагины</a></li>
-                        <li><a href="sdk.html" style="color: #555; text-decoration: none;">Разработчикам</a></li>
-                        <li><a href="changelog.html" style="color: #555; text-decoration: none;">Обновления</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="color: white; margin-bottom: 1.5rem;">Поддержка</h4>
-                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
-                        <li><a href="docs.html" style="color: #555; text-decoration: none;">Документация</a></li>
-                        <li><a href="media-partnership.html" style="color: #555; text-decoration: none;">Медиапартнерство</a></li>
-                        <li><a href="report.html" style="color: #555; text-decoration: none;">Обратная связь</a></li>
-                        <li><a href="https://t.me/FunpaySlov_Bot" target="_blank" style="color: #555; text-decoration: none;">Telegram Bot</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="color: white; margin-bottom: 1.5rem;">Юридическое</h4>
-                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
-                        <li><a href="terms.html" style="color: #555; text-decoration: none;">Условия использования</a></li>
-                        <li><a href="privacy.html" style="color: #555; text-decoration: none;">Политика конфиденциальности</a></li>
-                        <li><a href="payment.html" style="color: #555; text-decoration: none;">Соглашение для оплаты</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4rem; padding-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
-                <p style="color: #333; font-size: 0.85rem;">© 2026 FunPay Slow. Все права защищены.</p>
-                <p style="color: #222; font-size: 0.8rem;">Не является официальным приложением FunPay.com</p>
-            </div>
-        </div>
-    </footer>
 
-
-    <script src="script.js"></script>
+    <script src="script.js?v=2.4.1"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // Security check
             const user = window.App.user;
             const adminIds = ["6360699049", "5304677735", "755843448"];
-            const isAdmin = user && (user.is_admin || adminIds.includes(String(user.user_id)));
-            
-            if (!isAdmin) {
-                console.log("Admin check failed for:", user ? user.user_id : "null");
+            if (!user || !adminIds.includes(String(user.user_id))) {
                 window.location.href = 'index.html';
                 return;
             }
 
-            const stats = await window.loadAdminStats();
-            if (stats.error) {
-                alert('Ошибка доступа к админ-панели');
+            // Load Stats
+            const stats = await window.App.fetchAdminStats();
+            if (stats) {
+                document.getElementById('stat-users').textContent = stats.total_users;
+                document.getElementById('stat-subs').textContent = stats.active_subs;
+                document.getElementById('stat-sales').textContent = stats.total_sales;
+            }
+
+            // Load Payments
+            const payments = await window.App.fetchAdminPayments();
+            const tbody = document.getElementById('payments-table-body');
+            if (payments && payments.length > 0) {
+                tbody.innerHTML = payments.map(p => `
+                    <tr>
+                        <td style="font-family: monospace; color: var(--text-muted); font-size: 0.8rem;">${p.id}</td>
+                        <td>${p.user_id}</td>
+                        <td style="font-weight: 700;">${p.amount} руб.</td>
+                        <td>${p.plan}</td>
+                        <td><span class="status-pill status-${p.status}">${p.status === 'completed' ? 'Успешно' : 'В процессе'}</span></td>
+                        <td style="color: var(--text-muted); font-size: 0.8rem;">${p.date}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Платежей пока нет</td></tr>';
+            }
+        });
+
+        async function handleBalanceUpdate() {
+            const userId = document.getElementById('target-user-id').value;
+            const amount = parseFloat(document.getElementById('balance-amount').value);
+            
+            if (!userId || isNaN(amount)) {
+                alert('Заполните все поля корректно');
                 return;
             }
-            document.getElementById('stat-users').textContent = stats.total_users;
-            document.getElementById('stat-online').textContent = stats.online_users;
-            document.getElementById('stat-sales').textContent = stats.total_sales;
-            document.getElementById('stat-subs').textContent = stats.active_subs;
-            document.getElementById('stat-plugins').textContent = stats.total_plugins;
-        });
+
+            if (!confirm(`Вы действительно хотите изменить баланс пользователя ${userId} на ${amount} руб.?`)) return;
+
+            const res = await window.App.updateUserBalance(userId, amount);
+            if (res.success) {
+                alert(`Успешно! Новый баланс: ${res.new_balance}`);
+                location.reload();
+            } else {
+                alert('Ошибка: ' + (res.message || 'неизвестная ошибка'));
+            }
+        }
     </script>
 </body>
 </html>

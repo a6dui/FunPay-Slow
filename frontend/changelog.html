@@ -17,13 +17,11 @@
         .version-cell { padding: 25px; vertical-align: middle; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
         .version-cell:first-child { border-left: 1px solid var(--border-color); border-top-left-radius: 20px; border-bottom-left-radius: 20px; width: 150px; }
         .version-cell:last-child { border-right: 1px solid var(--border-color); border-top-right-radius: 20px; border-bottom-right-radius: 20px; width: 120px; text-align: center; }
-        
         .v-tag { background: var(--accent); color: black; font-weight: 800; padding: 6px 15px; border-radius: 10px; font-size: 1rem; display: inline-block; }
         .v-logs { color: #ccc; font-size: 0.95rem; line-height: 1.6; }
         .v-logs ul { list-style: none; padding: 0; }
         .v-logs li { margin-bottom: 8px; display: flex; gap: 10px; }
         .v-logs li::before { content: '—'; color: var(--accent); }
-        
         .beta-badge { background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
         .stable-badge { background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
     </style>
@@ -76,49 +74,31 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- v2.4.1 -->
                 <tr class="version-row">
                     <td class="version-cell"><span class="v-tag">v2.4.1</span><br><small style="color: #555; display: block; margin-top: 5px;">15.05.2026</small></td>
                     <td class="version-cell">
                         <div class="v-logs">
                             <ul>
                                 <li>Финальная стабилизация системы подписок FAST/SLOW.</li>
-                                <li>Полное удаление уведомлений об обновлении (hard-disable).</li>
+                                <li>Полное удаление уведомлений об обновлении.</li>
                                 <li>Новая система «авто-входа» через Telegram Bot.</li>
-                                <li>Обновление реферальных ссылок на домен funpayslow.com.</li>
                                 <li>Исправлены иконки профиля и переключение вкладок.</li>
                             </ul>
                         </div>
                     </td>
                     <td class="version-cell"><span class="stable-badge">Stable</span></td>
                 </tr>
-
-                <!-- v2.3.0 (Beta) -->
                 <tr class="version-row">
                     <td class="version-cell"><span class="v-tag" style="background: #3b82f6;">v2.3.0</span><br><small style="color: #555; display: block; margin-top: 5px;">12.05.2026</small></td>
                     <td class="version-cell">
                         <div class="v-logs">
                             <ul>
                                 <li>Тестирование новой архитектуры реферальной системы.</li>
-                                <li>Предварительная поддержка SDK для сторонних плагинов.</li>
+                                <li>Предварительная поддержка SDK.</li>
                             </ul>
                         </div>
                     </td>
                     <td class="version-cell"><span class="beta-badge">Beta</span></td>
-                </tr>
-
-                <!-- v2.2.2 -->
-                <tr class="version-row">
-                    <td class="version-cell"><span class="v-tag" style="background: #555;">v2.2.2</span><br><small style="color: #555; display: block; margin-top: 5px;">10.05.2026</small></td>
-                    <td class="version-cell">
-                        <div class="v-logs">
-                            <ul>
-                                <li>Первый публичный релиз FunPay Slow.</li>
-                                <li>Базовая автоматизация ответов и заказов.</li>
-                            </ul>
-                        </div>
-                    </td>
-                    <td class="version-cell"><span class="stable-badge">Stable</span></td>
                 </tr>
             </tbody>
         </table>
@@ -150,7 +130,7 @@
                         <li><a href="docs.html" style="color: #555; text-decoration: none;">Документация</a></li>
                         <li><a href="media-partnership.html" style="color: #555; text-decoration: none;">Медиапартнерство</a></li>
                         <li><a href="report.html" style="color: #555; text-decoration: none;">Обратная связь</a></li>
-                        <li><a href="https://t.me/FunpaySlov_Bot" target="_blank" style="color: #555; text-decoration: none;">Telegram Bot</a></li>
+                        <li><a href="https://t.me/FunpaySlowBot" target="_blank" style="color: #555; text-decoration: none;">Telegram Bot</a></li>
                     </ul>
                 </div>
                 <div>
@@ -169,6 +149,6 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=2.4.1"></script>
 </body>
 </html>

@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Плагины — FunPay Slow</title>
-    <link rel="stylesheet" href="styles.css?v=2.4.1">
+    <link rel="stylesheet" href="styles.css?v=2.2">
+    <link rel="icon" href="icon.png">
+    <link rel="icon" href="icon.png"><link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,27 +16,115 @@
         .marketplace-header { padding: 60px 0 40px 0; }
         .marketplace-title-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
         .marketplace-stats { display: flex; gap: 1.5rem; }
-        .stat-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 1.5rem 2rem; border-radius: 20px; min-width: 140px; }
+        .stat-box { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid var(--border-color); 
+            padding: 1.5rem 2rem; 
+            border-radius: 20px; 
+            min-width: 140px;
+        }
         .stat-num { font-size: 2.2rem; font-weight: 800; color: white; display: block; margin-bottom: 0.2rem; }
         .stat-label { color: var(--text-muted); font-size: 0.85rem; }
 
-        .filter-search-bar { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 20px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        .filter-search-bar {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
         .filter-tabs { display: flex; gap: 0.8rem; }
-        .filter-tab { padding: 0.8rem 1.5rem; border-radius: 12px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.8rem; transition: 0.3s; }
-        .filter-tab.active { background: rgba(16, 185, 129, 0.1); color: var(--accent); }
-        
-        .plugin-grid-market { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 6rem; }
-        .market-card { background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); border-radius: 30px; padding: 2rem; transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1); display: flex; flex-direction: column; }
-        .market-card:hover { transform: translateY(-8px); border-color: rgba(124, 58, 237, 0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .filter-tab {
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: 0.3s;
+        }
+        .filter-tab.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-color);
+        }
+        .search-input-wrapper { position: relative; width: 350px; }
+        .search-input-wrapper i { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            color: white;
+            font-family: inherit;
+        }
+
+        .plugin-grid-market {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 6rem;
+        }
+        .market-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .market-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.02);
+        }
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
-        .premium-icon-box { width: 60px; height: 60px; background: rgba(255,255,255,0.03); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
-        .badge-official { font-size: 0.7rem; font-weight: 800; background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 5px 12px; border-radius: 100px; text-transform: uppercase; }
-        .badge-fast-only { font-size: 0.7rem; font-weight: 800; background: rgba(251, 191, 36, 0.1); color: #fbbf24; padding: 5px 12px; border-radius: 100px; text-transform: uppercase; }
+        .card-icon-box {
+            width: 56px;
+            height: 56px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-stable { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .status-new { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+
+        .card-title { font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 0.5rem; }
+        .card-category { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.2rem; }
+        .card-description { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem; }
         
-        .btn-install { width: 100%; padding: 1rem; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; margin-top: auto; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.95rem; }
-        .btn-install.locked { background: rgba(255,255,255,0.05); color: #555; cursor: not-allowed; }
-        .btn-install.active { background: var(--accent); color: #000; }
-        .btn-install.active:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 5px 15px var(--accent-glow); }
+        .card-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        .card-tag {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-tag i { font-size: 0.7rem; color: var(--accent-color); opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -42,17 +134,29 @@
                 <span class="snail-logo">🐌</span>
                 <div class="logo-text">FunPay <span>Slow</span></div>
             </div>
+            
             <ul class="nav-links">
                 <li><a href="index.html">Главная</a></li>
                 <li><a href="plugins.html" class="active">Плагины</a></li>
                 <li><a href="sdk.html">SDK</a></li>
                 <li><a href="changelog.html">Обновления</a></li>
                 <li><a href="report.html">Поддержка</a></li>
+                <li><a href="media-partnership.html">Медиа</a></li>
             </ul>
+
             <div class="nav-actions">
-                <a href="https://github.com/a6dui/FunPay-Slow/releases/tag/Funpay-Slow" target="_blank" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
-                <div class="profile-nav-item" id="user-profile-nav" style="display: none;">
-                    <div class="user-avatar-btn" id="user-avatar" onclick="window.location.href='profile.html'">U</div>
+                <a href="https://github.com/a6dui/FunPay-Slow/releases/latest/download/FunPaySlow_Windows.exe" class="btn-download-nav"><i class="fas fa-download"></i> Скачать</a>
+                <a href="#" class="btn-download-nav" id="login-trigger-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+                
+                <div class="profile-nav-item" id="user-profile-nav" style="display: none; position: relative; align-items: center;">
+                    <div class="user-avatar-btn" id="user-avatar" onclick="event.stopPropagation(); var d=document.getElementById('profile-dropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'">U</div>
+                    <div class="profile-dropdown" id="profile-dropdown" onclick="event.stopPropagation()">
+                        <a href="profile.html" class="dropdown-item"><i class="fas fa-user"></i> Профиль</a>
+                        <a href="admin.html" class="dropdown-item" id="admin-link" style="display: none;"><i class="fas fa-shield-alt"></i> Админка</a>
+                        <a href="#" class="dropdown-item" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,136 +164,417 @@
 
     <main class="container">
         <div class="marketplace-header">
-            <div class="hero-badge"><i class="fas fa-store"></i> Маркетплейс плагинов</div>
+            <div class="hero-badge" style="margin-bottom: 1.5rem;"><i class="fas fa-store"></i> Маркетплейс плагинов</div>
             <div class="marketplace-title-section">
                 <div>
-                    <h1 style="font-size: 3.5rem; font-family: 'Outfit', sans-serif;">Плагины <span class="gradient-text">v2.4.1</span></h1>
-                    <p style="color: var(--text-muted); max-width: 600px; margin-top: 1.5rem;">Лучшие плагины для FAST-подписки и базовые для SLOW. Устанавливайте мгновенно в свой профиль.</p>
+                    <h1 style="font-size: 3.5rem; margin: 0; font-family: 'Outfit', sans-serif;">Плагины FunPay Slow</h1>
+                    <p style="color: var(--text-muted); max-width: 600px; margin-top: 1.5rem; font-size: 1.1rem; line-height: 1.6;">
+                        Выбирайте официальные и сторонние плагины, добавляйте их к аккаунту Slow и устанавливайте из профиля.
+                    </p>
                 </div>
                 <div class="marketplace-stats">
                     <div class="stat-box">
                         <span class="stat-num">16</span>
-                        <span class="stat-label">Доступно</span>
+                        <span class="stat-label">Официальные</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-num">5</span>
+                        <span class="stat-label">Маркетплейс</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-num">3</span>
+                        <span class="stat-label">Активно</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="plugin-grid-market">
-            <!-- Кнопки в карточках будут меняться в зависимости от подписки -->
-            
-            <!-- RentSteam (FAST ONLY) -->
-            <div class="market-card" data-tier="fast">
+        <div class="filter-search-bar">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="official"><i class="fas fa-shield-alt"></i> Официальные</button>
+                <button class="filter-tab" data-filter="all"><i class="fas fa-th-large"></i> Маркетплейс</button>
+            </div>
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input" placeholder="Поиск по названию, id или правам">
+            </div>
+        </div>
+
+        <!-- Section: Official Plugins -->
+        <div class="plugin-grid-market" id="official-plugins-grid">
+            <!-- Card: RentSteam -->
+            <div class="market-card category-official">
                 <div class="card-top">
                     <div class="premium-icon-box" style="color: #60a5fa;"><i class="fab fa-steam"></i></div>
-                    <span class="badge-fast-only"><i class="fas fa-crown"></i> FAST ONLY</span>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
                 </div>
                 <h3 class="card-title">RentSteam</h3>
-                <p class="card-description">Лучший плагин для автоматизации аренды Steam. Полный цикл управления аккаунтами.</p>
-                <button class="btn-install locked" onclick="installPlugin('RentSteam', 'fast')"><i class="fas fa-lock"></i> Установить</button>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Плагин для автоматизации аренды Steam-аккаунтов.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Steam</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Аренда</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Guard</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Аккаунты</span>
+                </div>
             </div>
 
-            <!-- Авто-ответчик (SLOW & FAST) -->
-            <div class="market-card" data-tier="slow">
+            <!-- Card: Авто-ответчик -->
+            <div class="market-card category-official">
                 <div class="card-top">
                     <div class="premium-icon-box" style="color: #4ade80;"><i class="fas fa-comment-dots"></i></div>
-                    <span class="badge-official"><i class="fas fa-check"></i> SLOW / FAST</span>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
                 </div>
                 <h3 class="card-title">Авто-ответчик</h3>
-                <p class="card-description">Базовый инструмент для общения с покупателями 24/7. Шаблоны и авто-ответы.</p>
-                <button class="btn-install locked" onclick="installPlugin('Responder', 'slow')"><i class="fas fa-lock"></i> Установить</button>
-            </div>
-
-            <!-- AutoGift (FAST ONLY) -->
-            <div class="market-card" data-tier="fast">
-                <div class="card-top">
-                    <div class="premium-icon-box" style="color: #f472b6;"><i class="fas fa-gift"></i></div>
-                    <span class="badge-fast-only"><i class="fas fa-crown"></i> FAST ONLY</span>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Автоматические ответы на сообщения покупателей.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Ответы</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Шаблоны</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Ключевые слова</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Приветствия</span>
                 </div>
-                <h3 class="card-title">AutoGift</h3>
-                <p class="card-description">Автоматическая отправка Telegram Stars Gifts. Маст-хэв для крупных продавцов.</p>
-                <button class="btn-install locked" onclick="installPlugin('AutoGift', 'fast')"><i class="fas fa-lock"></i> Установить</button>
             </div>
 
-            <!-- AutoSMM (SLOW & FAST) -->
-            <div class="market-card" data-tier="slow">
+            <!-- Card: AutoSMM -->
+            <div class="market-card category-official">
                 <div class="card-top">
                     <div class="premium-icon-box" style="color: #a855f7;"><i class="fas fa-share-nodes"></i></div>
-                    <span class="badge-official"><i class="fas fa-check"></i> SLOW / FAST</span>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
                 </div>
                 <h3 class="card-title">AutoSMM</h3>
-                <p class="card-description">Продажа SMM-услуг. Подключение внешних панелей через API.</p>
-                <button class="btn-install locked" onclick="installPlugin('AutoSMM', 'slow')"><i class="fas fa-lock"></i> Установить</button>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Продажа SMM-услуг через подключенные SMM-панели.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> SMM</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Панели</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> API</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Заказы</span>
+                </div>
             </div>
 
-            <!-- AutoStars (FAST ONLY) -->
-            <div class="market-card" data-tier="fast">
+            <!-- Card: AutoGift -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #f472b6;"><i class="fas fa-gift"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">AutoGift</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Автоматическая отправка Telegram Stars Gifts по заказам FunPay.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Telegram</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Stars Gifts</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Подарки</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Заказы</span>
+                </div>
+            </div>
+
+            <!-- Card: AutoAIAccounts -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #818cf8;"><i class="fas fa-brain"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">AutoAIAccounts</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Автоматическая покупка и выдача AI-аккаунтов через LZT Market.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> AI</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> LZT Market</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Аккаунты</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Автовыдача</span>
+                </div>
+            </div>
+
+            <!-- Card: AutoSteamNS -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #2dd4bf;"><i class="fas fa-money-bill-transfer"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">AutoSteamNS</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Автоматическое пополнение Steam через NSGifts по заказам на FunPay.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Steam</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> NSGifts</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Пополнение</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Заказы</span>
+                </div>
+            </div>
+
+            <!-- Card: AutoTicket -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #fb7185;"><i class="fas fa-ticket"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">AutoTicket</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Автоматическое создание тикетов в поддержку FunPay по просроченным заказам.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Поддержка</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Тикеты</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> FunPay</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Заказы</span>
+                </div>
+            </div>
+
+            <!-- Card: VIP Roblox -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #38bdf8;"><i class="fas fa-gamepad"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">VIP Roblox</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Плагин для работы с VIP-серверами Roblox.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Roblox</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> VIP</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Серверы</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Доступ</span>
+                </div>
+            </div>
+
+            <!-- Card: AutoRobux -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #fbbf24;"><i class="fas fa-coins"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">AutoRobux</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Выдача Robux через Roblox Game Pass.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Robux</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Game Pass</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Roblox</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Выдача</span>
+                </div>
+            </div>
+            <!-- Card: AutoDiscordBoost -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #a855f7;"><i class="fas fa-rocket"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">AutoDiscordBoost</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Автоматический Discord boost по заказам.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Discord</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Boost</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Nitro</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Заказы</span>
+                </div>
+            </div>
+
+            <!-- Card: AutoStars -->
+            <div class="market-card category-official">
                 <div class="card-top">
                     <div class="premium-icon-box" style="color: #fbbf24;"><i class="fas fa-star"></i></div>
-                    <span class="badge-fast-only"><i class="fas fa-crown"></i> FAST ONLY</span>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
                 </div>
                 <h3 class="card-title">AutoStars</h3>
-                <p class="card-description">Мгновенная выдача Telegram Stars. Лучшее решение на рынке.</p>
-                <button class="btn-install locked" onclick="installPlugin('AutoStars', 'fast')"><i class="fas fa-lock"></i> Установить</button>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Автоматическая выдача Telegram Stars по заказам.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Telegram</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Stars</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Выдача</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Заказы</span>
+                </div>
             </div>
 
-            <!-- ChatSpam (SLOW & FAST) -->
-            <div class="market-card" data-tier="slow">
+            <!-- Card: Offline Activite -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #94a3b8;"><i class="fas fa-user-clock"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">Offline Activite</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Выдача Steam Guard кодов по команде !guard для настроенных аккаунтов.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Steam Guard</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> !guard</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Чаты</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Аккаунты</span>
+                </div>
+            </div>
+
+            <!-- Card: CopyLots -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #2dd4bf;"><i class="fas fa-clone"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">CopyLots</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Копирование лотов между аккаунтами FunPay.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Копирование</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Лоты</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> FunPay</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Аккаунты</span>
+                </div>
+            </div>
+
+            <!-- Card: ChatSpam -->
+            <div class="market-card category-official">
                 <div class="card-top">
                     <div class="premium-icon-box" style="color: #f472b6;"><i class="fas fa-comments"></i></div>
-                    <span class="badge-official"><i class="fas fa-check"></i> SLOW / FAST</span>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
                 </div>
                 <h3 class="card-title">ChatSpam</h3>
-                <p class="card-description">Массовая рассылка сообщений покупателям. Простой и эффективный маркетинг.</p>
-                <button class="btn-install locked" onclick="installPlugin('ChatSpam', 'slow')"><i class="fas fa-lock"></i> Установить</button>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Массовая отправка сообщений в чаты FunPay.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Чаты</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Рассылка</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Сообщения</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> FunPay</span>
+                </div>
+            </div>
+
+            <!-- Card: EmailCode -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #3b82f6;"><i class="fas fa-key"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">EmailCode</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Получение кодов подтверждения из email через IMAP.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Email</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> IMAP</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Коды</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Письма</span>
+                </div>
+            </div>
+
+            <!-- Card: AutoDump -->
+            <div class="market-card category-official">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #10b981;"><i class="fas fa-scale-balanced"></i></div>
+                    <span class="badge-official"><i class="fas fa-shield-alt"></i> Official</span>
+                </div>
+                <h3 class="card-title">AutoDump</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #10b981; font-weight: 600; margin-bottom: 0.5rem;">FunPay Slow</div>
+                <div class="card-category">Официальный</div>
+                <p class="card-description">Автоматическая корректировка цен по публичному рынку FunPay.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Цены</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Рынок</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Лоты</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Автоматизация</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Marketplace (Community) Plugins -->
+        <div class="plugin-grid-market" id="marketplace-plugins-grid" style="display: none;">
+            <!-- Card: LotWatcher (Community) -->
+            <div class="market-card">
+                <div class="card-top">
+                    <div class="premium-icon-box" style="color: #f59e0b;"><i class="fas fa-users"></i></div>
+                    <span class="status-badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 8px;">COMMUNITY</span>
+                </div>
+                <h3 class="card-title">LotWatcher</h3>
+                <div class="card-author" style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; margin-bottom: 0.5rem;">by User1337</div>
+                <div class="card-category">Сторонний</div>
+                <p class="card-description">Уведомления о изменении цен на выбранные лоты конкурентов.</p>
+                <div class="card-tags">
+                    <span class="card-tag"><i class="fas fa-tag"></i> Лоты</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Цены</span>
+                    <span class="card-tag"><i class="fas fa-tag"></i> Конкуренты</span>
+                </div>
             </div>
         </div>
     </main>
 
-    <script src="script.js"></script>
+    
+    <footer class="main-footer" style="padding: 100px 0 60px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 100px;">
+        <div class="landing-container">
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 4rem; text-align: left;">
+                <div>
+                    <div class="logo-container" style="justify-content: flex-start; margin-bottom: 1.5rem; border: none; background: none; padding: 0;">
+                        <span class="snail-logo">🐌</span>
+                        <div class="logo-text">FunPay <span>Slow</span></div>
+                    </div>
+                    <p style="color: #555; font-size: 0.9rem; line-height: 1.6;">Десктопное приложение для работы с аккаунтами, лотами и плагинами на FunPay. При необходимости подключается удаленный воркер на VPS.</p>
+                    <a href="https://t.me/FunpaySlow" target="_blank" style="color: #888; text-decoration: none; display: flex; align-items: center; gap: 10px; margin-top: 1.5rem;"><i class="fab fa-telegram"></i> Telegram Channel</a>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Продукт</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="index.html" style="color: #555; text-decoration: none;">Главная</a></li>
+                        <li><a href="plugins.html" style="color: #555; text-decoration: none;">Плагины</a></li>
+                        <li><a href="sdk.html" style="color: #555; text-decoration: none;">Разработчикам</a></li>
+                        <li><a href="changelog.html" style="color: #555; text-decoration: none;">Обновления</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Поддержка</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="docs.html" style="color: #555; text-decoration: none;">Документация</a></li>
+                        <li><a href="media-partnership.html" style="color: #555; text-decoration: none;">Медиапартнерство</a></li>
+                        <li><a href="report.html" style="color: #555; text-decoration: none;">Обратная связь</a></li>
+                        <li><a href="https://t.me/FunpaySlowBot" target="_blank" style="color: #555; text-decoration: none;">Telegram Bot</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: white; margin-bottom: 1.5rem;">Юридическое</h4>
+                    <ul style="list-style: none; padding: 0; display: grid; gap: 0.8rem;">
+                        <li><a href="terms.html" style="color: #555; text-decoration: none;">Условия использования</a></li>
+                        <li><a href="privacy.html" style="color: #555; text-decoration: none;">Политика конфиденциальности</a></li>
+                        <li><a href="payment.html" style="color: #555; text-decoration: none;">Соглашение для оплаты</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4rem; padding-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <p style="color: #333; font-size: 0.85rem;">© 2026 FunPay Slow. Все права защищены.</p>
+                <p style="color: #222; font-size: 0.8rem;">Не является официальным приложением FunPay.com</p>
+            </div>
+        </div>
+    </footer>
+
+
     <script>
-        // Логика проверки подписки для кнопок
-        document.addEventListener('DOMContentLoaded', () => {
-            const userStr = localStorage.getItem('funpay_user');
-            if (!userStr) return;
-            
-            const user = JSON.parse(userStr);
-            const userPlan = user.plan || 'none'; // slow, fast, none
-            
-            document.querySelectorAll('.market-card').forEach(card => {
-                const tier = card.getAttribute('data-tier');
-                const btn = card.querySelector('.btn-install');
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
                 
-                if (userPlan === 'fast') {
-                    // FAST видит всё
-                    btn.classList.remove('locked');
-                    btn.classList.add('active');
-                    btn.innerHTML = '<i class="fas fa-download"></i> Установить';
-                } else if (userPlan === 'slow' && tier === 'slow') {
-                    // SLOW видит только свои
-                    btn.classList.remove('locked');
-                    btn.classList.add('active');
-                    btn.innerHTML = '<i class="fas fa-download"></i> Установить';
+                const filter = tab.getAttribute('data-filter');
+                if (filter === 'official') {
+                    document.getElementById('official-plugins-grid').style.display = 'grid';
+                    document.getElementById('marketplace-plugins-grid').style.display = 'none';
                 } else {
-                    // Закрыто
-                    btn.classList.add('locked');
-                    btn.innerHTML = '<i class="fas fa-lock"></i> ' + (tier === 'fast' ? 'Нужен FAST' : 'Нужна подписка');
+                    document.getElementById('official-plugins-grid').style.display = 'none';
+                    document.getElementById('marketplace-plugins-grid').style.display = 'grid';
                 }
             });
         });
-
-        function installPlugin(name, tier) {
-            const userStr = localStorage.getItem('funpay_user');
-            if (!userStr) { alert('Сначала войдите в аккаунт!'); return; }
-            
-            const user = JSON.parse(userStr);
-            if (user.plan === 'fast' || (user.plan === 'slow' && tier === 'slow')) {
-                alert(`Плагин ${name} успешно добавлен в ваш профиль!`);
-                window.location.href = 'profile.html';
-            } else {
-                alert('Эта функция недоступна в вашей подписке.');
-            }
-        }
     </script>
+    <script src="script.js?v=2.4.1"></script>
 </body>
 </html>
