@@ -1447,97 +1447,62 @@
                 <h2 style="font-size: 2rem; margin-bottom: 1rem;">Управление подпиской</h2>
                 <p style="color: var(--text-muted); margin-bottom: 3rem;">Выберите подходящий тариф для автоматизации</p>
 
-                <!-- Trial Section -->
-                <div class="trial-card" id="trial-card" style="display: none; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(20, 20, 20, 0.4) 100%); border: 1px solid rgba(245, 158, 11, 0.2); padding: 2rem; border-radius: 24px; margin-bottom: 3rem; justify-content: space-between; align-items: center;">
-                    <div>
-                        <span class="badge-trial" style="background: #f59e0b; color: black; padding: 4px 10px; border-radius: 100px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Free Trial</span>
-                        <h3 style="margin-top: 10px;">Пробный период 4 дня</h3>
-                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Попробуйте все возможности FunPay Slow бесплатно.</p>
-                    </div>
-                    <button class="btn-marketplace" onclick="window.activateTrial()" style="background: #f59e0b; color: black; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 800; cursor: pointer;">Активировать</button>
-                </div>
-
                 <div class="pricing-section-container">
                     <div class="tiers-wrapper" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                        <!-- FAST 1 Month -->
-                        <div class="tier-card fast" id="plan-card-fast_1m" onclick="window.selectPlan('fast_1m', 15)" style="cursor: pointer; position: relative; padding: 2.5rem; border-radius: 24px; background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); transition: 0.3s;">
-                            <div class="tier-badge" style="position: absolute; top: 20px; right: 20px; background: #fbbf24; color: black; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.7rem;">FAST</div>
-                            <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fas fa-bolt" style="color: #fbbf24;"></i> 1 Месяц</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Максимальная скорость и все плагины.</p>
-                            <div style="font-size: 2.5rem; font-weight: 800;">$15 <span style="font-size: 1rem; color: #555;">/ мес</span></div>
+                        
+                        <!-- SLOW BLOCK -->
+                        <div class="plan-card-group" style="background: rgba(30, 30, 30, 0.4); border: 1px solid rgba(59, 130, 246, 0.2); padding: 2.5rem; border-radius: 24px; position: relative;">
+                            <div class="plan-header" style="margin-bottom: 2rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <h3 style="font-size: 2rem; font-weight: 800; color: #3b82f6;">SLOW</h3>
+                                    <span style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 4px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 800;">BASIC</span>
+                                </div>
+                                <p style="color: #666; font-size: 0.9rem;">Оптимально для старта и одного аккаунта.</p>
+                            </div>
+                            <div class="plan-selection" style="display: grid; gap: 12px;">
+                                <button class="btn-tier-select" onclick="window.selectPlan('slow_1m', 5)" id="btn-slow_1m" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color: #ccc; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s;">
+                                    <span>1 Месяц</span><b>$5</b>
+                                </button>
+                                <button class="btn-tier-select" onclick="window.selectPlan('slow_3m', 12)" id="btn-slow_3m" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color: #ccc; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s;">
+                                    <span>3 Месяца</span><b>$12</b>
+                                </button>
+                                <button class="btn-tier-select" onclick="window.selectPlan('slow_6m', 20)" id="btn-slow_6m" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color: #ccc; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s;">
+                                    <span>6 Месяцев</span><b>$20</b>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- SLOW 6 Months -->
-                        <div class="tier-card" id="plan-card-slow_6m" onclick="window.selectPlan('slow_6m', 45)" style="cursor: pointer; position: relative; padding: 2.5rem; border-radius: 24px; background: rgba(20, 20, 20, 0.4); border: 1px solid var(--border-color); transition: 0.3s;">
-                            <div class="tier-badge" style="position: absolute; top: 20px; right: 20px; background: #10b981; color: black; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.7rem;">SLOW</div>
-                            <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fas fa-snail" style="color: #10b981;"></i> 6 Месяцев</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Стабильность и экономия 50%.</p>
-                            <div style="font-size: 2.5rem; font-weight: 800;">$45 <span style="font-size: 1rem; color: #555;">/ 6 мес</span></div>
+                        <!-- FAST BLOCK -->
+                        <div class="plan-card-group" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.3); padding: 2.5rem; border-radius: 24px; position: relative;">
+                            <div class="plan-header" style="margin-bottom: 2rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <h3 style="font-size: 2rem; font-weight: 800; color: #10b981;">FAST</h3>
+                                    <span style="background: #fbbf24; color: black; padding: 4px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 800;">ULTIMATE</span>
+                                </div>
+                                <p style="color: #888; font-size: 0.9rem;">Максимальная производительность и мультиаккаунты.</p>
+                            </div>
+                            <div class="plan-selection" style="display: grid; gap: 12px;">
+                                <button class="btn-tier-select" onclick="window.selectPlan('fast_1m', 15)" id="btn-fast_1m" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color: #ccc; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s;">
+                                    <span>1 Месяц</span><b>$15</b>
+                                </button>
+                                <button class="btn-tier-select" onclick="window.selectPlan('fast_3m', 35)" id="btn-fast_3m" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color: #ccc; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s;">
+                                    <span>3 Месяца</span><b>$35</b>
+                                </button>
+                                <button class="btn-tier-select" onclick="window.selectPlan('fast_6m', 60)" id="btn-fast_6m" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color: #ccc; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s;">
+                                    <span>6 Месяцев</span><b>$60</b>
+                                </button>
+                            </div>
                         </div>
+
                     </div>
 
-                    <button class="btn-buy-now" id="buy-subscription-btn" onclick="window.processPayment()" style="width: 100%; margin-top: 3rem; padding: 1.5rem; border-radius: 20px; border: none; background: #333; color: #888; font-weight: 800; font-size: 1.1rem; cursor: not-allowed; transition: 0.3s;">
-                        Выберите тариф для оплаты
+                    <button class="btn-primary" id="buy-subscription-btn" onclick="window.processPayment()" style="width: 100%; margin-top: 3rem; height: 70px; border-radius: 20px; font-weight: 800; font-size: 1.2rem; opacity: 0.5; cursor: not-allowed; transition: 0.4s; background: #333; color: #555;">
+                        <i class="fas fa-shopping-cart"></i> Выберите период оплаты
                     </button>
-                    <p style="text-align: center; color: #444; font-size: 0.8rem; margin-top: 1.5rem;">Оплата производится через Crypto Bot (Telegram Check).</p>
+                    <p style="text-align: center; color: #444; font-size: 0.85rem; margin-top: 1.5rem;">Безопасная оплата через Crypto Bot (Telegram Check).</p>
                 </div>
             </div>
-                                    <div class="plan-info">
-                                        <span class="plan-duration">12 месяцев</span>
-                                        <span class="plan-savings">Экономия 88 ₽</span>
-                                    </div>
-                                    <div class="plan-price">
-                                        <div class="price-val">2300 ₽</div>
-                                        <div class="price-mo">191 ₽/мес</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="btn-primary btn-buy-now" id="btn-buy-slow" style="width: 100%; margin-top: 1.5rem; justify-content: center; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white;" onclick="buySelectedPlan()"><i class="fas fa-shopping-cart"></i> Выбрать Slow</button>
-                        </div>
 
-                        <!-- Fast Plan -->
-                        <div class="tier-card fast" id="tier-fast">
-                            <div class="tier-badge">PREMIUM</div>
-                            <div class="tier-title"><i class="fas fa-bolt" style="color: #fbbf24;"></i> Fast</div>
-                            <div class="tier-desc">Полный доступ. Все плагины, 100% товаров и эксклюзивные функции.</div>
-                            
-                            <div class="plan-options">
-                                <div class="plan-option" onclick="selectPlan('fast_1', 400, this, 'fast')">
-                                    <div class="plan-info">
-                                        <span class="plan-duration">1 месяц</span>
-                                        <span class="plan-savings">Полный доступ</span>
-                                    </div>
-                                    <div class="plan-price">
-                                        <div class="price-val">400 ₽</div>
-                                        <div class="price-mo">400 ₽/мес</div>
-                                    </div>
-                                </div>
-                                <div class="plan-option" onclick="selectPlan('fast_6', 2200, this, 'fast')">
-                                    <div class="plan-info">
-                                        <span class="plan-duration">6 месяцев</span>
-                                        <span class="plan-savings">Экономия 200 ₽</span>
-                                    </div>
-                                    <div class="plan-price">
-                                        <div class="price-val">2200 ₽</div>
-                                        <div class="price-mo">366 ₽/мес</div>
-                                    </div>
-                                </div>
-                                <div class="plan-option" onclick="selectPlan('fast_12', 4600, this, 'fast')">
-                                    <div class="plan-info">
-                                        <span class="plan-duration">12 месяцев</span>
-                                        <span class="plan-savings">Экономия 200 ₽</span>
-                                    </div>
-                                    <div class="plan-price">
-                                        <div class="price-val">4600 ₽</div>
-                                        <div class="price-mo">383 ₽/мес</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="btn-primary btn-buy-now" id="btn-buy-fast" style="width: 100%; margin-top: 1.5rem; justify-content: center; height: 50px;" onclick="buySelectedPlan()"><i class="fas fa-crown"></i> Выбрать Fast</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Placeholder for other sections -->
             <div id="section-plugins" class="content-section">
