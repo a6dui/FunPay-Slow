@@ -480,10 +480,13 @@ if BOT_TOKEN:
             # 1. Если это код авторизации (6 цифр)
             if len(args) > 1 and args[1].isdigit() and len(args[1]) == 6:
                 code = args[1]
-                if code in auth_requests:
-                    req = auth_requests[code]
-                    conn = get_db_conn()
-                    # Ищем или создаем юзера
+                conn = get_db_conn()
+                
+                # Ищем токен по коду
+                token_row = fetchone(conn, f"SELECT token FROM auth_tokens WHERE code = {P} AND expires > {P}", (code, now))
+                
+                if token_row:
+                    # Создаем или обновляем пользователя
                     user = fetchone(conn, f"SELECT user_id, ref_code FROM users WHERE user_id={P}", (uid,))
                     my_ref = user.get("ref_code") if user else secrets.token_hex(4).upper()
                     
@@ -493,16 +496,19 @@ if BOT_TOKEN:
                         else:
                             execute(conn, f"INSERT INTO users (user_id, first_name, username, plan, ref_code, created_at) VALUES ({P},{P},{P},'none',{P},{P})", (uid, fname, uname, my_ref, now))
                     
-                    # Подтверждаем запрос
-                    req["confirmed"] = True
-                    req["user_id"] = uid
+                    # Привязываем user_id к токену сессии
+                    execute(conn, f"UPDATE auth_tokens SET user_id = {P} WHERE code = {P}", (uid, code))
                     conn.close()
                     
                     bot.send_message(message.chat.id, 
                         f"✅ <b>Авторизация успешна!</b>\n\n"
-                        f"Вернитесь в браузер — вход в аккаунт <b>{fname}</b> выполнен.\n"
-                        f"Приятного пользования! 🐌"
+                        f"Вход в аккаунт <b>{fname}</b> подтвержден.\n"
+                        f"Вернитесь в браузер, система пропустит вас автоматически. 🐌"
                     )
+                    return
+                else:
+                    conn.close()
+                    bot.send_message(message.chat.id, "❌ <b>Код недействителен или устарел.</b>\nПопробуйте обновить страницу на сайте.")
                     return
 
             # 2. Если это реферальная ссылка (ref_XXXX)
@@ -538,27 +544,13 @@ if BOT_TOKEN:
                     )
                 )
             else:
-                user = fetchone(conn, f"SELECT plan, balance FROM users WHERE user_id={P}", (uid,))
-                conn.close()
-                
-                if user:
-                    bot.send_message(message.chat.id, 
-                        f"🐌 <b>Вы уже в системе, {fname}!</b>\n\n"
-                        f"🎫 Тариф: <b>{user.get('plan', 'NONE')}</b>\n"
-                        f"💰 Баланс: <b>{user.get('balance', 0)} ₽</b>\n\n"
-                        f"Чтобы войти в другой аккаунт на сайте, нажмите там «Выйти» и снова «Войти через Telegram».",
-                        reply_markup=telebot.types.InlineKeyboardMarkup().add(
-                            telebot.types.InlineKeyboardButton("🌐 Перейти на сайт", url="https://funpay-slow.vercel.app")
-                        )
-                    )
-                else:
-                    bot.send_message(message.chat.id,
-                        f"👋 <b>FunPay Slow Bot</b>\n\n"
-                        f"Чтобы войти в свой профиль на сайте:\n"
-                        f"1. Нажмите кнопку <b>«Войти через Telegram»</b> на сайте.\n"
-                        f"2. Бот пришлет вам персональную ссылку.\n\n"
-                        f"Ждем вас! 🐌"
-                    )
+                bot.send_message(message.chat.id,
+                    f"👋 <b>FunPay Slow Bot</b>\n\n"
+                    f"Чтобы войти в свой профиль на сайте:\n"
+                    f"1. Нажмите кнопку <b>«Войти через Telegram»</b> на сайте.\n"
+                    f"2. Бот пришлет вам персональную ссылку.\n\n"
+                    f"Ждем вас! 🐌"
+                )
 
         @bot.message_handler(commands=["status"])
         def handle_status(message):

@@ -288,21 +288,30 @@ window.App = {
                 <button class="btn-login-method telegram" id="btn-telegram-login-injected" style="width: 100%; padding: 18px; border-radius: 16px; border: none; background: linear-gradient(135deg, #0088cc, #00aaff); color: white; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 10px 20px -5px rgba(0, 136, 204, 0.4); transition: 0.3s;">
                     <i class="fab fa-telegram-plane"></i> Войти через Telegram
                 </button>
-                <div style="margin-top: 25px; font-size: 0.75rem; color: #444; text-align: center;">Безопасный вход через официальный API</div>
+                <div style="margin-top: 25px; font-size: 0.75rem; color: #444; text-align: center;">Безопасный вход через @FunPaySlov_Bot</div>
             </div>
             
             <div class="login-box" id="login-box-telegram" style="display: none;">
                 <button class="btn-close-modal-new" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
-                <div class="login-logo-circle">🐌</div>
+                <div class="login-logo-circle" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
                 <div class="login-header" style="text-align: center; margin-bottom: 20px;">
-                    <h2 style="font-size: 1.5rem; color: white; margin-bottom: 10px;">Код доступа</h2>
-                    <p style="color: #666; font-size: 0.9rem;">Отправьте этот код нашему боту</p>
+                    <h2 style="font-size: 1.5rem; color: white; margin-bottom: 10px;">Код подтверждения</h2>
+                    <p style="color: #666; font-size: 0.9rem;">Откройте бота и подтвердите вход</p>
                 </div>
                 <div class="tg-auth-container" style="text-align: center;">
-                    <div class="tg-auth-code" id="tg-auth-code" style="font-size: 2.8rem; font-weight: 900; letter-spacing: 8px; color: #10b981; margin: 20px 0; font-family: 'Courier New', monospace; background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 12px; border: 1px dashed rgba(16, 185, 129, 0.3);">------</div>
-                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; justify-content: center; margin-top: 1.5rem; height: 55px; border-radius: 16px; font-weight: 800; background: #10b981; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);">
-                        <i class="fab fa-telegram-plane"></i> Открыть бота
+                    <div class="tg-auth-code" id="tg-auth-code" style="font-size: 3rem; font-weight: 900; letter-spacing: 6px; color: #10b981; margin: 15px 0; font-family: 'Inter', sans-serif; background: rgba(16, 185, 129, 0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.05);">000000</div>
+                    
+                    <div id="auth-status-text" style="margin-bottom: 20px; font-size: 0.85rem; color: #fbbf24; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-spinner fa-spin"></i> Ожидание подтверждения от бота...
+                    </div>
+
+                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; height: 60px; border-radius: 18px; font-weight: 800; background: #0088cc; display: flex; align-items: center; justify-content: center; gap: 12px; text-decoration: none; color: white; box-shadow: 0 10px 25px rgba(0, 136, 204, 0.3); transition: 0.3s;">
+                        <i class="fab fa-telegram-plane" style="font-size: 1.2rem;"></i> ОТКРЫТЬ @FunPaySlov_Bot
                     </a>
+                    
+                    <p style="margin-top: 20px; color: #444; font-size: 0.8rem;">Код действителен 5 минут</p>
                 </div>
             </div>
         `;
