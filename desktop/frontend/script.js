@@ -1,4 +1,4 @@
-const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
+const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" || window.location.protocol === "file:"
     ? "http://127.0.0.1:8080" 
     : "https://funpay-slow.onrender.com";
 
