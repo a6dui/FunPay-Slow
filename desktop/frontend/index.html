@@ -159,41 +159,8 @@
 
 
 
-    <!-- Login Overlay -->
-    <div id="login-overlay" class="login-overlay" style="display: none;">
-        <div class="login-box" id="login-box-standard">
-            <div class="login-header">
-                <div class="login-logo">🐌</div>
-                <h2>Войти в FunPay Slow</h2>
-                <p>Выберите удобный способ авторизации</p>
-            </div>
-            <div class="login-methods">
-                <button class="btn-login-method telegram" id="btn-telegram-login">
-                    <i class="fab fa-telegram-plane"></i> Войти через Telegram
-                </button>
-            </div>
-            <div class="login-footer">
-                Нажимая «Войти», вы соглашаетесь с условиями использования
-            </div>
-            <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
-        </div>
-
-        <div class="login-box" id="login-box-telegram" style="display: none;">
-            <div class="login-header">
-                <div class="login-logo">🐌</div>
-                <h2>Авторизация Telegram</h2>
-                <p>Отправьте код нашему боту</p>
-            </div>
-            <div class="tg-auth-container">
-                <div class="tg-auth-code" id="tg-auth-code">------</div>
-                <p class="tg-auth-hint">Нажмите на кнопку ниже и отправьте этот код боту</p>
-                <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; justify-content: center; margin-top: 1rem;">
-                    <i class="fab fa-telegram-plane"></i> Открыть бота
-                </a>
-            </div>
-            <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
-        </div>
-    </div>
+    <!-- Login Overlay will be injected by script.js -->
+    <div id="login-overlay-container"></div>
 
 
     <style>

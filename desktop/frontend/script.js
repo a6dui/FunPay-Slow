@@ -1,4 +1,6 @@
-const API_BASE = "https://funpay-slow.onrender.com";
+const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
+    ? "http://127.0.0.1:8080" 
+    : "https://funpay-slow.onrender.com";
 
 // --- Global App State ---
 window.App = {
@@ -233,7 +235,6 @@ window.App = {
     ensureLoginOverlay() {
         if (document.getElementById('login-overlay')) return;
         
-        // Add CSS for the modal
         const style = document.createElement('style');
         style.textContent = `
             .login-overlay {
@@ -243,32 +244,13 @@ window.App = {
             }
             .login-box {
                 background: #111; border: 1px solid rgba(255,255,255,0.1);
-                padding: 40px; border-radius: 24px; width: 100%; max-width: 400px;
+                padding: 40px; border-radius: 30px; width: 100%; max-width: 420px;
                 position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-                animation: modalAppear 0.3s ease-out;
+                animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }
             @keyframes modalAppear {
-                from { opacity: 0; transform: scale(0.9); }
-                to { opacity: 1; transform: scale(1); }
-            }
-            .btn-close-modal-new {
-                position: absolute; top: -15px; right: -15px;
-                width: 35px; height: 35px; border-radius: 50%;
-                background: #f43f5e; color: white; border: none;
-                display: flex; align-items: center; justify-content: center;
-                cursor: pointer; font-size: 1.2rem; font-weight: bold;
-                box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
-                transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                z-index: 11000;
-            }
-            .btn-close-modal-new:hover {
-                transform: scale(1.15) rotate(90deg);
-                background: #fb7185;
-            }
-            .login-logo-circle {
-                width: 60px; height: 60px; background: rgba(255,255,255,0.05);
-                border-radius: 50%; display: flex; align-items: center; justify-content: center;
-                margin: 0 auto 20px; font-size: 2rem;
+                from { opacity: 0; transform: translateY(20px) scale(0.95); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
             }
         `;
         document.head.appendChild(style);
@@ -278,47 +260,47 @@ window.App = {
         overlay.className = 'login-overlay';
         overlay.style.display = 'none';
         overlay.innerHTML = `
+            <!-- Step 1: Method Select -->
             <div class="login-box" id="login-box-standard">
                 <button class="btn-close-modal-new" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
                 <div class="login-logo-circle">🐌</div>
-                <div class="login-header" style="text-align: center; margin-bottom: 30px;">
-                    <h2 style="font-size: 1.5rem; color: white; margin-bottom: 10px;">Авторизация</h2>
-                    <p style="color: #666; font-size: 0.9rem;">Выберите способ входа в систему</p>
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 1.8rem; color: white; margin-bottom: 10px; font-weight: 800;">Вход в систему</h2>
+                    <p style="color: #666; font-size: 0.95rem;">Используйте Telegram для авторизации</p>
                 </div>
-                <button class="btn-login-method telegram" id="btn-telegram-login-injected" style="width: 100%; padding: 18px; border-radius: 16px; border: none; background: linear-gradient(135deg, #0088cc, #00aaff); color: white; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 10px 20px -5px rgba(0, 136, 204, 0.4); transition: 0.3s;">
-                    <i class="fab fa-telegram-plane"></i> Войти через Telegram
+                <button class="btn-login-method telegram" id="btn-tg-start" style="width: 100%; padding: 20px; border-radius: 18px; border: none; background: linear-gradient(135deg, #0088cc, #00aaff); color: white; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 1.1rem; box-shadow: 0 10px 25px -5px rgba(0, 136, 204, 0.5); transition: 0.3s;">
+                    <i class="fab fa-telegram-plane"></i> ВОЙТИ ЧЕРЕЗ TELEGRAM
                 </button>
-                <div style="margin-top: 25px; font-size: 0.75rem; color: #444; text-align: center;">Безопасный вход через @FunPaySlov_Bot</div>
+                <div style="margin-top: 30px; font-size: 0.8rem; color: #444; text-align: center; font-weight: 600; letter-spacing: 0.5px;">SECURE AUTH VIA @FunPaySlov_Bot</div>
             </div>
             
+            <!-- Step 2: Code Display -->
             <div class="login-box" id="login-box-telegram" style="display: none;">
                 <button class="btn-close-modal-new" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
                 <div class="login-logo-circle" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <div class="login-header" style="text-align: center; margin-bottom: 20px;">
-                    <h2 style="font-size: 1.5rem; color: white; margin-bottom: 10px;">Код подтверждения</h2>
-                    <p style="color: #666; font-size: 0.9rem;">Откройте бота и подтвердите вход</p>
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <h2 style="font-size: 1.6rem; color: white; margin-bottom: 8px; font-weight: 800;">Код подтверждения</h2>
+                    <p style="color: #666; font-size: 0.9rem;">Бот автоматически увидит этот код</p>
                 </div>
-                <div class="tg-auth-container" style="text-align: center;">
-                    <div class="tg-auth-code" id="tg-auth-code" style="font-size: 3rem; font-weight: 900; letter-spacing: 6px; color: #10b981; margin: 15px 0; font-family: 'Inter', sans-serif; background: rgba(16, 185, 129, 0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.05);">000000</div>
+                <div style="text-align: center;">
+                    <div id="tg-auth-code" style="font-size: 3.5rem; font-weight: 900; letter-spacing: 10px; color: #10b981; margin: 10px 0; font-family: 'Inter', sans-serif; background: rgba(16, 185, 129, 0.05); padding: 25px; border-radius: 24px; border: 1px solid rgba(16, 185, 129, 0.2); text-shadow: 0 0 20px rgba(16, 185, 129, 0.2);">------</div>
                     
-                    <div id="auth-status-text" style="margin-bottom: 20px; font-size: 0.85rem; color: #fbbf24; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <i class="fas fa-spinner fa-spin"></i> Ожидание подтверждения от бота...
+                    <div id="auth-status-text" style="margin: 20px 0; font-size: 0.9rem; color: #fbbf24; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600;">
+                        <i class="fas fa-circle-notch fa-spin"></i> Ожидание бота...
                     </div>
 
-                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; height: 60px; border-radius: 18px; font-weight: 800; background: #0088cc; display: flex; align-items: center; justify-content: center; gap: 12px; text-decoration: none; color: white; box-shadow: 0 10px 25px rgba(0, 136, 204, 0.3); transition: 0.3s;">
-                        <i class="fab fa-telegram-plane" style="font-size: 1.2rem;"></i> ОТКРЫТЬ @FunPaySlov_Bot
+                    <a href="#" target="_blank" class="btn-primary" id="link-to-bot" style="width: 100%; height: 65px; border-radius: 20px; font-weight: 800; background: #0088cc; display: flex; align-items: center; justify-content: center; gap: 12px; text-decoration: none; color: white; font-size: 1.1rem; box-shadow: 0 15px 30px rgba(0, 136, 204, 0.3); transition: 0.3s;">
+                        <i class="fab fa-telegram-plane" style="font-size: 1.4rem;"></i> ПОДТВЕРДИТЬ В БОТЕ
                     </a>
-                    
-                    <p style="margin-top: 20px; color: #444; font-size: 0.8rem;">Код действителен 5 минут</p>
                 </div>
             </div>
         `;
         document.body.appendChild(overlay);
         
-        const btn = document.getElementById('btn-telegram-login-injected');
-        if (btn) btn.onclick = () => window.handleTelegramLogin();
+        const startBtn = document.getElementById('btn-tg-start');
+        if (startBtn) startBtn.onclick = () => window.handleTelegramLogin();
     },
     
     async syncUser() {
@@ -524,26 +506,44 @@ window.FunPayWorker = {
 // --- Auth Logic ---
 window.handleTelegramLogin = async function() {
     const overlay = document.getElementById('login-overlay');
+    const boxStandard = document.getElementById('login-box-standard');
     const boxTelegram = document.getElementById('login-box-telegram');
     const codeDisplay = document.getElementById('tg-auth-code');
+    const linkToBot = document.getElementById('link-to-bot');
+    
     overlay.style.display = 'flex';
-    document.getElementById('login-box-standard').style.display = 'none';
+    boxStandard.style.display = 'none';
     boxTelegram.style.display = 'block';
+    
     try {
         const res = await fetch(`${API_BASE}/api/auth/generate`);
         const { code, token } = await res.json();
+        
         codeDisplay.textContent = code;
-        document.getElementById('link-to-bot').href = `https://t.me/FunPaySlov_Bot?start=${code}`;
-        const poll = setInterval(async () => {
-            const check = await fetch(`${API_BASE}/api/auth/check/${token}`);
-            if (check.ok) {
-                const userData = await check.json();
-                clearInterval(poll);
-                localStorage.setItem('funpay_user', JSON.stringify(userData));
-                window.location.reload();
-            }
+        linkToBot.href = `https://t.me/FunPaySlov_Bot?start=${code}`;
+        
+        // Clear old intervals if any
+        if (window.authInterval) clearInterval(window.authInterval);
+        
+        window.authInterval = setInterval(async () => {
+            try {
+                const check = await fetch(`${API_BASE}/api/auth/check/${token}`);
+                if (check.ok) {
+                    const userData = await check.json();
+                    clearInterval(window.authInterval);
+                    localStorage.setItem('funpay_user', JSON.stringify(userData));
+                    
+                    // Success UI
+                    document.getElementById('auth-status-text').innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> Успешно! Перенаправление...';
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            } catch (e) {}
         }, 3000);
-    } catch (e) { alert("Ошибка связи с сервером."); }
+        
+    } catch (e) { 
+        alert("Ошибка связи с сервером."); 
+        overlay.style.display = 'none';
+    }
 };
 
 window.logout = function() {
@@ -551,35 +551,19 @@ window.logout = function() {
     window.location.href = 'index.html';
 };
 
-window.activateTrial = async function() {
-    if (!window.App.user) return alert("Войдите в аккаунт!");
-    try {
-        const res = await fetch(`${API_BASE}/api/user/activate-trial`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ user_id: String(window.App.user.user_id) })
-        });
-        if (res.ok) {
-            alert("Подписка на 4 дня активирована!");
-            window.App.syncUser();
-        } else {
-            alert("Ошибка или триал уже использован.");
-        }
-    } catch (e) { alert("Сервер недоступен."); }
-};
-
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     window.App.init();
-    if (window.location.pathname.includes('profile.html')) {
-        window.App.loadAccountsList();
-    }
     
     const trigger = document.getElementById('login-trigger-btn');
-    if (trigger) trigger.onclick = () => document.getElementById('login-overlay').style.display = 'flex';
-    
-        const tgBtn = document.getElementById('btn-telegram-login');
-    if (tgBtn) tgBtn.onclick = () => window.handleTelegramLogin();
+    if (trigger) {
+        trigger.onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('login-overlay').style.display = 'flex';
+            document.getElementById('login-box-standard').style.display = 'block';
+            document.getElementById('login-box-telegram').style.display = 'none';
+        };
+    }
 });
 
 // --- Subscription Logic ---

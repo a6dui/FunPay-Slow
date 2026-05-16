@@ -18,7 +18,7 @@ app.add_middleware(
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 DATABASE_URL     = os.getenv("DATABASE_URL", "")       # PostgreSQL on Render
-BOT_TOKEN        = os.getenv("BOT_TOKEN", "")
+BOT_TOKEN        = os.getenv("BOT_TOKEN", "8997989380:AAFLk64Xrwe1ebr7LZMxaLuoDnT2Kg-P9-M")
 CRYPTO_BOT_TOKEN = os.getenv("CRYPTO_BOT_TOKEN", "581922:AA78JPxCzqnhyX8n6tyzrTJysjB4zbpFC9q")
 CRYPTO_PAY_URL   = "https://pay.crypt.bot/api"
 ADMIN_IDS        = ["6360699049", "5304677735", "755843448"]
