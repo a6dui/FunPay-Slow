@@ -1829,33 +1829,6 @@
                     <p>Сессия истекла или не установлена. Откройте локальный вход и повторите действие.</p>
                 </div>
 
-                <!-- Referral Card -->
-                <div style="margin-top: 2rem; background: linear-gradient(135deg, rgba(16,185,129,0.05), rgba(16,185,129,0.01)); border: 1px solid rgba(16,185,129,0.1); border-radius: 20px; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div style="width: 44px; height: 44px; background: rgba(16,185,129,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #10b981;">🤝</div>
-                        <div>
-                            <h4 style="margin:0; font-size: 0.95rem; font-weight: 800;">Реферальная программа</h4>
-                            <p style="margin:0; font-size: 0.8rem; color: #555;">Приглашайте друзей и получайте бонусы</p>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <code id="ref-link-display" style="color: #10b981; font-weight: 700; font-size: 0.85rem;">LOADING...</code>
-                        <button onclick="copyRefLink()" style="background: none; border: none; color: #555; cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='#10b981'" onmouseout="this.style.color='#555'">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <script>
-                    function copyRefLink() {
-                        const code = document.getElementById('ref-link-display').textContent;
-                        if (!code || code === 'LOADING...') return;
-                        const link = `https://t.me/FunPaySlov_Bot?start=ref_${code}`;
-                        navigator.clipboard.writeText(link);
-                        alert("Реферальная ссылка скопирована!");
-                    }
-                </script>
-
                 <!-- Tokens Section -->
                 <div class="dev-card">
                     <div class="dev-card-header">
@@ -2366,8 +2339,37 @@
             if (elHeroChar) elHeroChar.textContent = char;
             if (elHeroEmail) elHeroEmail.textContent = user.email || `@id${user.user_id}`;
             
-            const elRefLink = document.getElementById('ref-link-display');
-            if (elRefLink) elRefLink.textContent = user.ref_code || '---';
+            const elProfileBalance = document.getElementById('profile-balance');
+            if (elProfileBalance) elProfileBalance.textContent = user.balance || 0;
+            
+            // Populate Subscription Tab Header
+            const elSubPlan = document.getElementById('sub-plan-name');
+            const elSubBalance = document.getElementById('sub-balance-value');
+            if (elSubPlan) elSubPlan.textContent = (user.plan || 'NONE').toUpperCase();
+            if (elSubBalance) elSubBalance.textContent = user.balance || 0;
+
+            // Handle trial banner visibility
+            const trialBanner = document.getElementById('trial-banner');
+            if (trialBanner) {
+                const isNoSub = !user.plan || user.plan.toUpperCase() === 'NONE';
+                const trialUsed = user.trial_used || false;
+                trialBanner.style.display = (isNoSub && !trialUsed) ? 'flex' : 'none';
+            }
+
+            // Populate Referral Tab
+            const elRefCodeDisplay = document.getElementById('display-ref-code');
+            if (elRefCodeDisplay) elRefCodeDisplay.textContent = user.ref_code || '---';
+            const elRefLinkInput = document.getElementById('ref-link-input');
+            if (elRefLinkInput && user.ref_code) {
+                elRefLinkInput.value = `https://t.me/FunPaySlov_Bot?start=ref_${user.ref_code}`;
+            }
+            
+            if (user.sub_end) {
+                // If sub_end is a number (timestamp), convert to string
+                const expiryDate = new Date(user.sub_end * 1000).toLocaleDateString();
+                const subStatus = document.getElementById('sidebar-user-status');
+                if (subStatus) subStatus.textContent = expiryDate;
+            }
             
             if (user.subscription) {
                 const subStatus = document.getElementById('sidebar-user-status');
