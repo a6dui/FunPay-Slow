@@ -1,5 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
 pyTelegramBotAPI
 httpx
+psycopg2-binary
+python-multipart

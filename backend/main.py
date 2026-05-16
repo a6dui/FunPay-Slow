@@ -30,18 +30,22 @@ import httpx
 USE_POSTGRES = bool(DATABASE_URL)
 
 if USE_POSTGRES:
-    import psycopg2
-    import psycopg2.extras
+    try:
+        import psycopg2
+        import psycopg2.extras
+        print("✅ psycopg2 loaded — using PostgreSQL")
+    except ImportError:
+        print("⚠️ psycopg2 not found — falling back to SQLite")
+        USE_POSTGRES = False
 
+if USE_POSTGRES:
     def get_db_conn():
-        # Render provides postgres:// but psycopg2 needs postgresql://
         url = DATABASE_URL.replace("postgres://", "postgresql://", 1)
         conn = psycopg2.connect(url)
         conn.autocommit = False
         return conn
 
     def _ph():
-        """Placeholder — %s for Postgres."""
         return "%s"
 else:
     import sqlite3
