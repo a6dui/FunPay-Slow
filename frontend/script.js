@@ -544,27 +544,47 @@ window.App = {
         } catch(e) {
             body.innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#f43f5e">Ошибка загрузки</td></tr>';
         }
+    },
+
+    ensureLoginOverlay() {
+        const trigger = document.getElementById('login-trigger-btn');
+        const overlay = document.getElementById('login-overlay');
+        if (trigger && overlay) {
+            trigger.onclick = (e) => {
+                e.preventDefault();
+                overlay.style.display = 'flex';
+                const bs = document.getElementById('login-box-standard');
+                const bt = document.getElementById('login-box-telegram');
+                if (bs) bs.style.display = 'block';
+                if (bt) bt.style.display = 'none';
+            };
+        }
+    },
+
+    async syncUser() {
+        if (!this.user) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/user/info?user_id=${this.user.user_id}`);
+            if (res.ok) {
+                const data = await res.json();
+                this.user = data;
+                localStorage.setItem('funpay_user', JSON.stringify(data));
+                this.updateUI();
+            }
+        } catch (e) { console.warn("Sync failed"); }
     }
 };
 
 // --- Automation Worker ---
 window.FunPayWorker = {
     isRunning: false,
-    
     start() {
         if (this.isRunning) return;
         this.isRunning = true;
-        console.log("🚀 Воркер активен");
         this.loop();
     },
-    
     async loop() {
         while (this.isRunning) {
-            const accounts = JSON.parse(localStorage.getItem('funpay_accounts') || '[]');
-            for (const acc of accounts) {
-                console.log(`[Worker] Обработка ${acc.name}`);
-                // Automation logic placeholder
-            }
             await new Promise(r => setTimeout(r, 60000));
         }
     }
@@ -580,7 +600,6 @@ window.handleTelegramLogin = async function() {
 
     if (!overlay || !boxStandard || !boxTelegram) return;
 
-    // Show step 2
     boxStandard.style.display = 'none';
     boxTelegram.style.display = 'block';
     codeDisplay.textContent = '...';
@@ -589,52 +608,34 @@ window.handleTelegramLogin = async function() {
     try {
         const res = await fetch(`${API_BASE}/api/auth/request`, { method: 'POST' });
         const data = await res.json();
-        
-        if (!data.code) throw new Error("No code received");
+        if (!data.code) throw new Error("No code");
 
         codeDisplay.textContent = data.code;
         botLink.href = `https://t.me/FunPaySlov_Bot?start=${data.code}`;
 
-        // Clear existing poll
         if (window._authPoll) clearInterval(window._authPoll);
-
         window._authPoll = setInterval(async () => {
             try {
                 const check = await fetch(`${API_BASE}/api/auth/confirm?code=${data.code}`);
                 if (check.ok) {
                     const user = await check.json();
                     clearInterval(window._authPoll);
-                    
-                    // Success!
                     localStorage.setItem('funpay_user', JSON.stringify(user));
                     overlay.style.display = 'none';
-                    
-                    // Alert and Refresh
-                    const name = user.first_name || 'Друг';
-                    alert(`✅ Добро пожаловать, ${name}!`);
+                    alert(`✅ Добро пожаловать, ${user.first_name || 'Друг'}!`);
                     window.location.reload();
                 }
-            } catch (e) {
-                // Ignore network glitches during poll
-            }
+            } catch (e) {}
         }, 2500);
-
     } catch (e) {
-        console.error('Auth error:', e);
+        console.error(e);
         codeDisplay.textContent = 'ERR';
-        codeDisplay.style.color = '#f43f5e';
-
-    // Stop polling if overlay closed
-    const closeBtn = overlay.querySelector('.btn-close-modal-new');
-    if (closeBtn) {
-        closeBtn.onclick = () => {
-            if (pollInterval) clearInterval(pollInterval);
-            overlay.style.display = 'none';
-            if (boxStandard) boxStandard.style.display = 'block';
-            if (boxTelegram) boxTelegram.style.display = 'none';
-        };
-    }
-};
+                this.user = data;
+                localStorage.setItem('funpay_user', JSON.stringify(data));
+                this.updateUI();
+            }
+        } catch (e) { console.warn("Sync failed"); }
+    },
 
 
 window.logout = function() {
