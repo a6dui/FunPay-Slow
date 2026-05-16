@@ -471,52 +471,73 @@ if BOT_TOKEN:
 
         @bot.message_handler(commands=["start"])
         def handle_start(message):
-            uid        = str(message.from_user.id)
-            fname      = message.from_user.first_name or ""
-            uname      = message.from_user.username or ""
-            args       = message.text.split()
-            now        = int(time.time())
+            uid = str(message.from_user.id)
+            fname = message.from_user.first_name or "Друг"
+            uname = message.from_user.username or ""
+            args = message.text.split()
+            now = int(time.time())
 
             # 1. Если это код авторизации (6 цифр)
             if len(args) > 1 and args[1].isdigit() and len(args[1]) == 6:
                 code = args[1]
-                conn = get_db_conn()
-                execute(conn, f"UPDATE auth_tokens SET user_id={P} WHERE code={P} AND expires>{P}", (uid, code, now))
-                
-                ref_code = secrets.token_hex(4).upper()
-                if USE_POSTGRES:
-                    execute(conn,
-                        f"INSERT INTO users (user_id, first_name, username, plan, ref_code, created_at) "
-                        f"VALUES ({P},{P},{P},'none',{P},{P}) ON CONFLICT (user_id) DO UPDATE SET first_name={P}, username={P}",
-                        (uid, fname, uname, ref_code, now, fname, uname)
+                if code in auth_requests:
+                    req = auth_requests[code]
+                    conn = get_db_conn()
+                    # Ищем или создаем юзера
+                    user = fetchone(conn, f"SELECT user_id, ref_code FROM users WHERE user_id={P}", (uid,))
+                    my_ref = user.get("ref_code") if user else secrets.token_hex(4).upper()
+                    
+                    if not user:
+                        if USE_POSTGRES:
+                            execute(conn, f"INSERT INTO users (user_id, first_name, username, plan, ref_code, created_at) VALUES ({P},{P},{P},'none',{P},{P})", (uid, fname, uname, my_ref, now))
+                        else:
+                            execute(conn, f"INSERT INTO users (user_id, first_name, username, plan, ref_code, created_at) VALUES ({P},{P},{P},'none',{P},{P})", (uid, fname, uname, my_ref, now))
+                    
+                    # Подтверждаем запрос
+                    req["confirmed"] = True
+                    req["user_id"] = uid
+                    conn.close()
+                    
+                    bot.send_message(message.chat.id, 
+                        f"✅ <b>Авторизация успешна!</b>\n\n"
+                        f"Вернитесь в браузер — вход в аккаунт <b>{fname}</b> выполнен.\n"
+                        f"Приятного пользования! 🐌"
                     )
-                else:
-                    execute(conn, f"INSERT OR IGNORE INTO users (user_id, first_name, username, plan, ref_code, created_at) VALUES ({P},{P},{P},'none',{P},{P})", (uid, fname, uname, ref_code, now))
-                    execute(conn, f"UPDATE users SET first_name={P}, username={P} WHERE user_id={P}", (fname, uname, uid))
-                conn.close()
+                    return
 
-                bot.send_message(message.chat.id,
-                    f"✅ <b>Авторизация успешна!</b>\n\n"
-                    f"Добро пожаловать, <b>{fname}</b>! 🐌\n"
-                    f"Вернитесь на сайт — страница обновится автоматически."
-                )
-            
-            # 2. Если это реферальная ссылка
-            elif len(args) > 1 and args[1].startswith("ref_"):
+            # 2. Если это реферальная ссылка (ref_XXXX)
+            if len(args) > 1 and args[1].startswith("ref_"):
                 ref_code_in = args[1][4:]
                 conn = get_db_conn()
                 referrer = fetchone(conn, f"SELECT user_id FROM users WHERE ref_code={P}", (ref_code_in,))
                 my_ref = secrets.token_hex(4).upper()
-                if USE_POSTGRES:
-                    execute(conn, f"INSERT INTO users (user_id, first_name, username, plan, ref_code, referrer_id, created_at) VALUES ({P},{P},{P},'none',{P},{P},{P}) ON CONFLICT (user_id) DO NOTHING", (uid, fname, uname, my_ref, referrer.get("user_id"), now))
+                if not referrer:
+                    bot.send_message(message.chat.id, "❌ Реферальный код не найден.")
                 else:
-                    execute(conn, f"INSERT OR IGNORE INTO users (user_id, first_name, username, plan, ref_code, referrer_id, created_at) VALUES ({P},{P},{P},'none',{P},{P},{P})", (uid, fname, uname, my_ref, referrer.get("user_id"), now))
+                    if USE_POSTGRES:
+                        execute(conn, f"INSERT INTO users (user_id, first_name, username, plan, ref_code, referrer_id, created_at) VALUES ({P},{P},{P},'none',{P},{P},{P}) ON CONFLICT (user_id) DO NOTHING", (uid, fname, uname, my_ref, referrer.get("user_id"), now))
+                    else:
+                        execute(conn, f"INSERT OR IGNORE INTO users (user_id, first_name, username, plan, ref_code, referrer_id, created_at) VALUES ({P},{P},{P},'none',{P},{P},{P})", (uid, fname, uname, my_ref, referrer.get("user_id"), now))
+                    bot.send_message(message.chat.id, f"👋 <b>Привет, {fname}!</b>\n\nВы зарегистрированы по реферальной ссылке. Войдите на сайт через «Войти через Telegram».")
                 conn.close()
-                bot.send_message(message.chat.id, f"👋 <b>Привет, {fname}!</b>\n\nВы перешли по реферальной ссылке. Войдите на сайт через кнопку «Войти через Telegram», чтобы начать.")
+                return
 
-            # 3. Обычный старт или повторный запуск
+            # 3. Обычный старт
+            conn = get_db_conn()
+            user = fetchone(conn, f"SELECT plan, balance FROM users WHERE user_id={P}", (uid,))
+            conn.close()
+            
+            if user:
+                bot.send_message(message.chat.id, 
+                    f"🐌 <b>Вы в системе, {fname}!</b>\n\n"
+                    f"🎫 Тариф: <b>{user.get('plan', 'NONE')}</b>\n"
+                    f"💰 Баланс: <b>{user.get('balance', 0)} ₽</b>\n\n"
+                    f"Используйте сайт для управления аккаунтами.",
+                    reply_markup=telebot.types.InlineKeyboardMarkup().add(
+                        telebot.types.InlineKeyboardButton("🌐 Перейти на сайт", url="https://funpay-slow.vercel.app")
+                    )
+                )
             else:
-                conn = get_db_conn()
                 user = fetchone(conn, f"SELECT plan, balance FROM users WHERE user_id={P}", (uid,))
                 conn.close()
                 
