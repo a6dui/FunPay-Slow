@@ -477,65 +477,67 @@ if BOT_TOKEN:
             args       = message.text.split()
             now        = int(time.time())
 
+            # 1. Если это код авторизации (6 цифр)
             if len(args) > 1 and args[1].isdigit() and len(args[1]) == 6:
-                # This is a 6-digit auth code
                 code = args[1]
                 conn = get_db_conn()
-                # Update auth token
-                execute(conn,
-                    f"UPDATE auth_tokens SET user_id={P} WHERE code={P} AND expires>{P}",
-                    (uid, code, now)
-                )
+                execute(conn, f"UPDATE auth_tokens SET user_id={P} WHERE code={P} AND expires>{P}", (uid, code, now))
+                
                 ref_code = secrets.token_hex(4).upper()
                 if USE_POSTGRES:
                     execute(conn,
                         f"INSERT INTO users (user_id, first_name, username, plan, ref_code, created_at) "
-                        f"VALUES ({P},{P},{P},'none',{P},{P}) "
-                        f"ON CONFLICT (user_id) DO UPDATE SET first_name={P}, username={P}",
+                        f"VALUES ({P},{P},{P},'none',{P},{P}) ON CONFLICT (user_id) DO UPDATE SET first_name={P}, username={P}",
                         (uid, fname, uname, ref_code, now, fname, uname)
                     )
                 else:
-                    execute(conn,
-                        f"INSERT OR IGNORE INTO users (user_id, first_name, username, plan, ref_code, created_at) "
-                        f"VALUES ({P},{P},{P},'none',{P},{P})",
-                        (uid, fname, uname, ref_code, now)
-                    )
+                    execute(conn, f"INSERT OR IGNORE INTO users (user_id, first_name, username, plan, ref_code, created_at) VALUES ({P},{P},{P},'none',{P},{P})", (uid, fname, uname, ref_code, now))
                     execute(conn, f"UPDATE users SET first_name={P}, username={P} WHERE user_id={P}", (fname, uname, uid))
                 conn.close()
 
                 bot.send_message(message.chat.id,
-                    f"✅ <b>Вход выполнен!</b>\n\n"
-                    f"Добро пожаловать, <b>{fname}</b>! 🐌\n\n"
-                    f"Вернитесь на сайт — страница обновится автоматически через несколько секунд."
+                    f"✅ <b>Авторизация успешна!</b>\n\n"
+                    f"Добро пожаловать, <b>{fname}</b>! 🐌\n"
+                    f"Вернитесь на сайт — страница обновится автоматически."
                 )
+            
+            # 2. Если это реферальная ссылка
             elif len(args) > 1 and args[1].startswith("ref_"):
-                # Referral link
                 ref_code_in = args[1][4:]
                 conn = get_db_conn()
                 referrer = fetchone(conn, f"SELECT user_id FROM users WHERE ref_code={P}", (ref_code_in,))
                 my_ref = secrets.token_hex(4).upper()
                 if USE_POSTGRES:
-                    execute(conn,
-                        f"INSERT INTO users (user_id, first_name, username, plan, ref_code, referrer_id, created_at) "
-                        f"VALUES ({P},{P},{P},'none',{P},{P},{P}) "
-                        f"ON CONFLICT (user_id) DO NOTHING",
-                        (uid, fname, uname, my_ref, referrer.get("user_id"), now)
+                    execute(conn, f"INSERT INTO users (user_id, first_name, username, plan, ref_code, referrer_id, created_at) VALUES ({P},{P},{P},'none',{P},{P},{P}) ON CONFLICT (user_id) DO NOTHING", (uid, fname, uname, my_ref, referrer.get("user_id"), now))
+                else:
+                    execute(conn, f"INSERT OR IGNORE INTO users (user_id, first_name, username, plan, ref_code, referrer_id, created_at) VALUES ({P},{P},{P},'none',{P},{P},{P})", (uid, fname, uname, my_ref, referrer.get("user_id"), now))
+                conn.close()
+                bot.send_message(message.chat.id, f"👋 <b>Привет, {fname}!</b>\n\nВы перешли по реферальной ссылке. Войдите на сайт через кнопку «Войти через Telegram», чтобы начать.")
+
+            # 3. Обычный старт или повторный запуск
+            else:
+                conn = get_db_conn()
+                user = fetchone(conn, f"SELECT plan, balance FROM users WHERE user_id={P}", (uid,))
+                conn.close()
+                
+                if user:
+                    bot.send_message(message.chat.id, 
+                        f"🐌 <b>Вы уже в системе, {fname}!</b>\n\n"
+                        f"🎫 Тариф: <b>{user.get('plan', 'NONE')}</b>\n"
+                        f"💰 Баланс: <b>{user.get('balance', 0)} ₽</b>\n\n"
+                        f"Чтобы войти в другой аккаунт на сайте, нажмите там «Выйти» и снова «Войти через Telegram».",
+                        reply_markup=telebot.types.InlineKeyboardMarkup().add(
+                            telebot.types.InlineKeyboardButton("🌐 Перейти на сайт", url="https://funpay-slow.vercel.app")
+                        )
                     )
                 else:
-                    execute(conn,
-                        f"INSERT OR IGNORE INTO users (user_id, first_name, username, plan, ref_code, referrer_id, created_at) "
-                        f"VALUES ({P},{P},{P},'none',{P},{P},{P})",
-                        (uid, fname, uname, my_ref, referrer.get("user_id"), now)
+                    bot.send_message(message.chat.id,
+                        f"👋 <b>FunPay Slow Bot</b>\n\n"
+                        f"Чтобы войти в свой профиль на сайте:\n"
+                        f"1. Нажмите кнопку <b>«Войти через Telegram»</b> на сайте.\n"
+                        f"2. Бот пришлет вам персональную ссылку.\n\n"
+                        f"Ждем вас! 🐌"
                     )
-                conn.close()
-                bot.send_message(message.chat.id,
-                    f"👋 <b>Привет, {fname}!</b>\n\nЗарегистрируйтесь на сайте, чтобы начать работу."
-                )
-            else:
-                bot.send_message(message.chat.id,
-                    f"👋 <b>FunPay Slow Bot</b>\n\n"
-                    f"Для входа на сайт нажмите <b>«Войти через Telegram»</b> и введите код в этот чат."
-                )
 
         @bot.message_handler(commands=["status"])
         def handle_status(message):

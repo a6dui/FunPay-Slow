@@ -162,6 +162,7 @@
     <!-- Login Overlay -->
     <div id="login-overlay" class="login-overlay" style="display: none;">
         <div class="login-box" id="login-box-standard">
+            <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'">✕</button>
             <div class="login-header">
                 <div class="login-logo">🐌</div>
                 <h2>Войти в FunPay Slow</h2>
@@ -175,14 +176,14 @@
             <div class="login-footer">
                 Нажимая «Войти», вы соглашаетесь с условиями использования
             </div>
-            <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'">&times;</button>
         </div>
 
         <div class="login-box" id="login-box-telegram" style="display: none;">
+            <button class="btn-close-login" onclick="document.getElementById('login-overlay').style.display='none'; if(window._authPoll) clearInterval(window._authPoll);">✕</button>
             <div class="login-header">
-                <div class="login-logo">🐌</div>
-                <h2>Авторизация Telegram</h2>
-                <p>Отправьте код нашему боту</p>
+                <div class="login-logo">🔐</div>
+                <h2>Код для входа</h2>
+                <p>Отправьте этот код нашему боту</p>
             </div>
             <div class="tg-auth-container">
                 <div class="tg-auth-code" id="tg-auth-code">------</div>

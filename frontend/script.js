@@ -572,80 +572,57 @@ window.FunPayWorker = {
 
 // --- Auth Logic ---
 window.handleTelegramLogin = async function() {
-    const overlay     = document.getElementById('login-overlay');
+    const overlay = document.getElementById('login-overlay');
     const boxStandard = document.getElementById('login-box-standard');
     const boxTelegram = document.getElementById('login-box-telegram');
     const codeDisplay = document.getElementById('tg-auth-code');
-    const botLink     = document.getElementById('link-to-bot');
+    const botLink = document.getElementById('link-to-bot');
 
-    if (!overlay || !boxTelegram || !codeDisplay) {
-        alert("Ошибка интерфейса. Обновите страницу.");
-        return;
-    }
+    if (!overlay || !boxStandard || !boxTelegram) return;
 
-    // Show Telegram step
-    overlay.style.display    = 'flex';
-    if (boxStandard) boxStandard.style.display = 'none';
+    // Show step 2
+    boxStandard.style.display = 'none';
     boxTelegram.style.display = 'block';
-    codeDisplay.textContent   = '...';
-    if (botLink) botLink.href = '#';
-
-    let pollInterval = null;
+    codeDisplay.textContent = '...';
+    codeDisplay.style.color = '#10b981';
 
     try {
-        const res = await fetch(`${API_BASE}/api/auth/generate`);
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        const { code, token } = await res.json();
+        const res = await fetch(`${API_BASE}/api/auth/request`, { method: 'POST' });
+        const data = await res.json();
+        
+        if (!data.code) throw new Error("No code received");
 
-        codeDisplay.textContent = code;
-        if (botLink) botLink.href = `https://t.me/FunPaySlov_Bot?start=${code}`;
+        codeDisplay.textContent = data.code;
+        botLink.href = `https://t.me/FunPaySlov_Bot?start=${data.code}`;
 
-        let attempts = 0;
-        const maxAttempts = 100; // ~5 min
+        // Clear existing poll
+        if (window._authPoll) clearInterval(window._authPoll);
 
-        pollInterval = setInterval(async () => {
-            attempts++;
-            if (attempts > maxAttempts) {
-                clearInterval(pollInterval);
-                codeDisplay.textContent = '⏰';
-                codeDisplay.style.color = '#f43f5e';
-                return;
-            }
-
+        window._authPoll = setInterval(async () => {
             try {
-                const check = await fetch(`${API_BASE}/api/auth/check/${token}`);
+                const check = await fetch(`${API_BASE}/api/auth/confirm?code=${data.code}`);
                 if (check.ok) {
-                    clearInterval(pollInterval);
-                    const userData = await check.json();
-                    localStorage.setItem('funpay_user', JSON.stringify(userData));
+                    const user = await check.json();
+                    clearInterval(window._authPoll);
+                    
+                    // Success!
+                    localStorage.setItem('funpay_user', JSON.stringify(user));
                     overlay.style.display = 'none';
-                    window.App.user = userData;
-                    window.App.updateUI();
-                    window.App.syncUser();
-                    // If on profile page, reload so all tabs work
-                    if (window.location.pathname.includes('profile')) {
-                        window.location.reload();
-                    }
+                    
+                    // Alert and Refresh
+                    const name = user.first_name || 'Друг';
+                    alert(`✅ Добро пожаловать, ${name}!`);
+                    window.location.reload();
                 }
-                // 404 = still waiting — ignore and keep polling
             } catch (e) {
-                // Network error — keep trying
-                console.warn('Poll error:', e);
+                // Ignore network glitches during poll
             }
-        }, 3000);
+        }, 2500);
 
     } catch (e) {
         console.error('Auth error:', e);
-        codeDisplay.textContent = '❌';
+        codeDisplay.textContent = 'ERR';
         codeDisplay.style.color = '#f43f5e';
-        if (boxStandard) {
-            setTimeout(() => {
-                if (boxStandard) boxStandard.style.display = 'block';
-                boxTelegram.style.display = 'none';
-            }, 2000);
-        }
-        alert("Ошибка связи с сервером. Убедитесь что Render запущен.");
-    }
 
     // Stop polling if overlay closed
     const closeBtn = overlay.querySelector('.btn-close-modal-new');

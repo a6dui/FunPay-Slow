@@ -1271,71 +1271,181 @@ footer {
     .hero-main-title { font-size: 2.8rem; }
     .section-title { font-size: 2.5rem; }
 }
-/* --- LOGIN OVERLAY --- */
-#login-overlay {
+/* ─── LOGIN OVERLAY — PREMIUM REDESIGN ─────────────────────── */
+#login-overlay,
+.login-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(20px);
-    z-index: 9999;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 99999;
     display: none;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
 }
+
 .login-box {
     position: relative;
-    background: rgba(15, 15, 15, 0.7);
-    backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 3rem;
-    border-radius: 28px;
+    background: linear-gradient(145deg, #0d0d0f, #111114);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 3rem 2.8rem;
+    border-radius: 32px;
     text-align: center;
     width: 100%;
-    max-width: 440px;
-    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+    max-width: 420px;
+    box-shadow:
+        0 40px 80px -20px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255,255,255,0.04),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+    animation: loginModalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.close-login-btn {
+
+@keyframes loginModalIn {
+    from { opacity: 0; transform: scale(0.88) translateY(24px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+/* Glowing top border accent */
+.login-box::before {
+    content: '';
     position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 32px;
-    height: 32px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.2rem;
-    line-height: 1;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16,185,129,0.6), transparent);
+    border-radius: 100px;
 }
-.close-login-btn:hover {
-    background: rgba(255,255,255,0.1);
-    color: white;
+
+.login-header { margin-bottom: 2rem; }
+
+.login-logo {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04));
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 8px 32px rgba(16,185,129,0.1);
+}
+
+.login-header h2 {
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.login-header p {
+    font-size: 0.92rem;
+    color: #555;
+    margin: 0;
+}
+
+.login-methods { margin-bottom: 1.8rem; }
+
+.btn-login-method.telegram,
+#btn-telegram-login,
+#btn-telegram-login-injected {
+    width: 100%;
+    padding: 1.1rem 1.5rem;
+    background: linear-gradient(135deg, #0088cc, #006eaa);
+    border: none;
+    border-radius: 18px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px;
+    letter-spacing: 0.2px;
+    box-shadow: 0 12px 30px rgba(0, 136, 204, 0.3), 0 0 0 1px rgba(0,136,204,0.2);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: inherit;
+}
+
+.btn-login-method.telegram:hover,
+#btn-telegram-login:hover,
+#btn-telegram-login-injected:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgba(0, 136, 204, 0.4), 0 0 0 1px rgba(0,136,204,0.3);
+    background: linear-gradient(135deg, #009de0, #0080cc);
+}
+
+.login-footer {
+    font-size: 0.75rem;
+    color: #2a2a2a;
+    line-height: 1.5;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Close button */
+.btn-close-login {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #444;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.btn-close-login:hover {
+    background: rgba(244,63,94,0.15);
+    border-color: rgba(244,63,94,0.3);
+    color: #f43f5e;
     transform: rotate(90deg);
 }
-.btn-telegram {
-    background: #0088cc;
-    color: white;
-    border: none;
-    padding: 1.1rem 2rem;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
-    transition: 0.3s;
+
+/* Telegram auth step */
+.tg-auth-container { text-align: center; }
+
+.tg-auth-code {
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: 10px;
+    color: #10b981;
+    background: rgba(16,185,129,0.04);
+    border: 1px dashed rgba(16,185,129,0.25);
+    border-radius: 18px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 20px rgba(16,185,129,0.4);
 }
-.btn-telegram:hover {
-    background: #0099e6;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
+
+.tg-auth-hint {
+    color: #444;
+    font-size: 0.88rem;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
 }
+
+/* Polling spinner dots */
+.auth-waiting {
+    display: flex; align-items: center; justify-content: center;
+    gap: 5px; margin-top: 1.2rem; color: #333; font-size: 0.8rem;
+}
+.auth-waiting span {
+    width: 5px; height: 5px; background: #10b981;
+    border-radius: 50%; animation: authPulse 1.4s ease-in-out infinite;
+}
+.auth-waiting span:nth-child(2) { animation-delay: 0.2s; }
+.auth-waiting span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes authPulse {
+    0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1.2); }
+}
+
+
 
 /* --- Update Notification --- */
 .update-notification {
