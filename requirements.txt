@@ -4,3 +4,4 @@ httpx
 pyTelegramBotAPI
 pydantic
 python-multipart
+psycopg2-binary
